@@ -25,7 +25,9 @@
 # 若./.git是文件，则以该文件内容（一般会是绝对路径）为repo
 git [--git-dir=<repo>] [--work-tree=<worktree>] <command> [args]
 # 大部分命令的参数列表遵循以下格式：
-# object是对象的表达式（一般由引用、对象SHA1、^、~等构成）
+# object是对象的表达式（一般由引用、对象SHA1、^、~、:等构成）
 # path是以路径
-git <command> [options] <object> -- <path>
+# --在不引起歧义的情况下可以省略
+# 注意：是否存在<path>参数可能对语义有本质的影响
+git <command> [options] [<object>] -- [<path>]
 ```

@@ -76,12 +76,17 @@ git status
 
 ### Lv3
 
-日常创建repo、选配worktree、把repo放在worktree里面的方式为：
+日常创建repo、不选配worktree：
+```bash
+git init --bare the-repo.git
+```
+
+日常创建repo、选配worktree、把repo放在worktree里面：
 ```bash
 git init default-tree
 ```
 
-日常创建repo、选配worktree但不把repo放在worktree里面的方式为：
+日常创建repo、选配worktree但不把repo放在worktree里面：
 ```bash
 git init --separate-git-dir the-repo.git default-tree
 ```
@@ -168,4 +173,14 @@ rm another-tree/.git
 # 注意：此处填写小repo，甚至填写另一个小repo都是可以的
 git --git-dir=the-repo.git worktree prune
 ```
+
+## 总结
+
+（以下均为Lv3）
+- `git init --bare <repo>`
+- `git init --separate-git-dir <repo> <worktree>`
+- `git init <worktree>` - repo在`<worktree>/.git`
+- `git worktree list`
+- `git worktree add`
+- `git worktree prune`
 
