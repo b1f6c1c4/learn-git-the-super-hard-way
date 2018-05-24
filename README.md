@@ -1,5 +1,16 @@
 # learn-git-the-super-hard-way
 
+## 目录
+
+0. 创建工作环境（手工`git init`）
+1. 直接操纵对象（手工`git commit`）
+2. 直接操纵引用（手工`git branch`）
+3. TODO: 直接操纵索引（手工`git add`）
+4. TODO: 直接操纵远程（手工`git pull`）
+5. TODO: 直接操纵commit（手工`git rebase`）
+6. TODO: 单repo多分支工作流
+7. TODO: 配置和alias
+
 ## 基本约定
 
 为了更为本质地了解Git，本文会对同一种操作介绍多种不同的实现方法。
@@ -25,7 +36,7 @@
 # 若./.git是文件，则以该文件内容（一般会是绝对路径）为repo
 git [--git-dir=<repo>] [--work-tree=<worktree>] <command> [args]
 # 大部分命令的参数列表遵循以下格式：
-# object是对象的表达式（一般由引用、对象SHA1、^、~、:等构成）
+# object是对象的表达式，一般由引用、对象SHA1、^、~、:等构成，完整列表参见`git rev-parse`（Lv2）
 # path是以路径
 # --在不引起歧义的情况下可以省略
 # 注意：是否存在<path>参数可能对语义有本质的影响
