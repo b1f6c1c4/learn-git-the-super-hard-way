@@ -109,9 +109,11 @@ git read-tree --prefix=dir/fn/ 5841
 ```
 
 - Lv3
-*注意：该命令同时更新index和worktree*
 ```bash
-git checkout -f 5841 -- .
+# 整个index替换掉
+git reset 5841 -- .
+# 替换掉某个文件夹
+git reset 5841 -- dir/
 ```
 
 ## 利用index更新worktree
@@ -172,5 +174,9 @@ git commit --allow-empty -m 'The message'
   - `git add -f -- <path>`
   - `git rm --cached -- <path>`
   - `git mv` & `git cp`
+  - `git reset [<tree-ish>] -- <path>` - 留空`<tree-ish>`表示HEAD
   - `git checkout -f -- <path>`
+  - `git commit`
+
+关于`git reset`和`git checkout`的更多用法，见第4章。
 

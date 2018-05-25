@@ -39,7 +39,7 @@
 1. 直接操纵对象（手工`git commit`）
 2. 直接操纵引用（手工`git branch`）
 3. 直接操纵索引（手工`git add`）
-4. TODO: 直接操纵HEAD（`git checkout`和`git reset`）
+4. 直接操纵HEAD（`git checkout`和`git reset`）
 5. TODO: 直接操纵远程（手工`git pull`）
 6. TODO: 直接操纵commit（手工`git rebase`）
 7. TODO: 单repo多分支工作流

@@ -149,8 +149,12 @@ git --git-dir=the-repo.git update-ref --no-deref refs/heads/br2 f9ab
 - Lv0
   - 用来看可以，但是进行修改会非常危险
 - Lv2
+  - `git rev-parse <object>`
   - `git update-ref --no-deref <ref> [-d|<new>]` - 修改`<ref>`
   - `git update-ref <ref> [-d|<new>]` - 修改`<ref>`或者其引用的引用
+  - `git symbolic-ref <ref>`
+  - `git symbolic-ref --delete <ref>`
+  - `git symbolic-ref <from> <to>`
 - Lv3
   - `git branch -f <branch> <commit-ish>` - 只能操纵`refs/heads/s`
   - `git branch -D <branch>` - 只能操纵`refs/heads/s`
