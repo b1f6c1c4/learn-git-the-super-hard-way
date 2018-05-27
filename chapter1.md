@@ -68,12 +68,23 @@ git --git-dir=the-repo.git show ce00
 ## 创建tree
 
 - Lv1
+注意：要先对文件名排序，再使用`git hash-object`
 ```bash
 (printf '100644 name.ext\x00';
 echo '0: ce013625030ba8dba906f756967f9e9ca394464a' | xxd -rp -c 256;
 printf '100755 name2.ext\x00';
 echo '0: ce013625030ba8dba906f756967f9e9ca394464a' | xxd -rp -c 256) \
 | git --git-dir=the-repo.git hash-object -t tree --stdin -w
+# 58417991a0e30203e7e9b938f62a9a6f9ce10a9a
+```
+
+- Lv2
+*注意：SHA1和文件名之间必须用tab分隔*，在命令行里输入tab的方法是`<Ctrl-v><Tab>`
+```bash
+git mktree --missing <<EOF
+100644 blob ce013625030ba8dba906f756967f9e9ca394464a	name.ext
+100755 blob ce013625030ba8dba906f756967f9e9ca394464a	name2.ext
+EOF
 # 58417991a0e30203e7e9b938f62a9a6f9ce10a9a
 ```
 
@@ -301,6 +312,7 @@ git --git-dir=the-repo.git show 9cb6
 - Lv1
   - `git hash-object -t <type> [--stdin|<file>] -w` - 创建对象
 - Lv2
+  - `git mktree --missing` - 创建tree
   - `git commit-tree <tree> -m <message> [-p <parent>]*` - 创建commit
   - `git cat-file <type> <SHA1>` - 查看blob和commit
   - `git ls-tree <SHA1> -- [<path>]` - 查看tree
