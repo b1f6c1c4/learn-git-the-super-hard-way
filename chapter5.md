@@ -116,21 +116,231 @@ git unpack-objects < ../somewhere-else/prefix-a451aab5615fb6d97e2ecb337b7f1d783e
 # Unpacking objects: 100% (5/5), done.
 ```
 
-## 跨域对象传输
+## 跨库直接对象传输
 
-TODO
+首先创建另一个repo：
+```bash
+mkdir -p ../another-repo.git/objects ../another-repo.git/refs
+echo 'ref: refs/heads/master' > ../another-repo.git/HEAD
+# 允许直接传输对象
+git config uploadpack.allowAnySHA1InWant true
+```
 
-## 跨域引用传输
+直接索要对象（若不加`--keep`则直接解Packfile）：
+```bash
+git --git-dir=../another-repo.git fetch-pack --keep ../the-repo.git 187e91589a3f4f248f4cc8b1a1eca65b5161cc7b
+# remote: Counting objects: 5, done.
+# remote: Compressing objects: 100% (2/2), done.
+# remote: Total 5 (delta 0), reused 0 (delta 0)
+# Receiving objects: 100% (5/5), done.
+# keep    a451aab5615fb6d97e2ecb337b7f1d783ed66a70
+# 187e91589a3f4f248f4cc8b1a1eca65b5161cc7b 187e91589a3f4f248f4cc8b1a1eca65b5161cc7b
+```
+注意：`../the-repo.git`还可以是URL，用于跨域对象传输
 
-TODO
+## 跨库直接引用传输
+
+创建引用：
+```bash
+git hash-object -t commit --stdin -w <<EOF
+tree 187e91589a3f4f248f4cc8b1a1eca65b5161cc7b
+author b1f6c1c4 <b1f6c1c4@gmail.com> 1514736000 +0800
+committer b1f6c1c4 <b1f6c1c4@gmail.com> 1514736000 +0800
+
+The commit message
+EOF
+# bb6d205106a1104778884986d8e3594f35170fae
+git update-ref refs/heads/itst bb6d
+```
+
+直接索要引用及其对象：
+```bash
+git --git-dir=../another-repo.git fetch-pack ../the-repo.git refs/heads/itst
+# remote: Counting objects: 6, done.
+# remote: Compressing objects: 100% (3/3), done.
+# remote: Total 6 (delta 0), reused 0 (delta 0)
+# Unpacking objects: 100% (6/6), done.
+# bb6d205106a1104778884986d8e3594f35170fae refs/heads/itst
+```
+
+直接推送引用及其对象：
+```bash
+git send-pack --force ../another-repo.git 187e91589a3f4f248f4cc8b1a1eca65b5161cc7b
+# git send-pack --force ../another-repo.git refs/heads/itst
+# Counting objects: 6, done.
+# Delta compression using up to 2 threads.
+# Compressing objects: 100% (3/3), done.
+# Writing objects: 100% (6/6), 343 bytes | 343.00 KiB/s, done.
+# Total 6 (delta 0), reused 0 (delta 0)
+# To ../another-repo.git
+#  * [new branch]      itst -> itst
+```
+
+## 跨库间接传输
+
+跨域但无法建立网络连接时，先创建bundle：
+```bash
+git bundle create ../the-bundle refs/heads/itst
+# Counting objects: 6, done.
+# Delta compression using up to 2 threads.
+# Compressing objects: 100% (3/3), done.
+# Writing objects: 100% (6/6), 343 bytes | 343.00 KiB/s, done.
+# Total 6 (delta 0), reused 0 (delta 0)
+```
+再解bundle：
+```bash
+git --git-dir=../another-repo.git bundle unbundle ../the-bundle
+# bb6d205106a1104778884986d8e3594f35170fae refs/heads/itst
+```
 
 ## Lv3命令
 
-TODO
+首先用Lv0命令修改设置，以讨论设置对Lv3的影响。
 
-### 总结
+### 指明remote的`git push`和`git fetch`
 
-- Packfile
-  - `git rev-list --objects <object> | git pack-objects <path-prefix>`
-  - `git unpack-objects`
+裸remote：
+```bash
+cat <<EOF >../the-repo.git/config
+[remote "another"]
+  url = ../another-repo.git
+EOF
+git push another itst
+# Counting objects: 6, done.
+# Delta compression using up to 2 threads.
+# Compressing objects: 100% (3/3), done.
+# Writing objects: 100% (6/6), 343 bytes | 343.00 KiB/s, done.
+# Total 6 (delta 0), reused 0 (delta 0)
+# To ../another-repo.git
+#  * [new branch]      itst -> itst
+git fetch another itst
+# From ../another-repo
+#  * branch            itst       -> FETCH_HEAD
+git fetch another itst:tsts
+# From ../another-repo
+#  * [new branch]      itst       -> tsts
+```
+
+带默认fetch的remote：
+```bash
+cat <<EOF >../the-repo.git/config
+[remote "another"]
+  url = ../another-repo.git
+  fetch = +refs/heads/*:refs/heads/abc/*
+  fetch = +refs/heads/*:refs/heads/def/*
+EOF
+git fetch another itst
+# From ../another-repo
+#  * branch            itst       -> FETCH_HEAD
+#  * [new branch]      itst       -> abc/itst
+#  * [new branch]      itst       -> def/itst
+```
+
+强制全盘push：
+```bash
+cat <<EOF >../the-repo.git/config
+[remote "another"]
+  url = ../another-repo.git
+  mirror = true
+EOF
+git push another itst
+# error: --mirror can't be combined with refspecs
+git push another
+# ......
+# To ../another-repo.git/
+#  * [new branch]      abc/itst -> abc/itst
+#  * [new branch]      def/itst -> def/itst
+#  * [new branch]      master -> master
+#  * [new branch]      tsts -> tsts
+# ......
+```
+
+### 未指明remote的`git push`和`git fetch`
+
+```bash
+cat <<EOF >../the-repo.git/config
+[remote "another"]
+  url = ../another-repo.git
+[branch "itst"]
+  remote = another
+  merge = refs/heads/itst
+EOF
+git symbolic-ref HEAD refs/heads/itst
+# git push --verbose
+# Pushing to ../another-repo.git
+# To ../another-repo.git
+#  = [up to date]      itst -> itst
+# Everything up-to-date
+# 与git fetch无关
+```
+
+```bash
+cat <<EOF >../the-repo.git/config
+[remote "another"]
+  url = ../another-repo.git
+  fetch = +refs/heads/*:refs/remotes/another/*
+[branch "itst"]
+  remote = another
+EOF
+git symbolic-ref HEAD refs/heads/itst
+git fetch --verbose
+# From ../another-repo
+#  = [up to date]      itst       -> another/itst
+# 与git push无关
+```
+
+### 使用Lv3命令修改设置
+
+```bash
+git remote add another ../another-repo.git
+cat ../the-repo.git/config
+# [remote "another"]
+#         url = ../another-repo.git/
+#         fetch = +refs/heads/*:refs/remotes/another/*
+git remote add another --mirror=fetch ../another-repo.git
+cat ../the-repo.git/config
+# [remote "another"]
+#         url = ../another-repo.git/
+#         fetch = +refs/*:refs/*
+git remote add another --mirror=push ../another-repo.git
+cat ../the-repo.git/config
+# [remote "another"]
+#         url = ../another-repo.git/
+#         mirror = true
+git push -u another itst
+cat ../the-repo.git/config
+# ......
+# [branch "itst"]
+#         remote = another
+#         merge = refs/heads/itst
+```
+
+### 关于`git pull`
+
+`git pull`基本上是先`git fetch`再`git merge FETCH_HEAD`；
+`git pull --rebase`基本上是先`git fetch`再`git rebase FETCH_HEAD`。
+由于这个命令高度不可控，非常不推荐使用。
+
+## 总结
+
+- Lv2
+  - Packfile
+    - `git rev-list --objects <object> | git pack-objects <path-prefix>`
+    - `git unpack-objects`
+  - Bundle
+    - `git bundle create <file> <refs>*`
+    - `git bundle unbundle <file>`
+  - 传输
+    - `git fetch-pack <url> <hash>*` - 需要`git config uploadpack.allowAnySHA1InWant true`
+    - `git fetch-pack <url> <ref>*`
+    - `git send-pack --force <url> <local-ref>:<remote-ref>*`
+- Lv3
+  - 配置
+    - `git remote add <remote> [--mirror=push|fetch] <url>`
+    - `git push -u <remote> <ref>`
+  - 传输
+    - `git push <remote> <local-ref>:<remote-ref>`
+    - `git fetch <remote> <remote-ref>:<local-ref>`
+  - 不推荐使用的邪恶命令
+    - `git pull [--rebase]`
 
