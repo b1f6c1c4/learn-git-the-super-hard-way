@@ -41,9 +41,10 @@
 3. 直接操纵索引（手工`git add`）
 4. 直接操纵HEAD（`git checkout`和`git reset`）
 5. 直接操纵远程（手工`git pull`）
-6. WORKING: 直接操纵commit（`git diff`、`git merge`、`git rebase`）
-7. TODO: 单repo多分支工作流
-8. TODO: 配置和alias
+6. 直接操纵merge（手工`git diff`和`git merge`）
+7. TODO: 直接操纵commit（手工`git rebase`）
+8. TODO: 单repo多分支工作流
+9. TODO: 配置和alias
 
 ## 基本约定
 

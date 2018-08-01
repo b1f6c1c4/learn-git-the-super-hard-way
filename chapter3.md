@@ -6,6 +6,7 @@ Git索引位于`<repo>/index`，本质是一个复杂的二进制文件。
 具体格式参见[这里](https://github.com/git/git/blob/master/Documentation/technical/index-format.txt)，大概包括以下内容：
 - 路径和文件名
 - mode
+- stage数（第6章讨论merge时会用到，正常情况为0）
 - 修改时间
 - 文件大小
 - （其他标识文件唯一性的信息）
@@ -79,6 +80,7 @@ Lv3方法，使用`git cp`不仅复制了index还复制了worktree里的文件
 ## 查看index
 
 - Lv2
+（其中0为stage数，正常情况为0）
 ```bash
 git ls-files -s
 # 100644 d95f3ad14dee633a758d2e331151e950dd13e4ed 0       dir/fn
@@ -123,11 +125,11 @@ git reset 5841 -- dir/
 - Lv2
 ```bash
 # 整个worktree替换掉
-git checkout-index -f -a
+git checkout-index -fu -a
 # 全部加前缀（不必是文件夹路径）
-git checkout-index --prefix -f -a
+git checkout-index --prefix -fu -a
 # 只有一部分文件
-git checkout-index -f -- dir/fn
+git checkout-index -fu -- dir/fn
 ```
 
 - Lv3
@@ -149,6 +151,7 @@ git write-tree
 git write-tree --prefix=dir/
 # 264fb87379112c8d2b5b04f91fefc48e25959206
 ```
+注意：当存在非0的stage数时（一般是由`git read-tree -m`导致的，见第6章），`git write-tree`会失败
 
 - Lv3
 注意：`git commit`创建tree并创建commit
@@ -163,8 +166,8 @@ git commit --allow-empty -m 'The message'
 - 不常用Lv2
   - `git update-index --add [--info-only] -- <path>`
   - `git update-index --delete -- <path>`
-  - `git checkout-index -f [--prefix=<pf>] -a`
-  - `git checkout-index -f [--prefix=<pf>] -- <path>`
+  - `git checkout-index -fu [--prefix=<pf>] -a`
+  - `git checkout-index -fu [--prefix=<pf>] -- <path>`
 - 常用Lv2
   - `git ls-files -s`
   - `git ls-files -s -- <path>`
