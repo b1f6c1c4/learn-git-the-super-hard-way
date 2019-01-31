@@ -43,7 +43,7 @@
 5. 直接操纵远程（手工`git pull`）
 6. 直接操纵merge（手工`git diff`和`git merge`）
 7. 直接操纵commit（手工`git rebase`）
-8. TODO: 单repo多分支工作流
+8. 单repo多分支工作流
 9. TODO: 配置和alias
 
 ## 基本约定
