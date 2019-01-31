@@ -250,7 +250,7 @@ master之于component，就是component之于doc；
 
 一些诡异的情况下subtree无法完整地复制doc那边的整个tree的情况，
 比如删掉的文件还在、新添加的文件没有出现等等。
-建议`git rm -rf`全部删光在用`git read-tree`弄回来。
+参考第6章。
 
 #### 我应该在哪里build
 

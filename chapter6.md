@@ -526,14 +526,14 @@ alias.mnfnc=merge --no-ff --no-commit
 
 ## Lv5
 
-有一类merge情况是，需要用其他分支 *完全取代* 当前分支的某一目录。
+有一类merge情况是，需要用其他分支 *完全取代* 当前分支的某一目录。（第8章整章建立在此基础之上）
 然而，即便`git merge --no-ff -s subtree -Xsubtree=<prefix>`有时也会出错（毕竟是`git read-tree -m`）。
 
 采用以下脚本即可解决：
 ```bash
 function git-mnfss() {
   git rm --cached -r -- $1
-  git read-tree --prefix $1 $1
+  git read-tree --prefix $1/ $1
   git checkout-index -fua
   git clean -f -- $1
   git reset --soft $(echo "Merge branch $1" | git commit-tree $(git write-tree) -p HEAD -p $1)
