@@ -1,10 +1,11 @@
-# Professional git cheatsheet
+# learn git the super hard way cheatsheet
 
 ## 操纵repo（第0章）
 
-- `git init --bare <repo>`
-- `git init [--separate-git-dir <repo>] <worktree>`
-- `git worktree list|add|prune`
+- Lv3
+  - `git init --bare <repo>`
+  - `git init [--separate-git-dir <repo>] <worktree>`
+  - `git worktree list|add|prune`
 
 ## 操纵对象（第1章）
 
@@ -34,7 +35,7 @@
   - `git branch -f <branch> <commit-ish>` - 只能操纵`refs/heads/s`
   - `git branch -D <branch>` - 只能操纵`refs/heads/s`
 
-## 操纵index（第3章）
+## 操纵索引（第3章）
 
 - Lv1
   - `git update-index --add --cacheinfo <mode>,<SHA1>,<path>`
@@ -75,7 +76,8 @@
   - `git reset HEAD -- .` - 根据HEAD修改index，见第3章
   - `git checkout-index -f -a` - 修改worktree
 
-操纵remote（第5章）
+## 操纵远程（第5章）
+
 - Lv2
   - Packfile
     - `git rev-list --objects <object> | git pack-objects <path-prefix>`
@@ -123,7 +125,7 @@
     - `git merge -s recursive [--no-ff] [--no-commit] B`
     - `git merge -s subtree [--no-ff] [--no-commit] B`
 
-## 操纵rebase（第7章）
+## 操纵commit（第7章）
 
 - Lv2
   - `git cherry-pick --keep-redundant-commits <commit-ish>...`
