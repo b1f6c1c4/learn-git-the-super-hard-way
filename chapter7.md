@@ -227,26 +227,28 @@ git reset --soft 1a1e0cc5
 
 为了更方便地执行大规模commit复制，`git rebase`应运而生。
 基本用法是：
-- `git rebase --no-ff --keep-empty [-i] [--onto <newbase>] [<upstream> [<branch>]]`
+- `git rebase [--no-ff] --keep-empty [-i] [--onto <newbase>] [<upstream> [<branch>]]`
   - 若省略`--onto`，则`<newbase>=<upstream>`
   - 若省略`<branch>`，则为`git symbolic-ref HEAD`
   - 若省略`<upsteram>`，则为`<branch>`的默认remote
-- `git rebase --no-ff --keep-empty [-i] --onto <newbase> --root [<branch>]`
+- `git rebase [--no-ff] --keep-empty [-i] --onto <newbase> --root [<branch>]`
   - 若省略`<branch>`，则为`git symbolic-ref HEAD`
-- `git rebase --no-ff --keep-empty [-i] --root [<branch>]`
+- `git rebase [--no-ff] --keep-empty [-i] --root [<branch>]`
   - 若省略`<branch>`，则为`git symbolic-ref HEAD`
 
 第一种rebase是把upsteram到branch的所有逻辑修改（选择性地）应用到newbase上。
 依次执行以下命令：
-* `git rev-list ^<upstream> ^<newbase> <branch> > git-rebase-todo`
+* `git rev-list ^<upstream> <branch> > git-rebase-todo`
 * `vim git-rebase-todo`
 * `git update-ref <branch> <newbase>`
 * `git symbolic-ref HEAD <branch>`
 * `git reset --hard`
 * 根据todo文件的内容，对每一个非drop项执行：
   * `git read-tree -m <commit>^ <commit>`
+  * `git checkout-index -fua`
   * pick项：
-    * `git commit-tree $(git write-tree) -p HEAD`
+    * 如果没有`--no-ff`且`<commit>`以HEAD为parent，则`git reset --hard <commit>`
+    * 不然，`git commit-tree $(git write-tree) -p HEAD`
   * squash和fixup项：
     * `git commit-tree $(git write-tree) -p HEAD~`
   * `git reset --soft <new-commit>`
@@ -260,8 +262,10 @@ git reset --soft 1a1e0cc5
 * `git reset --hard`
 * 根据todo文件的内容，对每一个非drop项执行：
   * `git read-tree -m <commit>^ <commit>`
+  * `git checkout-index -fua`
   * pick项：
-    * `git commit-tree $(git write-tree) -p HEAD`
+    * 如果没有`--no-ff`且`<commit>`以HEAD为parent，则`git reset --hard <commit>`
+    * 不然，`git commit-tree $(git write-tree) -p HEAD`
   * squash和fixup项：
     * `git commit-tree $(git write-tree) -p HEAD~`
   * `git reset --soft <new-commit>`
@@ -274,13 +278,16 @@ git reset --soft 1a1e0cc5
 * `git rm -rf .`
 * 根据todo文件的内容，对第一个非drop项执行：
   * `git read-tree -m <commit>^ <commit>`
+  * `git checkout-index -fua`
   * pick项：
-    * `git commit-tree $(git write-tree)`
+    * 如果没有`--no-ff`且`<commit>`没有parent，则`git reset --hard <commit>`
+    * 不然，`git commit-tree $(git write-tree)`
   * `git reset --soft <new-commit>`
 * 根据todo文件的内容，对其余每一个非drop项执行：
   * `git read-tree -m <commit>^ <commit>`
   * pick项：
-    * `git commit-tree $(git write-tree) -p HEAD`
+    * 如果没有`--no-ff`且`<commit>`以HEAD为parent，则`git reset --hard <commit>`
+    * 不然，`git commit-tree $(git write-tree) -p HEAD`
   * squash和fixup项：
     * `git commit-tree $(git write-tree) -p HEAD~`
   * `git reset --soft <new-commit>`
@@ -384,7 +391,48 @@ git log --oneline --graph br1 br2 br3 br4
 
 ## 对merge的处理
 
-（这一部分实在是太复杂了。。。） TODO
+`git rebase`有四种处理merge的模式。
+其中`--preserve-merge`由于bug连篇建议在任何情况下都不要使用。
+
+下面分别对三种rebase讨论其他三种处理方式的语义。
+
+- 第一种rebase：对于`^<upstream> <branch>`
+  - 默认：
+    - 先对所有待rebase的DFS排序
+    - 再去掉所有包含多于1个parent的commit
+    - 依次应用到`<newbase>`上
+  - `--rebase-merges[=-no-rebase-cousins]`：
+    - 原没有parent，现依然没有parent
+    - 原以`<upstream>^!`为直接parent，现以`<newbase>`为直接parent
+    - 原以`<upstream>^@`为直接parent，parent不变
+    - 原以`^<upstream> <branch>`为直接parent，现以新创建的相应commit为parent
+  - `--rebase-merges=rebase-cousins`：
+    - 原没有parent，现以`<newbase>`为parent
+    - 原以`<upstream>^!`为直接parent，变成以`<newbase>`为直接parent
+    - 原以`<upstream>^@`为直接parent，parent不变
+    - 原以`^<upstream> <branch>`为直接parent，现以新创建的相应commit为parent
+- 第二种rebase：对于`^<newbase> <branch>`
+  - 默认：
+    - 先对所有待rebase的DFS排序
+    - 再去掉所有包含多于1个parent的commit
+    - 依次应用到`<newbase>`上
+  - `--rebase-merges[=-no-rebase-cousins]`：
+    - 原没有parent，现依然没有parent
+    - 原以`<newbase>`为直接parent，parent不变
+    - 原以`^<newbase> <branch>`为直接parent，现以新创建的相应commit为parent
+  - `--rebase-merges=rebase-cousins`：
+    - 原没有parent，现以`<newbase>`为parent
+    - 原以`<newbase>`为直接parent，parent不变
+    - 原以`^<newbase> <branch>`为直接parent，现以新创建的相应commit为parent
+- 第三种rebase：对于`<branch>`
+  - 默认：
+    - 先对所有待rebase的DFS排序
+    - 再去掉所有包含多于1个parent的commit
+    - 从零开始复制
+  - `--rebase-merges[=-no-rebase-cousins]`：同下
+  - `--rebase-merges=rebase-cousins`：
+    - 原没有parent，现依然没有parent
+    - 原以`<branch>`为直接parent，现以新创建的相应commit为parent
 
 ## 总结
 
@@ -392,4 +440,6 @@ git log --oneline --graph br1 br2 br3 br4
   - `git cherry-pick --keep-redundant-commits <commit-ish>...`
 - Lv3
   - `git revert <commit-ish>...`
-  - `git rebase --no-ff --keep-empty [-i] [--onto <newbase>] [(<upstream>|--root) [<branch>]]`
+  - `git rebase --keep-empty [-i] [--onto <newbase>] [(<upstream>|--root) [<branch>]]`
+    - `[--no-ff]`
+    - `[--rebase-merges[=[no-]rebase-cousins]]`
