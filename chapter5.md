@@ -70,7 +70,7 @@ ls ../somewhere-else/
 
 前述方法手工指定了打包的文件；然而，由于没有打包blob 5ff3和tree 2da9，即便接收者拿到了对象也没有什么卵用（还原不出整个tree 187e，在`git checkout-index`时会失败）。
 此时需要祭出Git最复杂的Lv2命令之一：`git rev-list`
-（复杂与之不相上下的还有`git filter-branch`、`git merge-tree`）。
+（复杂程度与之不相上下的还有`git filter-branch`、`git merge-tree`）。
 
 ```bash
 git rev-list --objects 187e

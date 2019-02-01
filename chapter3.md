@@ -43,6 +43,8 @@ git update-index --add --info-only -- dir/fn
 git update-index --add -- dir/fn
 ```
 
+若想手动改变mode，只需`git update-index --chmod +x -- <path>`
+
 - Lv3
 ```bash
 # 要先有文件才能添加到index
@@ -169,6 +171,7 @@ git commit --allow-empty -m 'The message'
   - `git checkout-index -fu [--prefix=<pf>] -a`
   - `git checkout-index -fu [--prefix=<pf>] -- <path>`
 - 常用Lv2
+  - `git update-index --chmod +x -- <path>`
   - `git ls-files -s`
   - `git ls-files -s -- <path>`
   - `git read-tree [--prefix=<pf>] <tree-ish>`

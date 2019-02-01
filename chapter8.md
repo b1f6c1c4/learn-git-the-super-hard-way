@@ -239,20 +239,20 @@ master之于component，就是component之于doc；
 就可以将不同组件整合到master上。
 别忘了多加几个parent。
 
-### FAQ
+## FAQ
 
-#### master要不要直接merge doc
+### master要不要直接merge doc
 
 如果在master上进行一些集成测试，那么应该有doc。
 否则可以省略。
 
-#### 为什么不用简单方便的`git merge -s subtree doc`
+### 为什么不用简单方便的`git merge -s subtree doc`
 
 一些诡异的情况下subtree无法完整地复制doc那边的整个tree的情况，
 比如删掉的文件还在、新添加的文件没有出现等等。
 参考第6章。
 
-#### 我应该在哪里build
+### 我应该在哪里build
 
 一般来说应该在每个组件各自的worktree里面build，
 比如`node_modules`、`*.o`、`*.pyc`等等。
@@ -261,6 +261,6 @@ master之于component，就是component之于doc；
 
 如果出于ci的需要，也可以选择在master里面再次build。但这就需要双倍的磁盘空间。
 
-#### 如何简化操作
+### 如何简化操作
 
 参见第9章。另外别忘了`git push --all`，`git log --all`等等。
