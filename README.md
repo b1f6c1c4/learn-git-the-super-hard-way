@@ -13,6 +13,8 @@
 8. 单repo多分支工作流
 9. 配置和alias
 
+本教程还提供了[cheatsheet](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/cheatsheet.md)
+
 ## 本教程适用范围
 
 （以下几个条件同时满足）
