@@ -54,6 +54,8 @@ echo 'content' > dir/fn
 git add -f dir/fn
 ```
 
+如果想只添加一部分内容，使用`git add -p`
+
 ## 删除index
 
 - Lv2
@@ -178,6 +180,7 @@ git commit --allow-empty -m 'The message'
   - `git write-tree [--prefix=<pf>]`
 - Lv3
   - `git add -f -- <path>`
+  - `git add -p`
   - `git rm --cached -- <path>`
   - `git mv` & `git cp`
   - `git reset [<tree-ish>] -- <path>` - 留空`<tree-ish>`表示HEAD
