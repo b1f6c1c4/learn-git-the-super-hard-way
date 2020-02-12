@@ -57,6 +57,8 @@
   - `git reset [<tree-ish>] -- <path>` - 留空`<tree-ish>`表示HEAD
   - `git checkout -f -- <path>`
   - `git commit`
+  - `git add -p`
+  - `git reset -p`
 
 ## 操纵HEAD（第4章）
 
