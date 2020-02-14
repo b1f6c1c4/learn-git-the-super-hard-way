@@ -20,7 +20,6 @@ while [ "$#" -gt 0 ]; do
     while IFS= read -r line; do
         case "$STATE" in
             TEXT)
-                printf '%s\n' "$line" >&2
                 if [ "$#" -eq 0 ]; then
                     printf '%s\n' "$line"
                 fi
@@ -33,12 +32,11 @@ while [ "$#" -gt 0 ]; do
                     cat "$TMP2" >>"$TMP"
                     truncate -s 0 "$TMP2"
                     if [ "$#" -eq 0 ]; then
-                        docker exec -i "$DK" /bin/bash <"$TMP" | tee /dev/stderr
-                        printf '%s\n' "$line" | tee /dev/stderr
+                        docker exec -i "$DK" /bin/bash <"$TMP"
+                        printf '%s\n' "$line"
                     else
-                        docker exec -i "$DK" /bin/bash <"$TMP" >&2
+                        docker exec -i "$DK" /bin/bash <"$TMP" >/dev/null
                     fi
-                    printf '%s\n' "$line" >&2
                     truncate -s 0 "$TMP"
                     STATE=TEXT
                 else
