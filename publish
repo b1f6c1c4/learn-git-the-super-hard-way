@@ -1,0 +1,11 @@
+#!/bin/sh
+
+set -euxo pipefail
+
+make docker
+make -j 8
+
+git add -f chapter*.md
+TREE="$(git mktree)"
+COMMIT="$(git commit-tree "$TREE" -p HEAD -m "publish")"
+git push --force-with-lease origin "$COMMIT:master"
