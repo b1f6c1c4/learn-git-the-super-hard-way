@@ -189,10 +189,24 @@ git show efd4:name.ext
 
 ## 创建tag
 
+注意：你可以让tag指向tag，虽然没有什么卵用
+
 - Lv1 模仿commit的创建方法即可创建
 
+- Lv2
+```bash
+git mktag <<EOF
+object efd4f82f6151bd20b167794bc57c66bbf82ce7dd
+type commit
+tag simple-tag
+tagger b1f6c1c4 <b1f6c1c4@gmail.com> 1527189535 +0000
+
+The tag message
+EOF
+```
+
 - Lv3
-*特别注意：`git tag`命令不仅仅创建了tag对象，还建立了新的引用在`refs/tags/the-tag`。*
+*特别注意：`git tag -a`命令不仅仅创建了tag对象，还建立了新的引用在`refs/tags/the-tag`。*
 ```bash
 # 该命令没有输出
 GIT_AUTHOR_NAME=b1f6c1c4 \
@@ -230,7 +244,8 @@ git show 9cb6
 - Lv2
   - `git mktree --missing` - 创建tree
   - `git commit-tree <tree> -m <message> [-p <parent>]*` - 创建commit
-  - `git cat-file <type> <SHA1>` - 查看blob和commit
+  - `git mktag` - 创建tag
+  - `git cat-file <type> <SHA1>` - 查看blob和commit和tag
   - `git ls-tree <SHA1> -- [<path>]` - 查看tree
 - Lv3
   - `git tag -a -m <message> <name> <object>` - 同时创建新引用在`refs/tags/<name>`
