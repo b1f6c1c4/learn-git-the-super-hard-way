@@ -1,0 +1,52 @@
+#!/bin/bash
+
+set -uo pipefail
+
+if [ "$#" -eq 0 ]; then
+    echo "Error: please specify what to generate" >&2
+fi
+
+DK="generate-$$"
+docker run -d --name "$DK" -i learn-git-generate >&2
+TMP="$(mktemp)"
+
+while [ "$#" -gt 0 ]; do
+    STATE=TEXT
+    FILE="$1"
+    printf 'File %s\n' "$FILE" >&2
+    shift
+    while IFS= read -r line; do
+        case "$STATE" in
+            TEXT)
+                printf '%s\n' "$line" >&2
+                if [ "$#" -eq 0 ]; then
+                    printf '%s\n' "$line"
+                fi
+                if [ "$line" = '```bash' ]; then
+                    STATE=CODE
+                fi
+                ;;
+            CODE)
+                if [ "$line" = '```' ]; then
+                    if [ "$#" -eq 0 ]; then
+                        docker exec -i "$DK" /bin/bash <"$TMP" | tee /dev/stderr
+                        printf '%s\n' "$line" | tee /dev/stderr
+                    else
+                        docker exec -i "$DK" /bin/bash <"$TMP" >&2
+                    fi
+                    printf '%s\n' "$line" >&2
+                    truncate -s 0 "$TMP"
+                    STATE=TEXT
+                else
+                    printf 'printf "%%s\\n" %q \n' "$line" >>"$TMP"
+                    if [ -z "$(printf '%s' "$line" | grep '^#')" ]; then
+                        printf '%s | sed "s/^/# /" \n' "$line" >>"$TMP"
+                    fi
+                fi
+                ;;
+        esac
+    done <"$FILE"
+done
+
+docker rm -f "$DK" >&2
+rm -f "$TMP"
