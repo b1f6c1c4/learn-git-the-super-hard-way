@@ -4,11 +4,13 @@ set -uo pipefail
 
 if [ "$#" -eq 0 ]; then
     echo "Error: please specify what to generate" >&2
+    exit 1
 fi
 
 DK="generate-$$"
 docker run -d --name "$DK" -i learn-git-generate >&2
 TMP="$(mktemp)"
+TMP2="$(mktemp)"
 
 while [ "$#" -gt 0 ]; do
     STATE=TEXT
@@ -28,23 +30,36 @@ while [ "$#" -gt 0 ]; do
                 ;;
             CODE)
                 if [ "$line" = '```' ]; then
-                    if [ "$#" -eq 0 ]; then
-                        docker exec -i "$DK" /bin/bash <"$TMP" | tee /dev/stderr
-                        printf '%s\n' "$line" | tee /dev/stderr
-                    else
-                        docker exec -i "$DK" /bin/bash <"$TMP" >&2
-                    fi
+                    cat "$TMP2" >>"$TMP"
+                    truncate -s 0 "$TMP2"
+                    cat "$TMP" >&2
+                    # if [ "$#" -eq 0 ]; then
+                    #     docker exec -i "$DK" /bin/bash <"$TMP" | tee /dev/stderr
+                    #     printf '%s\n' "$line" | tee /dev/stderr
+                    # else
+                    #     docker exec -i "$DK" /bin/bash <"$TMP" >&2
+                    # fi
                     printf '%s\n' "$line" >&2
                     truncate -s 0 "$TMP"
                     STATE=TEXT
                 else
                     printf 'printf "%%s\\n" %q \n' "$line" >>"$TMP"
                     if [ -z "$(printf '%s' "$line" | grep '^#')" ]; then
-                        if [ -z "$(printf '%s' "$line" | grep '^cd ')" ]; then
-                            printf '%s | sed "s/^/# /" | sed "s/^# $/#/"\n' "$line" >>"$TMP"
+                        if [ -z "$(printf '%s' "$line" | grep '\\$')" ]; then
+                            OBJ="$TMP"
+                            cat "$TMP2" >>"$TMP"
+                            truncate -s 0 "$TMP2"
                         else
-                            printf '%s\n' "$line" >>"$TMP"
+                            OBJ="$TMP2"
                         fi
+                        if [ -z "$(printf '%s' "$line" | grep -e '^cd ' -e '\\$')" ]; then
+                            printf '%s | sed "s/^/# /" | sed "s/^# $/#/"\n' "$line" >>"$OBJ"
+                        else
+                            printf '%s\n' "$line" >>"$OBJ"
+                        fi
+                    else
+                        cat "$TMP2" >>"$TMP"
+                        truncate -s 0 "$TMP2"
                     fi
                 fi
                 ;;
@@ -53,4 +68,4 @@ while [ "$#" -gt 0 ]; do
 done
 
 docker rm -f "$DK" >&2
-rm -f "$TMP"
+rm -f "$TMP" "$TMP2"
