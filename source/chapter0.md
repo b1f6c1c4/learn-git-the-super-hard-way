@@ -27,7 +27,6 @@ echo 'ref: refs/heads/master' > the-repo.git/HEAD
 至此一个最简单的Git repo创建完毕，采用`git symbolic-ref`（Lv2）检验是否创建成功：
 ```bash
 git --git-dir=the-repo.git symbolic-ref HEAD
-# refs/heads/master
 ```
 
 现在添加worktree：
@@ -42,11 +41,6 @@ mkdir default-tree
 git --git-dir=the-repo.git --work-tree=default-tree status --porcelain
 # 没有输出表明worktree是干净的
 git --git-dir=the-repo.git --work-tree=default-tree status
-# On branch master
-#
-# No commits yet
-#
-# nothing to commit (create/copy files and use "git add" to track)
 ```
 
 为了简化命令行调用方式，在worktree下添加.git文件：
@@ -78,16 +72,19 @@ git status
 
 日常创建repo、不选配worktree：
 ```bash
+rm -rf the-repo.git
 git init --bare the-repo.git
 ```
 
 日常创建repo、选配worktree、把repo放在worktree里面：
 ```bash
+rm -rf default-tree
 git init default-tree
 ```
 
 日常创建repo、选配worktree但不把repo放在worktree里面：
 ```bash
+rm -rf the-repo.git default-tree
 git init --separate-git-dir the-repo.git default-tree
 ```
 
@@ -96,6 +93,7 @@ git init --separate-git-dir the-repo.git default-tree
 ### Lv0
 
 ```bash
+git init --bare the-repo.git
 # 惯例是将小repo放在这个位置：
 mkdir -p the-repo.git/worktrees/another/
 # 为了和大repo建立起联系，创建commondir文件：
@@ -110,7 +108,6 @@ echo 'ref: refs/heads/another' > the-repo.git/worktrees/another/HEAD
 ```bash
 # 特别注意此处的git-dir已经发生变化
 git --git-dir=the-repo.git/worktrees/another symbolic-ref HEAD
-# refs/heads/another
 ```
 
 和普通repo一样，添加worktree非常简单：
@@ -121,11 +118,6 @@ mkdir another-tree
 采用`git status`（Lv3）检验是否创建成功：
 ```bash
 git --git-dir=the-repo.git/worktrees/another --work-tree=another-tree status
-# On branch another
-#
-# No commits yet
-#
-# nothing to commit (create/copy files and use "git add" to track)
 ```
 
 给小repo简化命令行调用方式完全相同：
@@ -139,8 +131,6 @@ echo "$(pwd)/another-tree/.git" > the-repo.git/worktrees/another/gitdir
 # 注意此处git-dir写大repo小repo都能得到一样的结果
 git --git-dir=the-repo.git worktree list
 git --git-dir=the-repo.git/worktrees/another worktree list
-# $(pwd)/the-repo.git  (bare)
-# $(pwd)/another-tree  0000000 [another]
 ```
 
 ### Lv3

@@ -40,7 +40,11 @@ while [ "$#" -gt 0 ]; do
                 else
                     printf 'printf "%%s\\n" %q \n' "$line" >>"$TMP"
                     if [ -z "$(printf '%s' "$line" | grep '^#')" ]; then
-                        printf '%s | sed "s/^/# /" \n' "$line" >>"$TMP"
+                        if [ -z "$(printf '%s' "$line" | grep '^cd ')" ]; then
+                            printf '%s | sed "s/^/# /" | sed "s/^# $/#/"\n' "$line" >>"$TMP"
+                        else
+                            printf '%s\n' "$line" >>"$TMP"
+                        fi
                     fi
                 fi
                 ;;
