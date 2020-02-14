@@ -32,27 +32,29 @@ while [ "$#" -gt 0 ]; do
                 if [ "$line" = '```' ]; then
                     cat "$TMP2" >>"$TMP"
                     truncate -s 0 "$TMP2"
-                    cat "$TMP" >&2
-                    # if [ "$#" -eq 0 ]; then
-                    #     docker exec -i "$DK" /bin/bash <"$TMP" | tee /dev/stderr
-                    #     printf '%s\n' "$line" | tee /dev/stderr
-                    # else
-                    #     docker exec -i "$DK" /bin/bash <"$TMP" >&2
-                    # fi
+                    if [ "$#" -eq 0 ]; then
+                        docker exec -i "$DK" /bin/bash <"$TMP" | tee /dev/stderr
+                        printf '%s\n' "$line" | tee /dev/stderr
+                    else
+                        docker exec -i "$DK" /bin/bash <"$TMP" >&2
+                    fi
                     printf '%s\n' "$line" >&2
                     truncate -s 0 "$TMP"
                     STATE=TEXT
                 else
                     printf 'printf "%%s\\n" %q \n' "$line" >>"$TMP"
                     if [ -z "$(printf '%s' "$line" | grep '^#')" ]; then
-                        if [ -z "$(printf '%s' "$line" | grep '\\$')" ]; then
+                        if [ -z "$(printf '%s' "$line" | grep -e '\\$' -e ';$' -e 'EOF$')" ]; then
                             OBJ="$TMP"
                             cat "$TMP2" >>"$TMP"
                             truncate -s 0 "$TMP2"
+                        elif [ -z "$(printf '%s' "$line" | grep -e 'EOF$')" ]; then
+                            OBJ="$TMP2"
                         else
                             OBJ="$TMP2"
+                            STATE=LITERAL
                         fi
-                        if [ -z "$(printf '%s' "$line" | grep -e '^cd ' -e '\\$')" ]; then
+                        if [ -z "$(printf '%s' "$line" | grep -e '^cd ' -e '\\$' -e ';$')" ]; then
                             printf '%s | sed "s/^/# /" | sed "s/^# $/#/"\n' "$line" >>"$OBJ"
                         else
                             printf '%s\n' "$line" >>"$OBJ"
@@ -61,6 +63,13 @@ while [ "$#" -gt 0 ]; do
                         cat "$TMP2" >>"$TMP"
                         truncate -s 0 "$TMP2"
                     fi
+                fi
+                ;;
+            LITERAL)
+                printf 'printf "%%s\\n" %q \n' "$line" >>"$TMP"
+                printf '%s\n' "$line" >>"$TMP2"
+                if [ "$line" = 'EOF' ]; then
+                    STATE=CODE
                 fi
                 ;;
         esac
