@@ -149,14 +149,14 @@ git --git-dir=the-repo.git/worktrees/another worktree list
 # 直接删掉repo
 rm -rf the-repo.git/worktrees/another
 # 这个其实可以不删，不过留着容易让人误会
-rm another-tree/.git
+rm -f another-tree/.git
 ```
 
 ### Lv3
 
 ```bash
 # 删掉the-repo.git/worktrees/another/gitdir所指向的对象
-rm another-tree/.git
+rm -f another-tree/.git
 # 主动让git检验各个worktree是否存在；
 # 在发现the-repo.git/worktrees/another的worktree已经找不到了之后，
 # 它会主动删掉对应的小repo（由于是小repo，所以基本不会损失什么数据）：

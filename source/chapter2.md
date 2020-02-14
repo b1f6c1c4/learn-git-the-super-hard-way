@@ -27,108 +27,102 @@ Git特别引用直接放在`<repo>`下，一般包括`HEAD`等。
 - Lv0
 该操作非常危险，因为没有保存操作记录。
 ```bash
-mkdir -p the-repo.git/refs/heads/br1
-echo bce83a8c51fdad7b2e11155826b9794590950268 > the-repo.git/refs/heads/br1
+mkdir -p ./refs/heads/
+echo d4dafde7cd9248ef94c0400983d51122099d312a > ./refs/heads/br1
 ```
 
 - Lv2
 该操作会在`<repo>/logs/refs/heads/br1`中留下操作记录。
 ```bash
-git --git-dir=the-repo.git update-ref --no-deref -m 'Reason for update' refs/heads/br1 bce8
+git update-ref --no-deref -m 'Reason for update' refs/heads/br1 d4da
 ```
 
 - Lv3
 该操作会在`<repo>/logs/refs/heads/br1`中留下操作记录，原因是`branch: Created from ...`或者`branch: Reset to ...`。
 ```bash
-git --git-dir=the-repo.git branch -f refs/heads/br1 bce8
+# 似乎此处必须省略refs/heads/
+git branch -f br1 d4da
 ```
 
 ### 查看直接引用
 
 - Lv0
 ```bash
-cat the-repo.git/refs/heads/br1
-# bce83a8c51fdad7b2e11155826b9794590950268
+cat ./refs/heads/br1
 ```
 
 - Lv2
 ```bash
-git --git-dir=the-repo.git rev-parse refs/heads/br1
-# bce83a8c51fdad7b2e11155826b9794590950268
+git rev-parse refs/heads/br1
 ```
 
 - Lv3
 ```bash
 # 似乎此处必须省略refs/heads/
-git --git-dir=the-repo.git branch -v --list br1
-#   br1 bce83a8 The commit message
+git branch -v --list br1
 ```
 
 ### 创建间接引用
 
 - Lv0
 ```bash
-echo 'ref: refs/heads/br1' > the-repo.git/refs/heads/br2
+echo 'ref: refs/heads/br1' > ./refs/heads/br2
 ```
 
 - Lv2
 ```bash
-git --git-dir=the-repo.git symbolic-ref refs/heads/br2 refs/heads/br1
+git symbolic-ref refs/heads/br2 refs/heads/br1
 ```
 
 ### 查看间接引用
 
 - Lv0
 ```bash
-cat the-repo.git/refs/heads/br2
-# ref: refs/heads/br1
+cat ./refs/heads/br2
 ```
 
 - Lv2
 注意以下两者的区别
 ```bash
-git --git-dir=the-repo.git symbolic-ref refs/heads/br2
-# ref: refs/heads/br1
-git --git-dir=the-repo.git rev-parse refs/heads/br2
-# bce83a8c51fdad7b2e11155826b9794590950268
+git symbolic-ref refs/heads/br2
+git rev-parse refs/heads/br2
 ```
 
 - Lv3
 Lv3命令只能看到解引用后的对象，无法看清楚间接引用本身
 ```bash
 # 似乎此处必须省略refs/heads/
-git --git-dir=the-repo.git branch -v --list br1
-#   br1 bce83a8 The commit message
-git --git-dir=the-repo.git branch -v --list br2
-#   br2 bce83a8 The commit message
+git branch -v --list br1
+git branch -v --list br2
 ```
 
 ### 删除引用
 
 - Lv0
 ```bash
-rm the-repo.git/refs/heads/br1
-rm the-repo.git/refs/heads/br2
+rm ./refs/heads/br1
+rm ./refs/heads/br2
 ```
 
 - Lv2
 ```bash
 # 以下操作会删除refs/heads/br1
-git --git-dir=the-repo.git update-ref -d refs/heads/br1
-git --git-dir=the-repo.git update-ref -d --no-deref refs/heads/br1
-git --git-dir=the-repo.git update-ref -d refs/heads/br2 # 注意--no-deref的作用
+git update-ref -d refs/heads/br1
+git update-ref -d --no-deref refs/heads/br1
+git update-ref -d refs/heads/br2 # 注意--no-deref的作用
 # 以下操作会删除refs/heads/br2
-git --git-dir=the-repo.git update-ref -d --no-deref refs/heads/br2
-git --git-dir=the-repo.git symbolic-ref --delete refs/heads/br2
+git update-ref -d --no-deref refs/heads/br2
+(git symbolic-ref refs/heads/br2 refs/heads/br1)
+git symbolic-ref --delete refs/heads/br2
 ```
 
 - Lv3
 ```bash
 # 似乎此处必须省略refs/heads/
-git --git-dir=the-repo.git branch -D br1
-# Deleted branch br1 (was bce83a8).
-git --git-dir=the-repo.git branch -D br2
-# Deleted branch br2 (was refs/heads/br1).
+(git update-ref --no-deref refs/heads/br1 d4da)
+git branch -D br1
+(git symbolic-ref refs/heads/br2 refs/heads/br1)
+git branch -D br2
 ```
 
 ## 关于`update-ref`的特别备注
@@ -137,11 +131,11 @@ git --git-dir=the-repo.git branch -D br2
 不带`--no-deref`表明修改引用本身（如果其不存在或者是直接引用）或者引用的引用（如果其是间接引用）
 ```bash
 # 以下操作会修改refs/heads/br1
-git --git-dir=the-repo.git update-ref refs/heads/br1 f9ab
-git --git-dir=the-repo.git update-ref --no-deref refs/heads/br1 f9ab
-git --git-dir=the-repo.git update-ref refs/heads/br2 f9ab # 注意--no-deref的作用
+git update-ref refs/heads/br1 efd4
+git update-ref --no-deref refs/heads/br1 efd4
+git update-ref refs/heads/br2 efd4 # 注意--no-deref的作用
 # 以下操作会修改refs/heads/br2，由间接引用变为直接引用
-git --git-dir=the-repo.git update-ref --no-deref refs/heads/br2 f9ab
+git update-ref --no-deref refs/heads/br2 efd4
 ```
 
 ## 总结

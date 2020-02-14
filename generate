@@ -7,8 +7,6 @@ if [ "$#" -eq 0 ]; then
     exit 1
 fi
 
-DK="generate-$$"
-docker run -d --name "$DK" -i learn-git-generate >&2
 TMP="$(mktemp)"
 TMP2="$(mktemp)"
 
@@ -21,9 +19,10 @@ while [ "$#" -gt 0 ]; do
         case "$STATE" in
             TEXT)
                 if [ "$#" -eq 0 ]; then
-                    printf '%s\n' "$line"
+                    printf 'printf "%%s\\n" %q \n' "$line" >>"$TMP"
                 fi
                 if [ "$line" = '```bash' ]; then
+                    echo '(' >>"$TMP"
                     STATE=CODE
                 fi
                 ;;
@@ -31,13 +30,10 @@ while [ "$#" -gt 0 ]; do
                 if [ "$line" = '```' ]; then
                     cat "$TMP2" >>"$TMP"
                     truncate -s 0 "$TMP2"
+                    echo ')' >>"$TMP"
                     if [ "$#" -eq 0 ]; then
-                        docker exec -i "$DK" /bin/bash <"$TMP"
-                        printf '%s\n' "$line"
-                    else
-                        docker exec -i "$DK" /bin/bash <"$TMP" >/dev/null
+                        printf 'printf "%%s\\n" %q \n' "$line" >>"$TMP"
                     fi
-                    truncate -s 0 "$TMP"
                     STATE=TEXT
                 else
                     printf 'printf "%%s\\n" %q \n' "$line" >>"$TMP"
@@ -74,5 +70,7 @@ while [ "$#" -gt 0 ]; do
     done <"$FILE"
 done
 
-docker rm -f "$DK" >&2
+truncate -s 0 "$TMP2"
+docker run --rm -i learn-git-generate <"$TMP" 2> >(while read line; do echo "$line" >>"$TMP2"; echo -e "\e[01;31m$line\e[0m" >&2; done) | tee -a "$TMP2" >&2
+cat "$TMP2"
 rm -f "$TMP" "$TMP2"
