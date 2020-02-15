@@ -12,7 +12,6 @@ Git引用常规放在`<repo>/refs/`中，可以有任意层次的文件夹结构
 - tags
   - 各标签
 - stash - 暂存
-为了简化起见，在*Lv3命令中*且*不引起歧义的情况下*，`refs/*/`可以省略。
 
 Git特别引用直接放在`<repo>`下，一般包括`HEAD`等。
 
@@ -153,6 +152,25 @@ git update-ref refs/heads/br2 efd4 # 注意--no-deref的作用
 git update-ref --no-deref refs/heads/br2 efd4
 ```
 
+## 查看历史记录
+
+```bash
+git update-ref --no-deref refs/heads/br1 d4da
+git update-ref --no-deref refs/heads/br1 efd4
+```
+
+- Lv0
+
+```bash
+cat ./logs/refs/heads/br1
+```
+
+- Lv3
+
+```bash
+git reflog refs/heads/br1
+```
+
 ## 批量查看引用
 
 - Lv2
@@ -193,6 +211,11 @@ git for-each-ref refs/remotes/
     - `git branch -D <branch>` - 只能操纵`refs/heads/`
     - `git tag -f <tag> <commit-ish>` - 只能操纵`refs/tags/`
     - `git tag -d <tag>` - 只能操纵`refs/tags/`
+- 查看历史记录
+  - Lv0
+    - `cat <repo>/logs/<ref>`
+  - Lv3
+    - `git reflog`
 - 单独查看
   - Lv0
     - `cat <repo>/<ref>`
