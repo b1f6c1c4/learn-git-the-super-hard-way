@@ -164,13 +164,100 @@ rm -f another-tree/.git
 git --git-dir=the-repo.git worktree prune
 ```
 
+## clone: 利用模板创建repo
+
+（参见第5章）
+
+### `git clone --mirror`
+
+- Lv2
+```bash
+rm -rf copy.git
+git init --bare copy.git
+tee -a ./copy.git/config <<EOF
+[remote "origin"]
+  url = git@github.com:b1f6c1c4/learn-git-the-super-hard-way.git
+  fetch = +refs/*:refs/*
+  mirror = true
+EOF
+git --git-dir=copy.git fetch origin refs/heads/master:refs/heads/master
+git --git-dir=copy.git fetch origin refs/heads/dev:refs/heads/dev
+git --git-dir=copy.git symbolic-ref HEAD refs/heads/master
+```
+
+- Lv3
+```bash
+rm -rf copy.git
+git clone --mirror git@github.com:b1f6c1c4/learn-git-the-super-hard-way.git copy.git
+```
+
+### `git clone --bare`
+
+与`--mirror`类似，但是四不像（没有config）
+
+- Lv2
+```bash
+rm -rf copy.git
+git init --bare copy.git
+tee -a ./copy.git/config <<EOF
+[remote "origin"]
+  url = git@github.com:b1f6c1c4/learn-git-the-super-hard-way.git
+EOF
+git --git-dir=copy.git fetch origin refs/heads/master:refs/heads/master
+git --git-dir=copy.git fetch origin refs/heads/dev:refs/heads/dev
+git --git-dir=copy.git symbolic-ref HEAD refs/heads/master
+```
+
+- Lv3
+```bash
+rm -rf copy.git
+git clone --bare git@github.com:b1f6c1c4/learn-git-the-super-hard-way.git copy.git
+```
+
+### `git clone`
+
+- Lv2
+```bash
+rm -rf copy-wt
+git init copy-wt
+tee -a ./copy-wt/.git/config <<EOF
+[remote "origin"]
+  url = git@github.com:b1f6c1c4/learn-git-the-super-hard-way.git
+  fetch = +refs/*:refs/*
+[branch "dev"]
+  remote = origin
+  merge = refs/heads/dev
+EOF
+git --git-dir=copy-wt/.git fetch origin
+git --git-dir=copy-wt/.git update-ref refs/heads/dev refs/remotes/origin/dev
+git --git-dir=copy-wt/.git symbolic-ref HEAD refs/heads/dev
+# 如果指定了--no-checkout，省略这一行
+git --git-dir=copy-wt/.git --work-tree=copy-wt checkout-index -fua
+```
+
+- Lv3
+```bash
+rm -rf copy-wt
+git clone --branch dev git@github.com:b1f6c1c4/learn-git-the-super-hard-way.git copy-wt
+```
+
 ## 总结
 
 （以下均为Lv3）
-- `git init --bare <repo>`
-- `git init --separate-git-dir <repo> <worktree>`
-- `git init <worktree>` - repo在`<worktree>/.git`
-- `git worktree list`
-- `git worktree add`
-- `git worktree prune`
+- 创建空repo
+  - `git init --bare <repo>`
+  - `git init --separate-git-dir <repo> <worktree>`
+  - `git init <worktree>` - repo在`<worktree>/.git`
+- 从模板创建
+  - `git clone --mirror <url> <repo>`
+  - `git clone --bare <url> <repo>`
+  - `git clone [--no-checkout] [--branch <ref>] [--separate-git-dir <repo>] <url> <worktree>`
+- “单”repo多worktree
+  - `git worktree list`
+  - `git worktree add`
+  - `git worktree prune`
+
+## 扩展阅读
+
+[gitrepository-layout](https://git-scm.com/docs/gitrepository-layout)
 
