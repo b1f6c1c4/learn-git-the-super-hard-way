@@ -5,8 +5,8 @@
 0. [创建工作环境](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter0.md)（手工`git init`）
 1. [直接操纵对象](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter1.md)（手工`git commit`）
 2. [直接操纵引用](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter2.md)（手工`git branch`）
-3. [直接操纵索引](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter3.md)（手工`git add`）
-4. [直接操纵HEAD](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter4.md)（`git checkout`和`git reset`）
+3. [直接操纵索引](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter3.md)（`git add`/`git restore`）
+4. [直接操纵HEAD](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter4.md)（`git switch`）
 5. [直接操纵远程](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter5.md)（手工`git pull`）
 6. [直接操纵merge](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter6.md)（手工`git diff`和`git merge`）
 7. [直接操纵commit](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter7.md)（手工`git rebase`）
@@ -20,6 +20,8 @@
 如果你已经完全掌握cheatsheet里面的所有命令，那么此教程可能对你来说太过浅显，建议移步[Git Reference](https://git-scm.com/docs)、[Git源码](https://github.com/git/git)。
 
 学习完本教程以后，你应该掌握了git的全部用法的1%。
+
+备注：`git reset`/`git checkout`的详解在第4章。强烈推荐改用功能更强大更直观的`git restore`和`git switch`。
 
 ## 基本约定
 

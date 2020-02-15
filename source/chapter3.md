@@ -79,7 +79,6 @@ Lv3方法，使用`git mv`不仅移动了index还移动了worktree里的文件
 
 没有简单办法。
 Lv2方法，使用`git update-index --cacheinfo`无法指定文件stat信息
-Lv3方法，使用`git cp`不仅复制了index还复制了worktree里的文件
 
 ## 查看index
 
@@ -117,14 +116,17 @@ git read-tree --prefix=dir/fn/ 5841
 - Lv3
 ```bash
 # 整个index替换掉
-git reset 5841 -- .
+git restore --source 5841 --staged -- :/
 # 替换掉某个文件夹
-git reset 5841 -- dir/
+git restore --source 5841 --staged -- dir/
+# 以下为等价的旧语法
+# git reset 5841 -- :/
+# git reset 5841 -- dir/
 ```
 
 ## 利用index更新worktree
 
-注意：添加修改都可以，但是似乎无法删除
+注意：添加修改都可以，但是无法删除worktree里面多出来的文件
 
 - Lv2
 ```bash
@@ -139,9 +141,12 @@ git checkout-index -fu -- dir/fn
 - Lv3
 ```bash
 # 整个worktree替换掉
-git checkout -f -- .
+git restore --worktree -- :/
 # 只有一部分文件
-git checkout -f -- dir/fn
+git restore --worktree -- dir/fn
+# 以下为等价的旧语法
+# git checkout -f -- :/
+# git checkout -f -- dir/fn
 ```
 
 ## 利用index创建tree
@@ -163,6 +168,85 @@ git write-tree --prefix=dir/
 git commit --allow-empty -m 'The message'
 ```
 
+## 利用tree更新worktree
+
+- Lv1
+```bash
+# 准备：
+echo 0 >f
+git add f
+git commit -m '0'
+echo 1 >f
+git add f
+echo 2 >f
+# 执行：
+git cat-file blob HEAD:f >f
+# 检查：
+git cat-file blob $(git ls-files -s -- f | awk '{ print $2; }')
+cat f
+```
+
+- Lv3
+```bash
+# 准备：
+echo 0 >f
+git add f
+git commit -m '0'
+echo 1 >f
+git add f
+echo 2 >f
+# 执行：
+git restore --source HEAD --worktree -- f
+# 检查：
+git cat-file blob $(git ls-files -s -- f | awk '{ print $2; }')
+cat f
+```
+
+## 利用tree同时更新index和worktree
+
+- Lv2
+一步一步来即可
+
+- Lv3
+```bash
+# 准备：
+echo 0 >f
+git add f
+git commit -m '0'
+echo 1 >f
+git add f
+echo 2 >f
+# 执行：
+git restore --source HEAD --index --worktree -- f
+# 检查：
+git cat-file blob $(git ls-files -s -- f | awk '{ print $2; }')
+cat f
+```
+
+注意：`git restore --worktree`没有对应的旧语法。
+
+## 详解`git restore`
+
+- `git restore [--source <tree-ish>] [--staged] [--worktree] -- <path>`
+  - 若`<tree-ish>`留空：
+    - 不写`--staged`也不写`--worktree`：`<tree-ish>`表示index
+    - `--worktree`：`<tree-ish>`表示index
+    - `--staged --worktree`：`<tree-ish>`表示index，而`--staged`被忽略了
+    - `--staged`：`<tree-ish>`表示HEAD
+  - 不写`--staged`也不写`--worktree`则默认`--worktree`
+
+等价旧语法：
+- `git restore [--worktree] -- <path>`=`git checkout -f -- <path>`
+- `git restore --staged --worktree -- <path>`=`git checkout -f -- <path>`
+- `git restore [--source <tree-ish>] --staged -- <path>`=`git reset [<tree-ish>] -- <path>`
+- `git restore --source <tree-ish> --staged --worktree -- <path>`=`git checkout -f <tree-ish> -- <path>`
+- `git restore --source <tree-ish> [--worktree] -- <path>` 没有等价的旧语法！
+
+## 交互式修改index
+
+有时候我们希望将一个文件的部分更改放入index中，此时使用`git add -p`即可。
+如果不小心放多了，使用`git restore -p`即可。（旧语法`git reset -p`）
+
 ## 总结
 
 - Lv1
@@ -180,12 +264,11 @@ git commit --allow-empty -m 'The message'
   - `git write-tree [--prefix=<pf>]`
 - Lv3
   - `git add -f -- <path>`
-  - `git add -p`
   - `git rm --cached -- <path>`
-  - `git mv` & `git cp`
-  - `git reset [<tree-ish>] -- <path>` - 留空`<tree-ish>`表示HEAD
-  - `git checkout -f -- <path>`
+  - `git mv`
+  - `git restore [--source <tree-ish>] [--staged] [--worktree] -- <path>`
   - `git commit`
-
-关于`git reset`和`git checkout`的更多用法，见第4章。
+- 交互式修改index
+  - `git add -p`
+  - `git restore -p`
 
