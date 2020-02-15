@@ -60,13 +60,12 @@ git add -f dir/fn
 
 - Lv2
 ```bash
-git update-index --delete -- dir/fn
+git update-index --force-remove -- dir/fn
 ```
 
 - Lv3
 ```bash
 git rm --cached -- dir/fn
-# rm 'dir/fn'
 ```
 
 ## 移动index
@@ -126,7 +125,8 @@ git restore --source 5841 --staged -- dir/
 
 ## 利用index更新worktree
 
-注意：添加修改都可以，但是无法删除worktree里面多出来的文件
+注意：添加修改都可以，但是无法删除worktree里面多出来的文件。
+请参阅本章最后一节（`git clean`）。
 
 - Lv2
 ```bash
@@ -247,13 +247,40 @@ cat f
 有时候我们希望将一个文件的部分更改放入index中，此时使用`git add -p`即可。
 如果不小心放多了，使用`git restore -p`即可。（旧语法`git reset -p`）
 
+## 删除worktree中多出来的文件（`git clean`）
+
+**警告：该命令十分危险，可能一瞬删掉你的全部心血！**
+
+```bash
+touch extra
+# 检查多出来了什么文件
+git clean -nd
+# 统统删掉
+git clean -fd
+```
+
+把以下命令的`-n`换成`-f`就能真正删掉文件了
+（**非常危险，请一定先`git clean -n`看看什么会消失再真的去`-f`**）：
+```bash
+echo 'fff' >.gitignore
+git add .gitignore
+touch fff
+touch extra
+# 准备删掉多出来的non-ignored文件
+git clean -nd
+# 准备删掉多出来的所有文件
+git clean -ndx
+# 准备删掉多出来的ignored文件
+git clean -ndX
+```
+
 ## 总结
 
 - Lv1
   - `git update-index --add --cacheinfo <mode>,<SHA1>,<path>`
 - 不常用Lv2
   - `git update-index --add [--info-only] -- <path>`
-  - `git update-index --delete -- <path>`
+  - `git update-index --force-remove -- <path>`
   - `git checkout-index -fu [--prefix=<pf>] -a`
   - `git checkout-index -fu [--prefix=<pf>] -- <path>`
 - 常用Lv2
@@ -268,6 +295,7 @@ cat f
   - `git mv`
   - `git restore [--source <tree-ish>] [--staged] [--worktree] -- <path>`
   - `git commit`
+  - `git clean -nd [-x|-X] [-- <path>]`（把`-n`换成`-f`就会真的删除，**非常危险**）
 - 交互式修改index
   - `git add -p`
   - `git restore -p`

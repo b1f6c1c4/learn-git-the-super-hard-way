@@ -195,6 +195,25 @@ git for-each-ref refs/remotes/
 
 两个都不能列出`$GIT_DIR`下的引用！
 
+## 给定commit-ish，逆向查找引用
+
+- Lv1
+
+```bash
+git show-ref | grep $(git rev-parse d4da) | awk '{ print $2; }'
+```
+
+- Lv3
+
+```bash
+git describe d4da
+git describe --always d4da
+git describe d4da~
+git describe --always d4da~
+```
+
+添加`--dirty`可以在结果后面添加`-dirty`，特别适用于版本号。
+
 ## 总结
 
 - 添加/修改/删除
@@ -230,6 +249,10 @@ git for-each-ref refs/remotes/
     - `git branch -av`
     - `git branch -avl <branch-pattern>`
     - `git branch -avl <tag-pattern>`
+- 给定commit-ish，逆向查找引用
+  - Lv3
+    - `git describe [--all] [--always] [<commit-ish>]` - 留空表示HEAD
+    - `git describe [--all] [--always] --dirty`
 
 ## 扩展阅读
 

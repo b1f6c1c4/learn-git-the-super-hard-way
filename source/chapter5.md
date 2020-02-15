@@ -176,6 +176,11 @@ git send-pack --force ../another-repo.git 187e91589a3f4f248f4cc8b1a1eca65b5161cc
 #  * [new branch]      itst -> itst
 ```
 
+检查远程引用：
+```bash
+git ls-remote ../another-repo.git
+```
+
 ## 跨库间接传输
 
 跨域但无法建立网络连接时，先创建bundle：
@@ -320,6 +325,7 @@ cat ../the-repo.git/config
 `git pull`基本上是先`git fetch`再`git merge FETCH_HEAD`；
 `git pull --rebase`基本上是先`git fetch`再`git rebase FETCH_HEAD`。
 由于这个命令高度不可控，非常不推荐使用。
+然而`git pull --ff-only`却非常有用，是先`git fetch`再`git merge --ff-only FETCH_HEAD`。
 
 ## 总结
 
@@ -334,6 +340,8 @@ cat ../the-repo.git/config
     - `git fetch-pack <url> <hash>*` - 需要`git config uploadpack.allowAnySHA1InWant true`
     - `git fetch-pack <url> <ref>*`
     - `git send-pack --force <url> <local-ref>:<remote-ref>*`
+  - 检查
+    - `git ls-remote <url>`
 - Lv3
   - 配置
     - `git remote add <remote> [--mirror=push|fetch] <url>`
@@ -341,6 +349,8 @@ cat ../the-repo.git/config
   - 传输
     - `git push <remote> <local-ref>:<remote-ref>`
     - `git fetch <remote> <remote-ref>:<local-ref>`
+  - 一键跟上进度
+    - `git pull --ff-only`
   - 不推荐使用的邪恶命令
     - `git pull [--rebase]`
 

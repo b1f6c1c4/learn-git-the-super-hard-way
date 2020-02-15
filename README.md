@@ -2,16 +2,16 @@
 
 ## 目录
 
-0. [创建工作环境](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter0.md)（手工`git init`）
-1. [直接操纵对象](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter1.md)（手工`git commit`）
-2. [直接操纵引用](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter2.md)（手工`git branch`）
+0. [创建工作环境](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter0.md)（`git init`）
+1. [直接操纵对象](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter1.md)（`git commit`）
+2. [直接操纵引用](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter2.md)（`git branch`）
 3. [直接操纵索引](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter3.md)（`git add`/`git restore`）
 4. [直接操纵HEAD](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter4.md)（`git switch`）
-5. [直接操纵远程](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter5.md)（手工`git pull`）
-6. [直接操纵merge](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter6.md)（手工`git diff`和`git merge`）
-7. [直接操纵commit](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter7.md)（手工`git rebase`）
+5. [直接操纵远程](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter5.md)（`git pull`/`git push`）
+6. [直接操纵merge](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter6.md)（`git diff`/`git merge`）
+7. [直接操纵commit](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter7.md)（`git rebase`）
 8. [单repo多分支工作流](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter8.md)
-9. [配置和alias](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter9.md)
+9. [配置和alias](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter9.md)（`git config`）
 
 **本教程还提供了[cheatsheet](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/cheatsheet.md)**，可以用来复习并检查学习效果。
 
