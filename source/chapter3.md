@@ -17,7 +17,7 @@ Git索引位于`<repo>/index`，本质是一个复杂的二进制文件。
 如未提前说明，本章所有命令都需要`--git-dir`和`--work-tree`。
 不过为了避免繁琐的`--git-dir`和`--work-tree`，本章所有命令都会在worktree里面执行：
 ```bash
-cd default-tree
+git init .
 ```
 也就意味着忽略掉`--git-dir`和`--work-tree`也能正常工作。读者需要判断哪些命令可以不依赖`--work-tree`。
 
@@ -27,7 +27,6 @@ cd default-tree
 ```bash
 # 注意：此处故意忽略掉-w，导致blob对象并没有被真正创建
 echo 'content' | git hash-object -t blob --stdin
-# d95f3ad14dee633a758d2e331151e950dd13e4ed
 # blob不一定需要真正存在
 git update-index --add --cacheinfo 100644,d95f3ad14dee633a758d2e331151e950dd13e4ed,dir/fn
 ```
@@ -35,7 +34,7 @@ git update-index --add --cacheinfo 100644,d95f3ad14dee633a758d2e331151e950dd13e4
 - Lv2
 ```bash
 # 要先有文件才能添加到index
-mkdir dir
+mkdir -p dir
 echo 'content' > dir/fn
 # 以下命令只修改index，不创建blob
 git update-index --add --info-only -- dir/fn
@@ -48,7 +47,7 @@ git update-index --add -- dir/fn
 - Lv3
 ```bash
 # 要先有文件才能添加到index
-mkdir dir
+mkdir -p dir
 echo 'content' > dir/fn
 # 以下命令既修改index，也创建blob
 git add -f dir/fn
@@ -60,11 +59,13 @@ git add -f dir/fn
 
 - Lv2
 ```bash
+(git add -f dir/fn)
 git update-index --force-remove -- dir/fn
 ```
 
 - Lv3
 ```bash
+(git add -f dir/fn)
 git rm --cached -- dir/fn
 ```
 
@@ -74,42 +75,39 @@ git rm --cached -- dir/fn
 Lv2方法，使用`git update-index --cacheinfo`无法指定文件stat信息
 Lv3方法，使用`git mv`不仅移动了index还移动了worktree里的文件
 
-## 复制index
-
-没有简单办法。
-Lv2方法，使用`git update-index --cacheinfo`无法指定文件stat信息
-
 ## 查看index
 
 - Lv2
 （其中0为stage数，正常情况为0）
 ```bash
+(git add -f dir/fn)
 git ls-files -s
-# 100644 d95f3ad14dee633a758d2e331151e950dd13e4ed 0       dir/fn
-git ls-files -s -- dir/
-# 100644 d95f3ad14dee633a758d2e331151e950dd13e4ed 0       dir/fn
 ```
 
 ## 利用tree更新index
+
+先弄一个tree：
+```bash
+echo 'hello' | git hash-object -t blob --stdin -w
+git mktree --missing <<EOF
+100644 blob ce013625030ba8dba906f756967f9e9ca394464a$(printf '\t')name.ext
+100755 blob ce013625030ba8dba906f756967f9e9ca394464a$(printf '\t')name2.ext
+EOF
+```
 
 - Lv2
 ```bash
 # 整个index替换掉
 git read-tree 5841
-# git ls-files -s
-# 100644 ce013625030ba8dba906f756967f9e9ca394464a 0       name.ext
-# 100755 ce013625030ba8dba906f756967f9e9ca394464a 0       name2.ext
+git ls-files -s
 # 合并到某个文件夹
+(git update-index --force-remove -- name.ext name2.ext && git add -f dir/fn)
 git read-tree --prefix=dir/ 5841
-# git ls-files -s
-# 100644 d95f3ad14dee633a758d2e331151e950dd13e4ed 0       dir/fn
-# 100644 ce013625030ba8dba906f756967f9e9ca394464a 0       dir/name.ext
-# 100755 ce013625030ba8dba906f756967f9e9ca394464a 0       dir/name2.ext
+git ls-files -s
 # 注意特殊情况
+(git update-index --force-remove -- dir/fn dir/name.ext dir/name2.ext && git add -f dir/fn)
 git read-tree --prefix=dir/fn/ 5841
-# git ls-files -s
-# 100644 ce013625030ba8dba906f756967f9e9ca394464a 0       dir/fn/name.ext
-# 100755 ce013625030ba8dba906f756967f9e9ca394464a 0       dir/fn/name2.ext
+git ls-files -s
 ```
 
 - Lv3
@@ -118,9 +116,6 @@ git read-tree --prefix=dir/fn/ 5841
 git restore --source 5841 --staged -- :/
 # 替换掉某个文件夹
 git restore --source 5841 --staged -- dir/
-# 以下为等价的旧语法
-# git reset 5841 -- :/
-# git reset 5841 -- dir/
 ```
 
 ## 利用index更新worktree
