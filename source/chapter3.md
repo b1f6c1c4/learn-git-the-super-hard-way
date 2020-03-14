@@ -247,6 +247,25 @@ cat f
 有时候我们希望将一个文件的部分更改放入index中，此时使用`git add -p`即可。
 如果不小心放多了，使用`git restore -p`即可。（旧语法`git reset -p`）
 
+## 将index和worktree中的更改暂存起来以备日后使用
+
+- Lv3
+
+只需`git stash [pop]`：
+```bash
+git status
+git stash
+git staus
+git stash pop
+git staus
+```
+
+注意：请一定认真检查`git stash`的输出！
+不要假设`git stash`总是成功的。
+如果`git stash`没有成功那么你的更改并没有并保存起来！
+
+`git stash pop`本质是`git merge`。参见第6章处理冲突。
+
 ## 删除worktree中多出来的文件（`git clean`）
 
 **警告：该命令十分危险，可能一瞬删掉你的全部心血！**
@@ -295,6 +314,7 @@ git clean -ndX
   - `git mv`
   - `git restore [--source <tree-ish>] [--staged] [--worktree] -- <path>`
   - `git commit`
+  - `git stash [pop]`
   - `git clean -nd [-x|-X] [-- <path>]`（把`-n`换成`-f`就会真的删除，**非常危险**）
 - 交互式修改index
   - `git add -p`

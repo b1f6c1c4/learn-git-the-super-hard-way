@@ -56,3 +56,57 @@ Lv3的`git log`的基本语法是`git log <commit-ish> [-- <path>]`。
 
 - Lv3: `git blame -n -- <path>`
 
+## 搜索关键词
+
+### 在worktree中搜索
+
+注意：只能搜索在index中有对应项的文件。
+
+- Lv1
+
+`git ls-files -s -- <path> | awk '{ print $2; }' | xargs -0 grep [-i] [-w] [-P] <regex>`
+
+- Lv3
+
+`git grep [-i] [-w] [-P] <regex> -- <path>`
+
+### 在index中搜索
+
+- Lv1
+
+`git ls-files -s -- <path> | awk '{ print $2; }' | xargs -n 1 bash -c 'git cat-file blob $1 | grep [-i] [-w] [-P] <regex>' ''`
+
+- Lv3
+
+`git grep --cached [-i] [-w] [-P] <regex> -- <path>`
+
+### 在tree中搜索
+
+- Lv1
+
+`git ls-tree -r <tree-ish> -- <path> | awk '{ print $3; }' | xargs -r -n 1 bash -c 'git cat-file blob $1 | grep [-i] [-w] [-P] <regex>' ''`
+
+- Lv3
+
+`git grep [-i] [-w] [-P] <regex> <tree-ish> -- <path>`
+
+### 在当前分支中搜索
+
+注意：一般正常人都会先在HEAD中搜索，找不到了再尝试在当前分支中搜索。
+因此我们可以认为关键词一定会在`git lf`中出现至少两次（一次添加一次删除）。
+
+- Lv2: `git grep <regex> $(git rev-list HEAD)`
+- Lv3: `git lf` 然后使用pager的搜索功能
+- Lv3: `git log -G <regex>`
+
+### 在整个repo的所有所有引用的最新commit中搜索
+
+- Lv2: `git grep <regex> $(git rev-parse --all)`
+
+### 在整个repo的所有历史中搜索
+
+过于暴力，走投无路了再用这个：
+
+- Lv2: `git grep <regex> $(git rev-list --all)`
+
+### 在HEAD及其所有submodule中搜索
