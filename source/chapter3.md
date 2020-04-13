@@ -114,8 +114,11 @@ git ls-files -s
 ```bash
 # 整个index替换掉
 git restore --source 5841 --staged -- :/
-# 替换掉某个文件夹
-git restore --source 5841 --staged -- dir/
+git ls-files -s
+# 替换掉某个文件
+(git update-index --force-remove -- name.ext)
+git restore --source 5841 --staged -- name.ext
+git ls-files -s
 ```
 
 ## 利用index更新worktree
@@ -130,7 +133,7 @@ git checkout-index -fu -a
 # 全部加前缀（不必是文件夹路径）
 git checkout-index --prefix -fu -a
 # 只有一部分文件
-git checkout-index -fu -- dir/fn
+git checkout-index -fu -- name.ext
 ```
 
 - Lv3
@@ -138,28 +141,30 @@ git checkout-index -fu -- dir/fn
 # 整个worktree替换掉
 git restore --worktree -- :/
 # 只有一部分文件
-git restore --worktree -- dir/fn
+git restore --worktree -- name.ext
 # 以下为等价的旧语法
 # git checkout -f -- :/
-# git checkout -f -- dir/fn
+# git checkout -f -- name.ext
 ```
 
 ## 利用index创建tree
 
 - Lv2
 ```bash
+(git read-tree --prefix=dir/ 5841)
+git ls-files -s
 # 用整个index创建tree
 git write-tree
-# 6e3eae41f3af12d20b09a136d3e20b2d862aacfc
 # 用一个子目录创建tree
 git write-tree --prefix=dir/
-# 264fb87379112c8d2b5b04f91fefc48e25959206
 ```
 注意：当存在非0的stage数时（一般是由`git read-tree -m`导致的，见第6章），`git write-tree`会失败
 
 - Lv3
 注意：`git commit`创建tree并创建commit
 ```bash
+(git config --global user.name "b1f6c1c4")
+(git config --global user.email "b1f6c1c4@gmail.com")
 git commit --allow-empty -m 'The message'
 ```
 
@@ -212,7 +217,7 @@ echo 1 >f
 git add f
 echo 2 >f
 # 执行：
-git restore --source HEAD --index --worktree -- f
+git restore --source HEAD --staged --worktree -- f
 # 检查：
 git cat-file blob $(git ls-files -s -- f | awk '{ print $2; }')
 cat f
@@ -250,9 +255,9 @@ cat f
 ```bash
 git status
 git stash
-git staus
+git status
 git stash pop
-git staus
+git status
 ```
 
 注意：请一定认真检查`git stash`的输出！
