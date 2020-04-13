@@ -9,6 +9,10 @@ fi
 
 TMP="$(mktemp)"
 TMP2="$(mktemp)"
+finish() {
+    rm -f "$TMP" "$TMP2"
+}
+trap finish EXIT
 
 while [ "$#" -gt 0 ]; do
     STATE=TEXT
@@ -73,4 +77,3 @@ done
 truncate -s 0 "$TMP2"
 docker run --rm -i learn-git-generate <"$TMP" 2> >(while read line; do echo "$line" >>"$TMP2"; echo -e "\e[01;31m$line\e[0m" >&2; done) | tee -a "$TMP2" >&2
 cat "$TMP2"
-rm -f "$TMP" "$TMP2"
