@@ -237,16 +237,46 @@ git cat-file blob 9cb6
 git show 9cb6
 ```
 
+## 检查文件系统
+
+查找并删除无用对象：（**有一定危险，可能会删掉有用的东西**）
+- Lv2
+```bash
+(git update-ref HEAD efd4)
+git count-objects
+# 列出没有在任何引用中使用的对象
+git fsck --unreachable
+# 列出没有在任何引用或对象中使用的对象
+git fsck
+# 删除以上（**有一定危险，可能会删掉有用的东西**）
+git prune
+git count-objects
+git fsck --unreachable
+git fsck
+```
+
+检查文件系统完整性：
+- Lv2
+```bash
+mv objects/ce/013625030ba8dba906f756967f9e9ca394464a ../evil
+git fsck --connectivity-only
+mv ../evil objects/ce/013625030ba8dba906f756967f9e9ca394464a
+git fsck --connectivity-only
+```
+
 ## 总结
 
 - Lv1
-  - `git hash-object -t <type> [--stdin|<file>] -w` - 创建对象
+  - `git hash-object -t <type> [--stdin|<file>] -w`
 - Lv2
-  - `git mktree --missing` - 创建tree
-  - `git commit-tree <tree> -m <message> [-p <parent>]*` - 创建commit
-  - `git mktag` - 创建tag
-  - `git cat-file <type> <SHA1>` - 查看blob和commit和tag
-  - `git ls-tree <SHA1> -- [<path>]` - 查看tree
+  - `git mktree --missing`
+  - `git commit-tree <tree> -m <message> [-p <parent>]*`
+  - `git mktag`
+  - `git cat-file <type> <SHA1>`
+  - `git ls-tree <SHA1> -- [<path>]`
+  - `git count-objects`
+  - `git fsck [--unreachable] [--connectivity-only]`
+  - `git prune` - **有一定危险，可能会删掉有用的东西**
 - Lv3
   - `git tag -a -m <message> <name> <object>` - 同时创建新引用在`refs/tags/<name>`
   - `git show <commit>`

@@ -12,13 +12,16 @@
 ## 操纵对象（第1章）
 
 - Lv1
-  - `git hash-object -t <type> [--stdin|<file>] -w` - 创建对象
+  - `git hash-object -t <type> [--stdin|<file>] -w`
 - Lv2
-  - `git mktree --missing` - 创建tree
-  - `git commit-tree <tree> -m <message> [-p <parent>]*` - 创建commit
-  - `git mktag` - 创建tag
-  - `git cat-file <type> <SHA1>` - 查看blob和commit
-  - `git ls-tree <SHA1> -- [<path>]` - 查看tree
+  - `git mktree --missing`
+  - `git commit-tree <tree> -m <message> [-p <parent>]*`
+  - `git mktag`
+  - `git cat-file <type> <SHA1>`
+  - `git ls-tree <SHA1> -- [<path>]`
+  - `git count-objects`
+  - `git fsck [--unreachable] [--connectivity-only]`
+  - `git prune` - **有一定危险，可能会删掉有用的东西**
 - Lv3
   - `git tag -a -m <message> <name> <object>` - 同时创建新引用在`refs/tags/<name>`
   - `git show <commit>`
