@@ -57,7 +57,7 @@
   - `git update-index --add --cacheinfo <mode>,<SHA1>,<path>`
 - 不常用Lv2
   - `git update-index --add [--info-only] -- <path>`
-  - `git update-index --delete -- <path>`
+  - `git update-index --force-remove -- <path>`
   - `git checkout-index -fu [--prefix=<pf>] -a`
   - `git checkout-index -fu [--prefix=<pf>] -- <path>`
 - 常用Lv2

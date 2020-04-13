@@ -9,4 +9,4 @@ git add -f chapter*.md
 TREE="$(git write-tree)"
 COMMIT="$(git commit-tree "$TREE" -p HEAD -m "publish")"
 git push --force-with-lease origin "$COMMIT:master"
-git update-index --force-delete -- chapter*.md
+git update-index --force-remove -- chapter*.md

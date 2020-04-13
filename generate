@@ -6,7 +6,6 @@ exec 3>&1 4>&2
 
 STATE=TEXT
 BUFFER=
-ECHO=
 LF=$'\n'
 
 (
@@ -18,12 +17,13 @@ echo 'ENABLE-ECHO'
 [ "$#" -gt 0 ] && cat "$1" || true
 ) | while IFS= read -r line; do
     if [ "$line" = 'ENABLE-ECHO' ]; then
-        ECHO=YES
+        printf 'printf "%%s\\n" %q \n' "$line"
+        printf 'printf "%%s\\n" %q >&2 \n' "$line"
         continue
     fi
     case "$STATE" in
         TEXT)
-            [ ! -z "$ECHO" ] && printf 'printf "%%s\\n" %q \n' "$line"
+            printf 'printf "%%s\\n" %q \n' "$line"
             if [ "$line" = '```bash' ]; then
                 echo '('
                 STATE=CODE
@@ -34,10 +34,10 @@ echo 'ENABLE-ECHO'
                 printf '%s' "$BUFFER"
                 BUFFER=
                 echo ')'
-                [ ! -z "$ECHO" ] && printf 'printf "%%s\\n" %q \n' "$line"
+                printf 'printf "%%s\\n" %q \n' "$line"
                 STATE=TEXT
             else
-                [ ! -z "$ECHO" ] && printf 'printf "%%s\\n" %q \n' "$line"
+                printf 'printf "%%s\\n" %q \n' "$line"
                 if [ -z "$(printf '%s' "$line" | grep '^#')" ]; then
                     if [ -z "$(printf '%s' "$line" | grep -e '^cd ' -e '\\$' -e ';$')" ]; then
                         OUT="$line"' | sed "s/^/# /; s/^# $/#/"'"$LF"
@@ -61,7 +61,7 @@ echo 'ENABLE-ECHO'
             fi
             ;;
         LITERAL)
-            [ ! -z "$ECHO" ] && printf 'printf "%%s\\n" %q \n' "$line"
+            printf 'printf "%%s\\n" %q \n' "$line"
             BUFFER="$BUFFER$line$LF"
             if [ "$line" = 'EOF' ]; then
                 STATE=CODE
@@ -71,13 +71,23 @@ echo 'ENABLE-ECHO'
             ;;
     esac
 done | docker run --rm -i learn-git-generate 1> >(
+    ECHO=
     while IFS= read -r line; do
-        printf '%s\n' "$line" >&3
-        printf '%s\n' "$line" >&4
+        if [ "$line" = 'ENABLE-ECHO' ]; then
+            ECHO=YES
+            continue
+        fi
+        [ ! -z "$ECHO" ] && printf '%s\n' "$line" >&3
+        [ ! -z "$ECHO" ] && printf '%s\n' "$line" >&4
     done
 ) 2> >(
+    ECHO=
     while IFS= read -r line; do
-        printf '# %s\n' "$line" >&3
-        printf '# \e[01;31m%s\e[0m\n' "$line" >&4
+        if [ "$line" = 'ENABLE-ECHO' ]; then
+            ECHO=YES
+            continue
+        fi
+        [ ! -z "$ECHO" ] && printf '# %s\n' "$line" >&3
+        [ ! -z "$ECHO" ] && printf '# \e[01;31m%s\e[0m\n' "$line" >&4
     done
 )
