@@ -1,84 +1,87 @@
 #!/bin/bash
 
-set -uo pipefail
+set -euo pipefail
 
-if [ "$#" -eq 0 ]; then
-    echo "Error: please specify what to generate" >&2
-    exit 1
-fi
-
-TMP="$(mktemp)"
 TMP2="$(mktemp)"
 finish() {
-    rm -f "$TMP" "$TMP2"
+    rm -f "$TMP2"
 }
 trap finish EXIT
 
-while [ "$#" -gt 0 ]; do
-    STATE=TEXT
-    FILE="$1"
-    printf 'File %s\n' "$FILE" >&2
-    shift
-    while IFS= read -r line; do
-        case "$STATE" in
-            TEXT)
+exec 3>&1 4>&2
+
+STATE=TEXT
+
+while IFS= read -r line; do
+    case "$STATE" in
+        TEXT)
+            if [ "$#" -eq 0 ]; then
+                printf 'printf "%%s\\n" %q \n' "$line"
+            fi
+            if [ "$line" = '```bash' ]; then
+                echo '('
+                STATE=CODE
+            fi
+            ;;
+        CODE)
+            if [ "$line" = '```' ]; then
+                cat "$TMP2"
+                truncate -s 0 "$TMP2"
+                echo ')'
                 if [ "$#" -eq 0 ]; then
-                    printf 'printf "%%s\\n" %q \n' "$line" >>"$TMP"
+                    printf 'printf "%%s\\n" %q \n' "$line"
                 fi
-                if [ "$line" = '```bash' ]; then
-                    echo '(' >>"$TMP"
-                    STATE=CODE
-                fi
-                ;;
-            CODE)
-                if [ "$line" = '```' ]; then
-                    cat "$TMP2" >>"$TMP"
-                    truncate -s 0 "$TMP2"
-                    echo ')' >>"$TMP"
-                    if [ "$#" -eq 0 ]; then
-                        printf 'printf "%%s\\n" %q \n' "$line" >>"$TMP"
+                STATE=TEXT
+            else
+                printf 'printf "%%s\\n" %q \n' "$line"
+                if [ -z "$(printf '%s' "$line" | grep '^#')" ]; then
+                    if [ -z "$(printf '%s' "$line" | grep -e '\\$' -e ';$' -e 'EOF$')" ]; then
+                        OBJ=
+                        cat "$TMP2"
+                        truncate -s 0 "$TMP2"
+                    elif [ -z "$(printf '%s' "$line" | grep -e 'EOF$')" ]; then
+                        OBJ=YES
+                    else
+                        OBJ=YES
+                        STATE=LITERAL
                     fi
-                    STATE=TEXT
-                else
-                    printf 'printf "%%s\\n" %q \n' "$line" >>"$TMP"
-                    if [ -z "$(printf '%s' "$line" | grep '^#')" ]; then
-                        if [ -z "$(printf '%s' "$line" | grep -e '\\$' -e ';$' -e 'EOF$')" ]; then
-                            OBJ="$TMP"
-                            cat "$TMP2" >>"$TMP"
-                            truncate -s 0 "$TMP2"
-                        elif [ -z "$(printf '%s' "$line" | grep -e 'EOF$')" ]; then
-                            OBJ="$TMP2"
+                    if [ -z "$(printf '%s' "$line" | grep -e '^cd ' -e '\\$' -e ';$')" ]; then
+                        if [ -z "$OBJ" ]; then
+                            printf '%s | sed "s/^/# /" | sed "s/^# $/#/"\n' "$line"
                         else
-                            OBJ="$TMP2"
-                            STATE=LITERAL
-                        fi
-                        if [ -z "$(printf '%s' "$line" | grep -e '^cd ' -e '\\$' -e ';$')" ]; then
-                            printf '%s | sed "s/^/# /" | sed "s/^# $/#/"\n' "$line" >>"$OBJ"
-                        else
-                            printf '%s\n' "$line" >>"$OBJ"
+                            printf '%s | sed "s/^/# /" | sed "s/^# $/#/"\n' "$line" >>"$TMP2"
                         fi
                     else
-                        cat "$TMP2" >>"$TMP"
-                        truncate -s 0 "$TMP2"
+                        if [ -z "$OBJ" ]; then
+                            printf '%s\n' "$line"
+                        else
+                            printf '%s\n' "$line" >>"$TMP2"
+                        fi
                     fi
+                else
+                    cat "$TMP2"
+                    truncate -s 0 "$TMP2"
                 fi
-                ;;
-            LITERAL)
-                printf 'printf "%%s\\n" %q \n' "$line" >>"$TMP"
-                printf '%s\n' "$line" >>"$TMP2"
-                if [ "$line" = 'EOF' ]; then
-                    STATE=CODE
-                fi
-                ;;
-        esac
-    done <"$FILE"
-done
-
-truncate -s 0 "$TMP2"
-docker run --rm -i learn-git-generate <"$TMP" 2> >(
+            fi
+            ;;
+        LITERAL)
+            printf 'printf "%%s\\n" %q \n' "$line"
+            printf '%s\n' "$line" >>"$TMP2"
+            if [ "$line" = 'EOF' ]; then
+                STATE=CODE
+                cat "$TMP2"
+                truncate -s 0 "$TMP2"
+            fi
+            ;;
+    esac
+done | docker run --rm -i learn-git-generate 1> >(
     while read line; do
-        printf '# %s\n' "$line" >>"$TMP2"
-        printf '# \e[01;31m%s\e[0m\n' "$line" >&2
+        printf '%s\n' "$line" >&3
+        printf '%s\n' "$line" >&4
     done
-    ) | tee -a "$TMP2" >&2
-cat "$TMP2"
+) 2> >(
+    while read line; do
+        printf '# %s\n' "$line" >&3
+        printf '# \e[01;31m%s\e[0m\n' "$line" >&4
+    done
+)
