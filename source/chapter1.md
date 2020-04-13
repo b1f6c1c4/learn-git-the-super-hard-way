@@ -135,7 +135,7 @@ GIT_AUTHOR_DATE='1600000000 +0800' \
 GIT_COMMITTER_NAME=b1f6c1c4 \
 GIT_COMMITTER_EMAIL=b1f6c1c4@gmail.com \
 GIT_COMMITTER_DATE='1600000000 +0800' \
-git commit-tree 5841 -p d4da << EOF
+git commit-tree 5841 -p d4da <<EOF
 Message may be read
 from stdin
 or by the option '-m'
@@ -264,6 +264,89 @@ mv ../evil objects/ce/013625030ba8dba906f756967f9e9ca394464a
 git fsck --connectivity-only
 ```
 
+## “修改”对象
+
+Git对象本身是无法修改的，但是Git提供了一种机制使得我们可以用一个新的对象来覆盖某个现成对象，
+在访问原对象的时候会被自动定向到新的对象中。
+
+若要将efd4替换为另外的一个commit，首先先创建一个commit：
+```bash
+git hash-object -t commit --stdin -w <<EOF
+tree 58417991a0e30203e7e9b938f62a9a6f9ce10a9a
+parent d4dafde7cd9248ef94c0400983d51122099d312a
+author Mx. Evil <evil@gmail.com> 1600000000 -0400
+committer Mx. Evil <evil@gmail.com> 1600000000 -0400
+
+OOF.. This is a fake one... hahahaha!
+EOF
+```
+
+### 添加replace
+
+- Lv0
+```bash
+mkdir -p refs/replace/
+echo '9f3162e7fd9f1d41b704c0064c62714d7e699643' >refs/replace/efd4f82f6151bd20b167794bc57c66bbf82ce7dd
+```
+
+- Lv2
+```bash
+(git replace --delete efd4 >/dev/null)
+git replace -f efd4 9f31
+```
+
+注意：若成环会导致错误
+```bash
+(git replace --delete efd4 >/dev/null)
+git replace -f efd4 9f31
+git replace -f 9f31 efd4
+git cat-file commit efd4
+(git replace --delete 9f31 >/dev/null)
+```
+
+- Lv3
+无需提前创建，直接使用vim方便地修改对象：（此时要求新旧对象类型一致）
+```sh
+git replace --edit efd4
+```
+
+### 列出所有replace
+
+- Lv3
+```bash
+git replace -l --format=long
+```
+
+### 分别访问新旧对象
+
+除非使用Lv0方式或者`--no-replace-objects`，否则访问efd4的时候总会被重定向到9f31：
+
+- Lv2
+```bash
+git cat-file commit efd4
+# 注意--no-replace-objects是总的参数，不是cat-file自己的
+git --no-replace-objects cat-file commit efd4
+```
+
+- Lv3
+```bash
+git show efd4
+git --no-replace-objects show efd4
+```
+
+### 取消replace，保留新旧两个对象
+
+- Lv0
+```bash
+rm -f refs/replace/efd4f82f6151bd20b167794bc57c66bbf82ce7dd
+```
+
+- Lv3
+```bash
+(git replace -f efd4 9f31)
+git replace --delete efd4
+```
+
 ## 总结
 
 - Lv1
@@ -277,9 +360,13 @@ git fsck --connectivity-only
   - `git count-objects`
   - `git fsck [--unreachable] [--connectivity-only]`
   - `git prune` - **有一定危险，可能会删掉有用的东西**
+  - `git replace -f <original> <replacement>`
 - Lv3
   - `git tag -a -m <message> <name> <object>` - 同时创建新引用在`refs/tags/<name>`
   - `git show <commit>`
   - `git show <tree>` - 如`HEAD^{tree}`
   - `git show <blob>` - 如`HEAD:index.js`
+  - `git replace --edit <original>`
+  - `git replace -l --format=long`
+  - `git replace --delete <original>`
 

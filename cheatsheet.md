@@ -22,11 +22,15 @@
   - `git count-objects`
   - `git fsck [--unreachable] [--connectivity-only]`
   - `git prune` - **有一定危险，可能会删掉有用的东西**
+  - `git replace -f <original> <replacement>`
 - Lv3
   - `git tag -a -m <message> <name> <object>` - 同时创建新引用在`refs/tags/<name>`
   - `git show <commit>`
   - `git show <tree>` - 如`HEAD^{tree}`
   - `git show <blob>` - 如`HEAD:index.js`
+  - `git replace --edit <original>`
+  - `git replace -l --format=long`
+  - `git replace --delete <original>`
 
 ## 操纵引用（第2章）
 
