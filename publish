@@ -3,9 +3,10 @@
 set -euxo pipefail
 
 make docker
-make -j 8
+make -j32
 
 git add -f chapter*.md
-TREE="$(git mktree)"
+TREE="$(git write-tree)"
 COMMIT="$(git commit-tree "$TREE" -p HEAD -m "publish")"
 git push --force-with-lease origin "$COMMIT:master"
+git update-index --force-delete -- chapter*.md

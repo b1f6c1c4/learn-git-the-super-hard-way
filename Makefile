@@ -1,4 +1,4 @@
-CHAPTERS=$(patsubst source/%,source/%,$(wildcard source/chapter*.md))
+CHAPTERS=$(patsubst source/%,%,$(wildcard source/chapter*.md))
 
 all: $(CHAPTERS)
 
@@ -10,6 +10,7 @@ chapter1.md: source/chapter1.md
 chapter2.md: source/chapter1.md source/chapter2.md
 chapter3.md: source/chapter3.md
 chapter4.md: source/chapter4.md
+chapter5.md: source/chapter5.md
 
 $(CHAPTERS):
 	./generate $^ >$@

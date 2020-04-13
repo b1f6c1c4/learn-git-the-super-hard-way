@@ -75,5 +75,10 @@ while [ "$#" -gt 0 ]; do
 done
 
 truncate -s 0 "$TMP2"
-docker run --rm -i learn-git-generate <"$TMP" 2> >(while read line; do echo "$line" >>"$TMP2"; echo -e "\e[01;31m$line\e[0m" >&2; done) | tee -a "$TMP2" >&2
+docker run --rm -i learn-git-generate <"$TMP" 2> >(
+    while read line; do
+        printf '# %s\n' "$line" >>"$TMP2"
+        printf '# \e[01;31m%s\e[0m\n' "$line" >&2
+    done
+    ) | tee -a "$TMP2" >&2
 cat "$TMP2"

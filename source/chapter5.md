@@ -10,6 +10,11 @@
 
 本章所有命令都无需worktree。为了方便起见，本章所有命令都将直接在repo中操作，省略`--git-dir`。
 
+```bash
+git init --bare .
+ls
+```
+
 ## Packfile
 研究Git remotes之前需要先研究packfile。
 由于packfile内部格式相当复杂，本节不介绍Lv0命令。
@@ -18,34 +23,21 @@
 在开始之前，先创建几个对象：
 ```bash
 echo 'obj1' | git hash-object -t blob --stdin -w
-# 5ff37e33c444f1ef1a6b3abda4fa05bf78352d12
 echo 'obj2' | git hash-object -t blob --stdin -w
-# 95fc5713e4d2debb0e898632c63bfe4a4ce0c665
 echo 'obj3' | git hash-object -t blob --stdin -w
-# cff99442835504ec82ba2b6d6328d898033a5300
 git mktree <<EOF
-100644 blob 5ff37e33c444f1ef1a6b3abda4fa05bf78352d12	1.txt
-100755 blob 95fc5713e4d2debb0e898632c63bfe4a4ce0c665	2.txt
+100644 blob 5ff37e33c444f1ef1a6b3abda4fa05bf78352d12$(printf '\t')1.txt
+100755 blob 95fc5713e4d2debb0e898632c63bfe4a4ce0c665$(printf '\t')2.txt
 EOF
-# 2da98740b77749cb1b6b3acaee43a3644fb3e9e5
 git mktree <<EOF
-100644 blob cff99442835504ec82ba2b6d6328d898033a5300	3.txt
-040000 tree 2da98740b77749cb1b6b3acaee43a3644fb3e9e5	dir
+100644 blob cff99442835504ec82ba2b6d6328d898033a5300$(printf '\t')3.txt
+040000 tree 2da98740b77749cb1b6b3acaee43a3644fb3e9e5$(printf '\t')dir
 EOF
-# 187e91589a3f4f248f4cc8b1a1eca65b5161cc7b
 ```
 检查对象创建情况：
 ```bash
 git ls-tree -r 187e
-# 100644 blob cff99442835504ec82ba2b6d6328d898033a5300    3.txt
-# 100644 blob 5ff37e33c444f1ef1a6b3abda4fa05bf78352d12    dir/1.txt
-# 100755 blob 95fc5713e4d2debb0e898632c63bfe4a4ce0c665    dir/2.txt
 find objects -type f
-# objects/cf/f99442835504ec82ba2b6d6328d898033a5300
-# objects/5f/f37e33c444f1ef1a6b3abda4fa05bf78352d12
-# objects/95/fc5713e4d2debb0e898632c63bfe4a4ce0c665
-# objects/18/7e91589a3f4f248f4cc8b1a1eca65b5161cc7b
-# objects/2d/a98740b77749cb1b6b3acaee43a3644fb3e9e5
 ```
 
 ### 创建Packfile
@@ -57,13 +49,7 @@ cff99442835504ec82ba2b6d6328d898033a5300
 95fc5713e4d2debb0e898632c63bfe4a4ce0c665
 187e91589a3f4f248f4cc8b1a1eca65b5161cc7b
 EOF
-# Counting objects: 3, done.
-# 2b2d8ce85275da98291c5ad8f60680b2dec81ba4
-# Writing objects: 100% (3/3), done.
-# Total 3 (delta 0), reused 0 (delta 0)
 ls ../somewhere-else/
-# prefix-2b2d8ce85275da98291c5ad8f60680b2dec81ba4.idx
-# prefix-2b2d8ce85275da98291c5ad8f60680b2dec81ba4.pack
 ```
 
 ### 自动列出应该打包哪些对象
@@ -74,37 +60,14 @@ ls ../somewhere-else/
 
 ```bash
 git rev-list --objects 187e
-# 187e91589a3f4f248f4cc8b1a1eca65b5161cc7b
-# cff99442835504ec82ba2b6d6328d898033a5300 3.txt
-# 2da98740b77749cb1b6b3acaee43a3644fb3e9e5 dir
-# 5ff37e33c444f1ef1a6b3abda4fa05bf78352d12 dir/1.txt
-# 95fc5713e4d2debb0e898632c63bfe4a4ce0c665 dir/2.txt
 git rev-list --objects 187e | git pack-objects ../somewhere-else/prefix
-# Counting objects: 5, done.
-# Delta compression using up to 2 threads.
-# Compressing objects: 100% (2/2), done.
-# a451aab5615fb6d97e2ecb337b7f1d783ed66a70
-# Writing objects: 100% (5/5), done.
-# Total 5 (delta 0), reused 0 (delta 0)
 ```
 
 ### 查看Packfile
 
 ```bash
 git verify-pack -v ../somewhere-else/prefix-2b2d8ce85275da98291c5ad8f60680b2dec81ba4.idx
-# cff99442835504ec82ba2b6d6328d898033a5300 blob   5 14 12
-# 95fc5713e4d2debb0e898632c63bfe4a4ce0c665 blob   5 14 26
-# 187e91589a3f4f248f4cc8b1a1eca65b5161cc7b tree   63 73 40
-# non delta: 3 objects
-# ../somewhere-else/prefix-2b2d8ce85275da98291c5ad8f60680b2dec81ba4.pack: ok
 git verify-pack -v ../somewhere-else/prefix-a451aab5615fb6d97e2ecb337b7f1d783ed66a70.idx
-# 187e91589a3f4f248f4cc8b1a1eca65b5161cc7b tree   63 73 12
-# cff99442835504ec82ba2b6d6328d898033a5300 blob   5 14 85
-# 2da98740b77749cb1b6b3acaee43a3644fb3e9e5 tree   66 75 99
-# 5ff37e33c444f1ef1a6b3abda4fa05bf78352d12 blob   5 14 174
-# 95fc5713e4d2debb0e898632c63bfe4a4ce0c665 blob   5 14 188
-# non delta: 5 objects
-# ../somewhere-else/prefix-a451aab5615fb6d97e2ecb337b7f1d783ed66a70.pack: ok
 ```
 对于复杂的packfile，可能出现链状结构（只保存了增量修改信息）。详情参见[这里](https://git-scm.com/book/en/v2/Git-Internals-Packfiles)。
 
@@ -113,7 +76,6 @@ git verify-pack -v ../somewhere-else/prefix-a451aab5615fb6d97e2ecb337b7f1d783ed6
 （先删除所有objects：`rm -rf objects/*`)
 ```bash
 git unpack-objects < ../somewhere-else/prefix-a451aab5615fb6d97e2ecb337b7f1d783ed66a70.pack
-# Unpacking objects: 100% (5/5), done.
 ```
 
 ## 跨库直接对象传输
@@ -124,19 +86,14 @@ mkdir -p ../another-repo.git/objects ../another-repo.git/refs
 echo 'ref: refs/heads/master' > ../another-repo.git/HEAD
 # 允许直接传输对象
 git config uploadpack.allowAnySHA1InWant true
+git --git-dir=../another-repo.git config uploadpack.allowAnySHA1InWant true
 ```
 
 直接索要对象（若不加`--keep`则直接解Packfile）：
 ```bash
-git --git-dir=../another-repo.git fetch-pack --keep ../the-repo.git 187e91589a3f4f248f4cc8b1a1eca65b5161cc7b
-# remote: Counting objects: 5, done.
-# remote: Compressing objects: 100% (2/2), done.
-# remote: Total 5 (delta 0), reused 0 (delta 0)
-# Receiving objects: 100% (5/5), done.
-# keep    a451aab5615fb6d97e2ecb337b7f1d783ed66a70
-# 187e91589a3f4f248f4cc8b1a1eca65b5161cc7b 187e91589a3f4f248f4cc8b1a1eca65b5161cc7b
+git --git-dir=../another-repo.git fetch-pack --keep --no-progress "$PWD" 187e91589a3f4f248f4cc8b1a1eca65b5161cc7b
 ```
-注意：`../the-repo.git`还可以是URL，用于跨域对象传输
+注意：`$PWD`还可以是URL，用于跨域对象传输
 
 ## 跨库直接引用传输
 
@@ -149,31 +106,17 @@ committer b1f6c1c4 <b1f6c1c4@gmail.com> 1514736000 +0800
 
 The commit message
 EOF
-# bb6d205106a1104778884986d8e3594f35170fae
 git update-ref refs/heads/itst bb6d
 ```
 
 直接索要引用及其对象：
 ```bash
-git --git-dir=../another-repo.git fetch-pack ../the-repo.git refs/heads/itst
-# remote: Counting objects: 6, done.
-# remote: Compressing objects: 100% (3/3), done.
-# remote: Total 6 (delta 0), reused 0 (delta 0)
-# Unpacking objects: 100% (6/6), done.
-# bb6d205106a1104778884986d8e3594f35170fae refs/heads/itst
+git --git-dir=../another-repo.git fetch-pack --no-progress "$PWD" refs/heads/itst
 ```
 
 直接推送引用及其对象：
 ```bash
-git send-pack --force ../another-repo.git 187e91589a3f4f248f4cc8b1a1eca65b5161cc7b
-# git send-pack --force ../another-repo.git refs/heads/itst
-# Counting objects: 6, done.
-# Delta compression using up to 2 threads.
-# Compressing objects: 100% (3/3), done.
-# Writing objects: 100% (6/6), 343 bytes | 343.00 KiB/s, done.
-# Total 6 (delta 0), reused 0 (delta 0)
-# To ../another-repo.git
-#  * [new branch]      itst -> itst
+git send-pack --force --no-progress ../another-repo.git refs/heads/itst
 ```
 
 检查远程引用：
@@ -186,16 +129,10 @@ git ls-remote ../another-repo.git
 跨域但无法建立网络连接时，先创建bundle：
 ```bash
 git bundle create ../the-bundle refs/heads/itst
-# Counting objects: 6, done.
-# Delta compression using up to 2 threads.
-# Compressing objects: 100% (3/3), done.
-# Writing objects: 100% (6/6), 343 bytes | 343.00 KiB/s, done.
-# Total 6 (delta 0), reused 0 (delta 0)
 ```
 再解bundle：
 ```bash
 git --git-dir=../another-repo.git bundle unbundle ../the-bundle
-# bb6d205106a1104778884986d8e3594f35170fae refs/heads/itst
 ```
 
 ## Lv3命令
@@ -206,64 +143,41 @@ git --git-dir=../another-repo.git bundle unbundle ../the-bundle
 
 裸remote：
 ```bash
-cat <<EOF >../the-repo.git/config
+cat >./config <<EOF
 [remote "another"]
   url = ../another-repo.git
 EOF
 git push another itst
-# Counting objects: 6, done.
-# Delta compression using up to 2 threads.
-# Compressing objects: 100% (3/3), done.
-# Writing objects: 100% (6/6), 343 bytes | 343.00 KiB/s, done.
-# Total 6 (delta 0), reused 0 (delta 0)
-# To ../another-repo.git
-#  * [new branch]      itst -> itst
 git fetch another itst
-# From ../another-repo
-#  * branch            itst       -> FETCH_HEAD
 git fetch another itst:tsts
-# From ../another-repo
-#  * [new branch]      itst       -> tsts
 ```
 
 带默认fetch的remote：
 ```bash
-cat <<EOF >../the-repo.git/config
+cat >./config <<EOF
 [remote "another"]
   url = ../another-repo.git
   fetch = +refs/heads/*:refs/heads/abc/*
   fetch = +refs/heads/*:refs/heads/def/*
 EOF
 git fetch another itst
-# From ../another-repo
-#  * branch            itst       -> FETCH_HEAD
-#  * [new branch]      itst       -> abc/itst
-#  * [new branch]      itst       -> def/itst
 ```
 
 强制全盘push：
 ```bash
-cat <<EOF >../the-repo.git/config
+cat >./config <<EOF
 [remote "another"]
   url = ../another-repo.git
   mirror = true
 EOF
 git push another itst
-# error: --mirror can't be combined with refspecs
 git push another
-# ......
-# To ../another-repo.git/
-#  * [new branch]      abc/itst -> abc/itst
-#  * [new branch]      def/itst -> def/itst
-#  * [new branch]      master -> master
-#  * [new branch]      tsts -> tsts
-# ......
 ```
 
 ### 未指明remote的`git push`和`git fetch`
 
 ```bash
-cat <<EOF >../the-repo.git/config
+cat >./config <<EOF
 [remote "another"]
   url = ../another-repo.git
 [branch "itst"]
@@ -271,16 +185,12 @@ cat <<EOF >../the-repo.git/config
   merge = refs/heads/itst
 EOF
 git symbolic-ref HEAD refs/heads/itst
-# git push --verbose
-# Pushing to ../another-repo.git
-# To ../another-repo.git
-#  = [up to date]      itst -> itst
-# Everything up-to-date
+git push --verbose
 # 与git fetch无关
 ```
 
 ```bash
-cat <<EOF >../the-repo.git/config
+cat >./config <<EOF
 [remote "another"]
   url = ../another-repo.git
   fetch = +refs/heads/*:refs/remotes/another/*
@@ -289,35 +199,23 @@ cat <<EOF >../the-repo.git/config
 EOF
 git symbolic-ref HEAD refs/heads/itst
 git fetch --verbose
-# From ../another-repo
-#  = [up to date]      itst       -> another/itst
 # 与git push无关
 ```
 
 ### 使用Lv3命令修改设置
 
 ```bash
+(rm -f ./config)
 git remote add another ../another-repo.git
-cat ../the-repo.git/config
-# [remote "another"]
-#         url = ../another-repo.git/
-#         fetch = +refs/heads/*:refs/remotes/another/*
-git remote add another --mirror=fetch ../another-repo.git
-cat ../the-repo.git/config
-# [remote "another"]
-#         url = ../another-repo.git/
-#         fetch = +refs/*:refs/*
-git remote add another --mirror=push ../another-repo.git
-cat ../the-repo.git/config
-# [remote "another"]
-#         url = ../another-repo.git/
-#         mirror = true
+cat ./config
 git push -u another itst
-cat ../the-repo.git/config
-# ......
-# [branch "itst"]
-#         remote = another
-#         merge = refs/heads/itst
+cat ./config
+(rm -f ./config)
+git remote add another --mirror=fetch ../another-repo.git
+cat ./config
+(rm -f ./config)
+git remote add another --mirror=push ../another-repo.git
+cat ./config
 ```
 
 ### 关于`git pull`
