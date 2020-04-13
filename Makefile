@@ -11,6 +11,7 @@ chapter2.md: source/chapter1.md source/chapter2.md
 chapter3.md: source/chapter3.md
 chapter4.md: source/chapter4.md
 chapter5.md: source/chapter5.md
+chapter6.md: source/chapter6.md
 
 $(CHAPTERS):
 	./generate $^ >$@
