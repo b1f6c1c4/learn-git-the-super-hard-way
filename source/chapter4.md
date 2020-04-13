@@ -58,12 +58,12 @@
 必须在以下几种用法中选一种：
 - `git reset [<tree-ish>] -- <path>` - 根据`<commit-ish>`修改index，见第3章
   - 请使用新语法：`git restore [--source <commit-ish>] --stage -- <path>`
-- `git reset --soft [<commit-ish>]` - 相当于依次执行以下命令：（留空`<tree-ish>`表示HEAD）
+- `git reset --soft [<commit-ish>] --` - 相当于依次执行以下命令：（留空`<tree-ish>`表示HEAD）
   - `git update-ref HEAD <commit-ish>` - 修改HEAD*或者*HEAD指向的引用
-- `git reset [--mixed] [<commit-ish>]` - 相当于依次执行以下命令：（留空`<tree-ish>`表示HEAD）
+- `git reset [--mixed] [<commit-ish>] --` - 相当于依次执行以下命令：（留空`<tree-ish>`表示HEAD）
   - `git update-ref HEAD <commit-ish>` - 修改HEAD*或者*HEAD指向的引用
   - `git restore --staged -- :/` - 根据HEAD修改index，见第3章
-- `git reset --hard [<commit-ish>]` - 相当于依次执行以下命令：（留空`<tree-ish>`表示HEAD）
+- `git reset --hard [<commit-ish>] --` - 相当于依次执行以下命令：（留空`<tree-ish>`表示HEAD）
   - `git update-ref HEAD <commit-ish>` - 修改HEAD*或者*HEAD指向的引用
   - `git restore --staged --worktree -- :/` - 根据HEAD修改index，见第3章
 
@@ -99,7 +99,7 @@
   - `git switch --detach <commit-ish>`
   - `git switch -c <branch> <commit-ish>`
   - `git switch <ref>`
-  - `git reset --soft [<commit-ish>]`
-  - `git reset [--mixed] [<commit-ish>]`
-  - `git reset --hard [<commit-ish>]`
+  - `git reset --soft [<commit-ish>] --`
+  - `git reset [--mixed] [<commit-ish>] --`
+  - `git reset --hard [<commit-ish>] --`
 

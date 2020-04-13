@@ -5,6 +5,8 @@
 - Lv3
   - `git init --bare <repo>`
   - `git init [--separate-git-dir <repo>] <worktree>`
+  - `git clone --mirror|--bare <url> <repo>`
+  - `git clone [--no-checkout] [--branch <ref>] [--separate-git-dir <repo>] <url> <worktree>`
   - `git worktree list|add|prune`
 
 ## 操纵对象（第1章）
@@ -14,6 +16,7 @@
 - Lv2
   - `git mktree --missing` - 创建tree
   - `git commit-tree <tree> -m <message> [-p <parent>]*` - 创建commit
+  - `git mktag` - 创建tag
   - `git cat-file <type> <SHA1>` - 查看blob和commit
   - `git ls-tree <SHA1> -- [<path>]` - 查看tree
 - Lv3
@@ -25,15 +28,21 @@
 ## 操纵引用（第2章）
 
 - Lv2
-  - `git rev-parse <object>`
+  - `git rev-parse <object|ref>`
+  - `git show-ref [--head] [<ref>...]`
+  - `git for-each-ref [<ref-pattern>...]`
   - `git update-ref --no-deref <ref> [-d|<new>]` - 修改`<ref>`
   - `git update-ref <ref> [-d|<new>]` - 修改`<ref>`或者其引用的引用
   - `git symbolic-ref <ref>`
   - `git symbolic-ref --delete <ref>`
   - `git symbolic-ref <from> <to>`
 - Lv3
+  - `git branch -av`
+  - `git branch -avl <branch-pattern>`
+  - `git branch -avl <tag-pattern>`
   - `git branch -f <branch> <commit-ish>` - 只能操纵`refs/heads/s`
   - `git branch -D <branch>` - 只能操纵`refs/heads/s`
+  - `git describe [--all] [--always] --dirty`
 
 ## 操纵索引（第3章）
 
@@ -53,51 +62,54 @@
 - Lv3
   - `git add -f -- <path>`
   - `git rm --cached -- <path>`
-  - `git mv` & `git cp`
-  - `git reset [<tree-ish>] -- <path>` - 留空`<tree-ish>`表示HEAD
+  - `git mv`
+  - `git restore [--source <tree-ish>] [--staged] [--worktree] -- <path>`
   - `git checkout -f -- <path>`
   - `git commit`
+  - `git stash [pop]`
+  - `git clean -nd [-x|-X] [-- <path>]`（把`-n`换成`-f`就会真的删除，**非常危险**）
   - `git add -p`
-  - `git reset -p`
+  - `git restore -p`
 
 ## 操纵HEAD（第4章）
 
-- `git checkout -- <path>` - 根据index更新worktree，见第3章
-- `git checkout [--detach] [<commit-ish>] --` - 修改HEAD、index、worktree，见上面（留空`<tree-ish>`表示HEAD）
-- `git checkout <commit-ish> -- <path>` - 相当于依次执行以下命令：
-  - `git reset <commit-ish> -- <path>` - 根据`<commit-ish>`修改index，见第3章
-  - `git checkout-index -- <path>` - 修改worktree
-- `git reset [<tree-ish>] -- <path>` - 根据`<commit-ish>`修改index，见第3章
-- `git reset --soft [<commit-ish>]` - 相当于依次执行以下命令：（留空`<tree-ish>`表示HEAD）
-  - `git update-ref HEAD <commit-ish>` - 修改HEAD*或者*HEAD指向的引用
-- `git reset [--mixed] [<commit-ish>]` - 相当于依次执行以下命令：（留空`<tree-ish>`表示HEAD）
-  - `git update-ref HEAD <commit-ish>` - 修改HEAD*或者*HEAD指向的引用
-  - `git reset HEAD -- .` - 根据HEAD修改index，见第3章
-- `git reset --hard [<commit-ish>]` - 相当于依次执行以下命令：（留空`<tree-ish>`表示HEAD）
-  - `git update-ref HEAD <commit-ish>` - 修改HEAD*或者*HEAD指向的引用
-  - `git reset HEAD -- .` - 根据HEAD修改index，见第3章
-  - `git checkout-index -f -a` - 修改worktree
+- Lv3
+  - `git switch --detach <commit-ish>`
+  - `git switch -c <branch> <commit-ish>`
+  - `git switch <ref>`
+  - `git reset --soft [<commit-ish>] --`
+  - `git reset [--mixed] [<commit-ish>] --`
+  - `git reset --hard [<commit-ish>] --`
+
+- Lv3(旧语法)
+  - `git checkout -- <path>` - 根据index更新worktree，见第3章
+    - 请使用新语法：`git restore [--worktree] -- <path>`
+  - `git checkout [--detach] [<commit-ish>] --` - 修改HEAD、index、worktree，见上面（留空`<tree-ish>`表示HEAD）
+    - 请使用新语法：`git switch <commit-ish>`
+  - `git checkout <commit-ish> -- <path>` - 根据tree更新index和worktree，见第3章
+    - 请使用新语法：`git restore --source <commit-ish> --stage --worktree -- <path>`
+  - `git reset [<tree-ish>] -- <path>` - 根据`<commit-ish>`修改index，见第3章
+    - 请使用新语法：`git restore [--source <commit-ish>] --stage -- <path>`
+  - `git reset --soft [<commit-ish>]` - 相当于依次执行以下命令：（留空`<tree-ish>`表示HEAD）
+    - `git update-ref HEAD <commit-ish>` - 修改HEAD*或者*HEAD指向的引用
+  - `git reset [--mixed] [<commit-ish>]` - 相当于依次执行以下命令：（留空`<tree-ish>`表示HEAD）
+    - `git update-ref HEAD <commit-ish>` - 修改HEAD*或者*HEAD指向的引用
+    - `git restore --staged -- :/` - 根据HEAD修改index，见第3章
+  - `git reset --hard [<commit-ish>]` - 相当于依次执行以下命令：（留空`<tree-ish>`表示HEAD）
+    - `git update-ref HEAD <commit-ish>` - 修改HEAD*或者*HEAD指向的引用
+    - `git restore --staged --worktree -- :/` - 根据HEAD修改index，见第3章
 
 ## 操纵远程（第5章）
 
 - Lv2
-  - Packfile
-    - `git rev-list --objects <object> | git pack-objects <path-prefix>`
-    - `git unpack-objects`
-  - Bundle
-    - `git bundle create <file> <refs>*`
-    - `git bundle unbundle <file>`
-  - 传输
-    - `git fetch-pack <url> <hash>*` - 需要`git config uploadpack.allowAnySHA1InWant true`
-    - `git fetch-pack <url> <ref>*`
-    - `git send-pack --force <url> <local-ref>:<remote-ref>*`
+  - `git ls-remote <url>`
 - Lv3
-  - 配置
-    - `git remote add <remote> [--mirror=push|fetch] <url>`
-    - `git push -u <remote> <ref>`
-  - 传输
-    - `git push <remote> <local-ref>:<remote-ref>`
-    - `git fetch <remote> <remote-ref>:<local-ref>`
+  - `git remote add <remote> [--mirror=push|fetch] <url>`
+  - `git push [-u] <remote> <local-ref>:<remote-ref>`
+  - `git fetch <remote> <remote-ref>:<local-ref>`
+  - `git pull --ff-only`
+- Lv3(不推荐使用的邪恶命令)
+  - `git pull [--rebase]`
 
 ## 操纵merge（第6章）
 
@@ -126,6 +138,12 @@
     - `git merge -s ours [--no-ff] [--no-commit] B*`
     - `git merge -s recursive [--no-ff] [--no-commit] B`
     - `git merge -s subtree [--no-ff] [--no-commit] B`
+  - Lv4
+    - `git mf`
+    - `git mnf`
+    - `git mnfnc`
+  - Lv5
+    - `git-mnfss`
 
 ## 操纵commit（第7章）
 

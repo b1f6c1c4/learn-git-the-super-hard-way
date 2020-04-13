@@ -43,8 +43,8 @@
 ### 全局命令行参数
 
 - cwd默认为.，表示先cd到那里再运行后续命令
-- work-tree默认为.，但并非所有命令都涉及worktree
-- git-dir默认为./.git：
+- work-tree默认为`GIT_WORK_TREE`或者`.`，但并非所有命令都涉及worktree
+- git-dir默认为`GIT_DIR`或者`./.git`：
   - 若./.git是目录，则就以该目录为repo
   - 若./.git是文件，则以该文件内容（一般会是绝对路径）为repo
 

@@ -243,7 +243,7 @@ cat ./config
 - Lv3
   - 配置
     - `git remote add <remote> [--mirror=push|fetch] <url>`
-    - `git push -u <remote> <ref>`
+    - `git push -u <remote> <local-ref>:<remote-ref>`
   - 传输
     - `git push <remote> <local-ref>:<remote-ref>`
     - `git fetch <remote> <remote-ref>:<local-ref>`
