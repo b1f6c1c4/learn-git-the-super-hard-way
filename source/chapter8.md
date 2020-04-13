@@ -88,20 +88,18 @@
 首先创建repo，不连带创建worktree：
 ```bash
 mkdir the-project
-cd the-project
-git init --bare the-project.git
-cd the-project.git
-# git remote add origin https://github.com/...
+git init --bare the-project/the-project.git
+# git -C the-project/the-project.git remote add origin https://github.com/...
 ```
 
 然后给doc和每一个component分别创建一个（小repo和）worktree：
 ```bash
+cd the-project/the-project.git
 # 由于git worktree实在太蠢，这里搞一个workaround
 git hash-object -t commit -w --stdin <<EOF
 tree 0000000000000000000000000000000000000000
 
 EOF
-# 60bc2812cc97ab2d2f2c7168aa101f7bfabcbf88
 git update-ref refs/workaround 60bc2812cc97ab2d2f2c7168aa101f7bfabcbf88
 git worktree add --no-checkout --detach ../doc refs/workaround
 git --git-dir=worktrees/doc symbolic-ref HEAD refs/heads/doc
@@ -127,7 +125,7 @@ rm -f objects/60/bc2812cc97ab2d2f2c7168aa101f7bfabcbf88
 
 直接在根目录（`the-project/doc`）下写文档即可：
 ```bash
-cd ../doc
+cd the-project/doc
 echo 'Some documents' > documents.txt
 git add documents.txt
 git hash-object -t commit --stdin -w <<EOF
@@ -137,7 +135,6 @@ committer b1f6c1c4 <b1f6c1c4@gmail.com> 1514736000 +0800
 
 Write documents
 EOF
-# ffe7520ba83e48bb254b9eb0fd07390d98124ede
 git reset --soft ffe7520b
 ```
 
@@ -145,9 +142,9 @@ git reset --soft ffe7520b
 
 首先配置开发环境（这里以c++为例）：
 ```bash
-cd ../component1
+cd the-project/component1
 echo 'build/' > .gitignore
-cat - <<EOF > Makefile
+cat - >Makefile <<EOF
 build/component1: main.cpp
 	g++ -std=2a -o $@ $^
 EOF
@@ -159,13 +156,13 @@ committer b1f6c1c4 <b1f6c1c4@gmail.com> 1514736010 +0800
 
 Setup environment
 EOF
-# 609a581e9014936d05acfdca69396ee2a0e0cc90
-git reset --soft 609a581e
+git reset --soft 4dbe0f1
 ```
 
 然后从doc分支读取文档：
 ```bash
-git rm -rf doc/
+cd the-project/component1
+# git rm -rf doc/
 git read-tree --prefix=doc/ doc
 git checkout-index -fua
 git hash-object -t commit --stdin -w <<EOF
@@ -177,15 +174,14 @@ committer b1f6c1c4 <b1f6c1c4@gmail.com> 1514736010 +0800
 
 Merge branch doc
 EOF
-# 26b309b6821743bed336b39910ff1dd73ea9e1c2
-git reset --soft 26b309b6
+git reset --soft 9f1f329
 ```
 
 ### 文档更新以后各component的处理
 
 假设文档在doc更新了：
 ```bash
-cd ../doc
+cd the-project/doc
 git rm -f documents.txt
 echo 'New documents' > new-documents.txt
 git add new-documents.txt
@@ -197,13 +193,12 @@ committer b1f6c1c4 <b1f6c1c4@gmail.com> 1514736000 +0800
 
 Move to new documents
 EOF
-# 9584d01267d5f16c581e521d3bb401f211508eee
 git reset --soft 9584d012
 ```
 
 那么需要在component1分支更新文档：
 ```bash
-cd ../component1
+cd the-project/component1
 git rm -rf doc/
 git read-tree --prefix=doc/ doc
 git checkout-index -fua
@@ -216,17 +211,9 @@ committer b1f6c1c4 <b1f6c1c4@gmail.com> 1514736010 +0800
 
 Merge branch doc
 EOF
-# 8420bc9227ff0b195f184b78b0a696a785eac1cf
-git reset --soft 8420bc92
-git log --oneline --graph
-# *   8420bc9 (HEAD -> component1) Merge branch doc
-# |\
-# | * 9584d01 (doc) Move to new documents
-# * |   26b309b Merge branch doc
-# |\ \
-# | |/
-# | * ffe7520 Write documents
-# * 609a581 Setup environment
+git reset --soft 7ad8da3
+git config alias.lg "log --graph --pretty=tformat:'%h -%d (%an/%cn) %s' --abbrev-commit"
+git lg
 ```
 
 ### master
