@@ -2,22 +2,28 @@
 
 set -euo pipefail
 
-TMP2="$(mktemp)"
-finish() {
-    rm -f "$TMP2"
-}
-trap finish EXIT
-
 exec 3>&1 4>&2
 
 STATE=TEXT
+BUFFER=
+ECHO=
+LF=$'\n'
 
-while IFS= read -r line; do
+(
+while [ "$#" -gt 1 ]; do
+    cat "$1"
+    shift
+done
+echo 'ENABLE-ECHO'
+[ "$#" -gt 0 ] && cat "$1" || true
+) | while IFS= read -r line; do
+    if [ "$line" = 'ENABLE-ECHO' ]; then
+        ECHO=YES
+        continue
+    fi
     case "$STATE" in
         TEXT)
-            if [ "$#" -eq 0 ]; then
-                printf 'printf "%%s\\n" %q \n' "$line"
-            fi
+            [ ! -z "$ECHO" ] && printf 'printf "%%s\\n" %q \n' "$line"
             if [ "$line" = '```bash' ]; then
                 echo '('
                 STATE=CODE
@@ -25,62 +31,52 @@ while IFS= read -r line; do
             ;;
         CODE)
             if [ "$line" = '```' ]; then
-                cat "$TMP2"
-                truncate -s 0 "$TMP2"
+                printf '%s' "$BUFFER"
+                BUFFER=
                 echo ')'
-                if [ "$#" -eq 0 ]; then
-                    printf 'printf "%%s\\n" %q \n' "$line"
-                fi
+                [ ! -z "$ECHO" ] && printf 'printf "%%s\\n" %q \n' "$line"
                 STATE=TEXT
             else
-                printf 'printf "%%s\\n" %q \n' "$line"
+                [ ! -z "$ECHO" ] && printf 'printf "%%s\\n" %q \n' "$line"
                 if [ -z "$(printf '%s' "$line" | grep '^#')" ]; then
-                    if [ -z "$(printf '%s' "$line" | grep -e '\\$' -e ';$' -e 'EOF$')" ]; then
-                        OBJ=
-                        cat "$TMP2"
-                        truncate -s 0 "$TMP2"
-                    elif [ -z "$(printf '%s' "$line" | grep -e 'EOF$')" ]; then
-                        OBJ=YES
-                    else
-                        OBJ=YES
-                        STATE=LITERAL
-                    fi
                     if [ -z "$(printf '%s' "$line" | grep -e '^cd ' -e '\\$' -e ';$')" ]; then
-                        if [ -z "$OBJ" ]; then
-                            printf '%s | sed "s/^/# /" | sed "s/^# $/#/"\n' "$line"
-                        else
-                            printf '%s | sed "s/^/# /" | sed "s/^# $/#/"\n' "$line" >>"$TMP2"
-                        fi
+                        OUT="$line"' | sed "s/^/# /; s/^# $/#/"'"$LF"
                     else
-                        if [ -z "$OBJ" ]; then
-                            printf '%s\n' "$line"
-                        else
-                            printf '%s\n' "$line" >>"$TMP2"
-                        fi
+                        OUT="$line$LF"
+                    fi
+                    if [ -z "$(printf '%s' "$line" | grep -e '\\$' -e ';$' -e 'EOF$')" ]; then
+                        printf '%s' "$BUFFER"
+                        BUFFER=
+                        printf '%s' "$OUT"
+                    elif [ -z "$(printf '%s' "$line" | grep -e 'EOF$')" ]; then
+                        BUFFER="$BUFFER$OUT"
+                    else
+                        STATE=LITERAL
+                        BUFFER="$BUFFER$OUT"
                     fi
                 else
-                    cat "$TMP2"
-                    truncate -s 0 "$TMP2"
+                    printf '%s' "$BUFFER"
+                    BUFFER=
                 fi
             fi
             ;;
         LITERAL)
-            printf 'printf "%%s\\n" %q \n' "$line"
-            printf '%s\n' "$line" >>"$TMP2"
+            [ ! -z "$ECHO" ] && printf 'printf "%%s\\n" %q \n' "$line"
+            BUFFER="$BUFFER$line$LF"
             if [ "$line" = 'EOF' ]; then
                 STATE=CODE
-                cat "$TMP2"
-                truncate -s 0 "$TMP2"
+                printf '%s' "$BUFFER"
+                BUFFER=
             fi
             ;;
     esac
 done | docker run --rm -i learn-git-generate 1> >(
-    while read line; do
+    while IFS= read -r line; do
         printf '%s\n' "$line" >&3
         printf '%s\n' "$line" >&4
     done
 ) 2> >(
-    while read line; do
+    while IFS= read -r line; do
         printf '# %s\n' "$line" >&3
         printf '# \e[01;31m%s\e[0m\n' "$line" >&4
     done

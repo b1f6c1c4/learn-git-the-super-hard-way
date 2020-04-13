@@ -15,7 +15,7 @@ chapter6.md: source/chapter6.md
 chapter7.md: source/chapter7.md
 
 $(CHAPTERS):
-	cat $^ | ./generate >$@
+	./generate $^ >$@
 
 clean:
 	rm -f ./chapter*.md
