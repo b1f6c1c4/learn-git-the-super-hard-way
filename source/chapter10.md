@@ -1,112 +1,253 @@
-# 第10章：查看历史
+# 第10章：单repo多分支工作流
 
-## 检查分支的commit
+考虑如下场景：开发一个**中型、小型或者微型**微服务系统，包含10个组件
 
-- Lv2
+方案1：（多repo）创建10个git repo，每个repo一个master一个dev
 
-若要根据parent关系，列出一个引用的所有commit，只需使用`git rev-list <commit-ish>`。
-加上`-v`可以列出更多内容。
-然而这并不能满足日常工作需求：
-没有语法高亮、没有具体修改内容、没有非线性关系、
-没有自动分页、没有tag。
-所以Lv2的`git rev-list`命令并没有什么实际意义。
+方案2：（单repo单分支）创建1个git repo，设一个master一个dev
 
-- Lv3
+方案3：（单repo多分支）创建1个git repo，弃用master，每个组件单设自己的master和dev等等
 
-Lv3的`git log`的基本语法是`git log <commit-ish> [-- <path>]`。
-但是依然没有好到哪里去。
-我们必须添加一些参数，最好封装成Lv4。
-根据实际使用需求，分成4种情况：
+| | 方案1 | 方案2 | 方案3 |
+| --- | --- | --- | --- |
+| 环境配置简易程度 | -------- | ++++++++ | --- |
+| 空间独立（同时修改不同组件是否可行） | ++++++++ | -------- | ++++++++ |
+| 时间对齐（组件版本是否能够统一） | -------- | ++++++++ | +++++ |
+| 组件之间可以互相参照 | -------- | ++++++ | ++++++++ |
+| 添加删除组件是否方便 | ++++++++ | -------- | +++++++ |
 
-### 查看当前分支的简要历史
+由此可见，微型项目方案2最优，小型和中型项目方案3最优。
+方案3可能存在的问题是：
 
-- Lv4: `git lg`
+- 时间对齐无法实现：不存在的，参考下文
+- 需要频繁checkout：不存在的，参考下文
+- 单个git库过大：不存在的，我已经假设了是**中小型**系统
 
-`git log --color --graph --pretty=format:'%Cred%h%Creset -%C(magenta)%d %Cgreen(%aI)%Creset %s %C(bold blue)<%an>%Creset' --abbrev-commit`
+## 单repo多分支工作流的分支设置
 
-### 查看整个repo的简要历史
+对于小型项目，推荐按以下方式配置分支：
 
-- Lv4: `git la`
+- doc
+  - 全部系统设计文档
+- master
+  - 通过merge componentX整合系统各个部分
+- component1
+  - 通过merge doc取得与之相关的部分设计文档
+- component2
+  - 通过merge doc取得与之相关的部分设计文档
+- component3
+  - 通过merge doc取得与之相关的部分设计文档
+- component4
+  - 通过merge doc取得与之相关的部分设计文档
+- ...
 
-`git log --color --graph --pretty=format:'%Cred%h%Creset -%C(magenta)%d %Cgreen(%aI)%Creset %s %C(bold blue)<%an>%Creset' --abbrev-commit --all`
+对于中型项目，推荐按以下方式配置分支：
 
-### 查看当前分支的历史文件修改摘要
+- doc
+  - 系统总体设计文档，组件接口文档
+- master
+  - 在测试稳定后，merge dev
+- release
+  - 发布之前merge master
+- dev
+  - 通过merge componentX/master整合系统各个部分
+  - 此处进行集成测试
+- component1/doc
+  - 通过merge doc取得系统总体文档，并添加组件内部设计文档
+- component1/master
+  - 在测试稳定后，merge component1/dev
+- component1/dev
+  - 在功能开发完毕后，merge component1/featY
+- component1/feat1
+  - 在此处开发具体功能
+- component1/feat2
+  - 在此处开发具体功能
+- component1/feat3
+  - 在此处开发具体功能
+- component2/doc
+  - 通过merge doc取得系统总体文档，并添加组件内部设计文档
+- component2/master
+  - 在测试稳定后，merge component2/dev
+- component2/dev
+  - 在功能开发完毕后，merge component2/featY
+- component2/feat1
+  - 在此处开发具体功能
+- component2/feat2
+  - 在此处开发具体功能
+- component2/feat3
+  - 在此处开发具体功能
+- ...
 
-- Lv4: `git ls`
+## 单repo多分支工作流的具体操作
 
-`git log --color --graph --pretty=format:'%Cred%h%Creset -%C(magenta)%d %Cgreen(%aI)%Creset %s %C(bold blue)<%an>%Creset' --abbrev-commit --decorate --numstat`
+需要注意的是，不同component分支上的worktree完全不同，互相独立，绝对不能够互相merge，也不能共享同一个worktree；
+而同一component里面各个小分支的worktree基本一致，只是有开发先后关系（类似于单体应用的不同分支），适合互相merge，也一般共享同一个worktree。
 
-### 查看当前分支的历史文件修改详情
+### 创建
 
-- Lv4: `git lf`
+首先创建repo，不连带创建worktree：
+```bash
+mkdir the-project
+git init --bare the-project/the-project.git
+# git -C the-project/the-project.git remote add origin https://github.com/...
+```
 
-`git log -p`
+然后给doc和每一个component分别创建一个（小repo和）worktree：
+```bash
+cd the-project/the-project.git
+# 由于git worktree实在太蠢，这里搞一个workaround
+git hash-object -t commit -w --stdin <<EOF
+tree 0000000000000000000000000000000000000000
 
-## 检查某个文件的历史
+EOF
+git update-ref refs/workaround 60bc2812cc97ab2d2f2c7168aa101f7bfabcbf88
+git worktree add --no-checkout --detach ../doc refs/workaround
+git --git-dir=worktrees/doc symbolic-ref HEAD refs/heads/doc
+git worktree add --no-checkout --detach ../component1 refs/workaround
+git --git-dir=worktrees/component1 symbolic-ref HEAD refs/heads/component1
+git worktree add --no-checkout --detach ../component2 refs/workaround
+git --git-dir=worktrees/component2 symbolic-ref HEAD refs/heads/component2
+git worktree add --no-checkout --detach ../component3 refs/workaround
+git --git-dir=worktrees/component3 symbolic-ref HEAD refs/heads/component3
+git worktree add --no-checkout --detach ../component4 refs/workaround
+git --git-dir=worktrees/component4 symbolic-ref HEAD refs/heads/component4
+git update-ref -d refs/workaround
+rm -f objects/60/bc2812cc97ab2d2f2c7168aa101f7bfabcbf88
+```
 
-有两种视角：
+### 从其他地方clone
 
-### 分支视角：列出当前分支中和该文件有关的所有commit
+不建议使用`git clone --bare`，因为还需要手工修改fetch信息（参考第5章，这种方式创建的repo默认没有fetch的config项）
 
-- Lv4: `git lf [--follow] -- <path>`
+建议按上述方法创建，然后再remote add。
 
-添加`--follow`可以兼容文件重命名。
+### doc分支
 
-### 内容视角：对文件的每一行列出哪个commit修改了它
+直接在根目录（`the-project/doc`）下写文档即可：
+```bash
+cd the-project/doc
+echo 'Some documents' > documents.txt
+git add documents.txt
+git hash-object -t commit --stdin -w <<EOF
+tree $(git write-tree)
+author b1f6c1c4 <b1f6c1c4@gmail.com> 1514736000 +0800
+committer b1f6c1c4 <b1f6c1c4@gmail.com> 1514736000 +0800
 
-- Lv3: `git blame -n -- <path>`
+Write documents
+EOF
+git reset --soft ffe7520b
+```
 
-## 搜索关键词
+### component分支
 
-### 在worktree中搜索
+首先配置开发环境（这里以c++为例）：
+```bash
+cd the-project/component1
+echo 'build/' > .gitignore
+cat - >Makefile <<EOF
+build/component1: main.cpp
+	g++ -std=2a -o $@ $^
+EOF
+git add .gitignore Makefile
+git hash-object -t commit --stdin -w <<EOF
+tree $(git write-tree)
+author b1f6c1c4 <b1f6c1c4@gmail.com> 1514736010 +0800
+committer b1f6c1c4 <b1f6c1c4@gmail.com> 1514736010 +0800
 
-注意：只能搜索在index中有对应项的文件。
+Setup environment
+EOF
+git reset --soft 4dbe0f1
+```
 
-- Lv1
+然后从doc分支读取文档：
+```bash
+cd the-project/component1
+# git rm -rf doc/
+git read-tree --prefix=doc/ doc
+git checkout-index -fua
+git hash-object -t commit --stdin -w <<EOF
+tree $(git write-tree)
+parent $(git rev-parse HEAD)
+parent $(git rev-parse doc)
+author b1f6c1c4 <b1f6c1c4@gmail.com> 1514736010 +0800
+committer b1f6c1c4 <b1f6c1c4@gmail.com> 1514736010 +0800
 
-`git ls-files -s -- <path> | awk '{ print $2; }' | xargs -0 grep [-i] [-w] [-P] <regex>`
+Merge branch doc
+EOF
+git reset --soft 9f1f329
+```
 
-- Lv3
+### 文档更新以后各component的处理
 
-`git grep [-i] [-w] [-P] <regex> -- <path>`
+假设文档在doc更新了：
+```bash
+cd the-project/doc
+git rm -f documents.txt
+echo 'New documents' > new-documents.txt
+git add new-documents.txt
+git hash-object -t commit --stdin -w <<EOF
+tree $(git write-tree)
+parent $(git rev-parse HEAD)
+author b1f6c1c4 <b1f6c1c4@gmail.com> 1514736000 +0800
+committer b1f6c1c4 <b1f6c1c4@gmail.com> 1514736000 +0800
 
-### 在index中搜索
+Move to new documents
+EOF
+git reset --soft 9584d012
+```
 
-- Lv1
+那么需要在component1分支更新文档：
+```bash
+cd the-project/component1
+git rm -rf doc/
+git read-tree --prefix=doc/ doc
+git checkout-index -fua
+git hash-object -t commit --stdin -w <<EOF
+tree $(git write-tree)
+parent $(git rev-parse HEAD)
+parent $(git rev-parse doc)
+author b1f6c1c4 <b1f6c1c4@gmail.com> 1514736010 +0800
+committer b1f6c1c4 <b1f6c1c4@gmail.com> 1514736010 +0800
 
-`git ls-files -s -- <path> | awk '{ print $2; }' | xargs -n 1 bash -c 'git cat-file blob $1 | grep [-i] [-w] [-P] <regex>' ''`
+Merge branch doc
+EOF
+git reset --soft 7ad8da3
+git config alias.lg "log --graph --pretty=tformat:'%h -%d (%an/%cn) %s' --abbrev-commit"
+git lg
+```
 
-- Lv3
+### master
 
-`git grep --cached [-i] [-w] [-P] <regex> -- <path>`
+master之于component，就是component之于doc；
+唯一区别是一个master会merge多个compoent，而且master上自身代码很少
+（可能只有README.md、LICENSE、docker-compose.yml等等全局配置）。
 
-### 在tree中搜索
+和component完全一致，在master上依次read-tree、write-tree、commit-tree，
+就可以将不同组件整合到master上。
+别忘了多加几个parent。
 
-- Lv1
+## FAQ
 
-`git ls-tree -r <tree-ish> -- <path> | awk '{ print $3; }' | xargs -r -n 1 bash -c 'git cat-file blob $1 | grep [-i] [-w] [-P] <regex>' ''`
+### master要不要直接merge doc
 
-- Lv3
+如果在master上进行一些集成测试，那么应该有doc。
+否则可以省略。
 
-`git grep [-i] [-w] [-P] <regex> <tree-ish> -- <path>`
+### 为什么不用简单方便的`git merge -s subtree doc`
 
-### 在当前分支中搜索
+一些诡异的情况下subtree无法完整地复制doc那边的整个tree的情况，
+比如删掉的文件还在、新添加的文件没有出现等等。
+参考第6章。
 
-注意：一般正常人都会先在HEAD中搜索，找不到了再尝试在当前分支中搜索。
-因此我们可以认为关键词一定会在`git lf`中出现至少两次（一次添加一次删除）。
+### 我应该在哪里build
 
-- Lv2: `git grep <regex> $(git rev-list HEAD)`
-- Lv3: `git lf` 然后使用pager的搜索功能
-- Lv3: `git log -G <regex>`
+一般来说应该在每个组件各自的worktree里面build，
+比如`node_modules`、`*.o`、`*.pyc`等等。
+如果采用docker，那么每个组件分支上应该能生成一个image，
+而到了master里面就直接`docker-compose up`了。
 
-### 在整个repo的所有所有引用的最新commit中搜索
+如果出于ci的需要，也可以选择在master里面再次build。但这就需要双倍的磁盘空间。
 
-- Lv2: `git grep <regex> $(git rev-parse --all)`
+### 如何简化操作
 
-### 在整个repo的所有历史中搜索
-
-过于暴力，走投无路了再用这个：
-
-- Lv2: `git grep <regex> $(git rev-list --all)`
-
-### 在HEAD及其所有submodule中搜索
+参见第9章。另外别忘了`git push --all`，`git log --all`等等。

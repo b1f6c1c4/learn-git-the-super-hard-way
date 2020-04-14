@@ -161,3 +161,7 @@
   - `git rebase --keep-empty [-i] [--onto <newbase>] [(<upstream>|--root) [<branch>]]`
     - `[--no-ff]`
     - `[--rebase-merges[=[no-]rebase-cousins]]`
+
+## 检索与查看历史（第8章）
+
+TODO
