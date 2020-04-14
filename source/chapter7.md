@@ -12,7 +12,7 @@
 
 ```bash
 git init .
-git config alias.lg "log --graph --pretty=tformat:'%h -%d (%an/%cn) %s' --abbrev-commit"
+git config alias.lg "log --graph --pretty=tformat:'%h -%d <%an/%cn> %s' --abbrev-commit"
 ```
 
 ## 复制逻辑commit

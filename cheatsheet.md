@@ -192,3 +192,42 @@
     - `git grep <regex> $(git rev-list --all)` - 在整个repo中搜索
   - Lv4
     - `git greps [-i] [-w] [-P] <regex>`
+
+## 邪恶的submodule（第9章）
+
+- 一次性添加submodule的五个部分：
+  - `git submodule add [-b <branch>] [--name <name>] -- <url> <path>`
+- 分别修改submodule的五个部分：
+  - `.gitmodules`
+    - Lv0: `vim .gitmodules`
+    - Lv2: `git config --file=.gitmodules submodule.<name>.<key> <value>`
+  - `$GIT_DIR/config`
+    - Lv0: `vim .git/config`
+    - Lv2: `git config submodule.<name>.<key> <value>`
+  - index
+    - Lv2：`git update-index [--add|--force-remove] --cacheinfo 160000,<sha1>,<path>`
+  - repo (`$GIT_DIR/modules/<name>`)
+    - `git -C <path> ...`
+  - worktree (`$GIT_WORK_TREE/<path>`)
+    - `git -C <path> ...`
+- 用静态更新动态：
+  - `git submodule init -- <path>`
+    - 用`.gitmodules`来更新`.git/config`
+  - `git submodule update --init [--recursive] --checkout -- <path>`
+    - 用`.gitmodules`和index来创建repo和worktree
+  - `git submodule sync -- <path>`
+    - 用`.gitmodules`来更新`.git/config`和repo的URL
+  - `git gets -- <path>`
+    - 快速下载指定commit
+- 用静态和动态更新动态：
+  - `git submodule update [--recursive] [--checkout|--rebase|--merge] -- <path>`
+    - 用`.git/config`和index来更新repo和worktree，共5种选项
+- 用动态更新静态：
+  - `git update-index -- <path>` - 用repo来更新index
+  - `git add <path>` - 用repo来更新index
+  - `git submodule absorbgitdirs -- <path>`
+    - 有repo、worktree、`.gitmodules`和index之后，用该命令创建`.git/config`并将repo移动到正确位置
+- 删除：
+  - `git submodule deinit -f -- <path>`
+    - 删除`.git/config`和worktree
+  - 其他部分需要逐一删除
