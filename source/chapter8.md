@@ -56,6 +56,22 @@ Lv3的`git log`的基本语法是`git log <commit-ish> [-- <path>]`。
 
 - Lv3: `git blame -n -- <path>`
 
+## 寻找文件
+
+### 在index中寻找
+
+- Lv4: `git find`
+
+`!git ls-files -- :/ | grep --color=always`
+
+### 在index和所有submodule的index中寻找
+
+参见第9章。
+
+- Lv4: `git finds`
+
+`!(git ls-files; git submodule foreach --recursive "git ls-files") | awk -F '/' "{ if (match(\$0, /^Entering '(.*)'\$/, ary)) { P=ary[1]; sep=\"/\" } else { printf \"%s%s%s\\n\",P,sep,\$0; } }" | grep --color=always`
+
 ## 搜索关键词
 
 ### 在worktree中搜索
@@ -109,6 +125,41 @@ Lv3的`git log`的基本语法是`git log <commit-ish> [-- <path>]`。
 
 - Lv2: `git grep <regex> $(git rev-list --all)`
 
-### 在HEAD及其所有submodule中搜索
+### 在worktree和所有submodule的index中搜索
 
-TODO
+参见第9章。
+
+- Lv4: `git greps [-i] [-w] [-P] <regex>`
+
+`!bash -c '(git --no-pager grep --color=always "$@" -- :/; git submodule foreach --recursive "$(printf "%s || true" "$(printf "%q " git --no-pager greps --color=always "$@")" )") | less' ''`
+
+## 总结
+
+- 列出commit
+  - Lv2
+    - `git rev-list [-v] <commit-ish>`
+  - Lv3
+    - `git log`
+  - Lv4
+    - `git lg` - HEAD的简要历史
+    - `git la` - 整个repo的简要历史
+    - `git ls` - HEAD的文件修改摘要
+    - `git lf` - HEAD的文件修改详情
+- 检查文件的历史
+  - Lv3
+    - `git blame -n -- <path>` - 对每一行找出最近一次修改它的commit
+  - Lv4
+    - `git lf [--follow] -- <path>` - 列出相关commit
+- 寻找文件
+  - Lv4
+    - `git find`
+    - `git finds`
+- 搜索关键词
+  - Lv3
+    - `git grep [-i] [-w] [-P] <regex> -- <path>` - 在worktree中搜索
+    - `git grep --cached [-i] [-w] [-P] <regex> -- <path>` - 在index中搜索
+    - `git grep [-i] [-w] [-P] <regex> <tree-ish> -- <path>` - 在tree中搜索
+    - `git log -G <regex>` - 在HEAD的历史中搜索
+    - `git grep <regex> $(git rev-list --all)` - 在整个repo中搜索
+  - Lv4
+    - `git greps [-i] [-w] [-P] <regex>`
