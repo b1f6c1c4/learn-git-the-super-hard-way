@@ -12,8 +12,9 @@
 7. [直接操纵commit](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter7.md)（`git rebase`）
 8. [检索与查看历史](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter8.md)（`git log / blame / grep`）
 9. [邪恶的submodule](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter9.md)（`git submodule`）
-10. [配置和alias](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter10.md)（`git config`）
-11. [单repo多分支工作流](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter11.md)
+10. [批处理与自动化](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter10.md)
+11. [配置和alias](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter11.md)（`git config`）
+12. [单repo多分支工作流](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter12.md)
 
 **本教程还提供了[cheatsheet](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/cheatsheet.md)**，可以用来复习并检查学习效果。
 

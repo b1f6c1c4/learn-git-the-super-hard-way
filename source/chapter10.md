@@ -1,33 +1,31 @@
-# 第10章：配置和alias
+# 第10章：批处理与自动化
 
-## 全局gitignore
+以下命令只需知道其存在，到了真正需要用到的时候再查询其帮助也不迟。
 
-```bash
-cat - >~/.gitignore <<EOF
-*~
-*.swp
-*.swo
-EOF
-git config --global core.excludesfile ~/.gitignore
-```
+## Git批处理
 
-## Lv3, Lv4
+一些复杂的Git操作需要利用xargs。而Git提供了一些化简的办法。
 
-* [shared-git-config](https://github.com/b1f6c1c4/shared-git-config)
+- `git for-each-ref` - 对每个引用进行处理（比`git show-ref`更灵活）
+- `git filter-branch` - 对每个commit进行处理（比`git rebase`更灵活）
+- `git submodule foreach --recursive` - 对每个submodule进行处理
 
-## Lv5
+## 自动化debug
 
-（摘自第6章）
-有一类merge情况是，需要用其他分支 *完全取代* 当前分支的某一目录。
-```sh
-git-mnfss() {
-  git rm --cached -r -- $1
-  git read-tree --prefix $1/ $1
-  git checkout-index -fua
-  git clean -f -- $1
-  git reset --soft $(echo "Merge branch $1" | git commit-tree $(git write-tree) -p HEAD -p $1)
-}
-```
+- `git bisect` - 二分查找法定位bug位于哪个commit
 
-* [git-freeze](https://github.com/b1f6c1c4/git-freeze)
-* [git-get](https://github.com/b1f6c1c4/git-get)
+## 在特定情况下执行特定脚本：hooks
+
+- `vim .git/hooks/pre-commit` - 在commit前做检查
+- `vim .git/hooks/commit-msg` - 自动撰写commit message
+- `vim .git/hooks/pre-push` - 在push前做检查
+- `vim .git/hooks/...`
+
+## 自动处理CRLF/LF
+
+- `git config --global core.autocrlf true|false|input`
+
+## 自动处理行尾/文件末尾空格
+
+- `git stripspace`
+- `git config --global core.whitespace ...`

@@ -43,6 +43,7 @@
   - `git symbolic-ref <ref>`
   - `git symbolic-ref --delete <ref>`
   - `git symbolic-ref <from> <to>`
+  - `git name-rev [--tags] --all|<commit-ish>`
 - Lv3
   - `git branch -av`
   - `git branch -avl <branch-pattern>`
@@ -169,6 +170,7 @@
     - `git rev-list [-v] <commit-ish>`
   - Lv3
     - `git log`
+    - `git show-branch` - 另一种方式查看整个repo的历史
   - Lv4
     - `git lg` - HEAD的简要历史
     - `git la` - 整个repo的简要历史
@@ -231,3 +233,17 @@
   - `git submodule deinit -f -- <path>`
     - 删除`.git/config`和worktree
   - 其他部分需要逐一删除
+
+## 批处理与自动化（第9章）
+
+- `git for-each-ref` - 对每个引用进行处理（比`git show-ref`更灵活）
+- `git filter-branch` - 对每个commit进行处理（比`git rebase`更灵活）
+- `git submodule foreach --recursive` - 对每个submodule进行处理
+- `git bisect` - 二分查找法定位bug位于哪个commit
+- `vim .git/hooks/pre-commit` - 在commit前做检查
+- `vim .git/hooks/commit-msg` - 自动撰写commit message
+- `vim .git/hooks/pre-push` - 在push前做检查
+- `vim .git/hooks/...`
+- `git config --global core.autocrlf true|false|input`
+- `git stripspace`
+- `git config --global core.whitespace ...`

@@ -404,7 +404,7 @@ alias.mnfnc=merge --no-ff --no-commit
 
 ## Lv5
 
-有一类merge情况是，需要用其他分支 *完全取代* 当前分支的某一目录。（第11章整章建立在此基础之上）
+有一类merge情况是，需要用其他分支 *完全取代* 当前分支的某一目录。（第12章整章建立在此基础之上）
 然而，即便`git merge --no-ff -s subtree -Xsubtree=<prefix>`有时也会出错（毕竟是`git read-tree -m`）。
 
 采用以下脚本即可解决：

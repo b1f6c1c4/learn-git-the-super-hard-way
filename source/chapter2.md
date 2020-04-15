@@ -203,6 +203,13 @@ git for-each-ref refs/remotes/
 git show-ref | grep $(git rev-parse d4da) | awk '{ print $2; }'
 ```
 
+- Lv2
+
+```bash
+git name-rev d4da
+git name-rev --all
+```
+
 - Lv3
 
 ```bash
@@ -250,6 +257,8 @@ git describe --always d4da~
     - `git branch -avl <branch-pattern>`
     - `git branch -avl <tag-pattern>`
 - 给定commit-ish，逆向查找引用
+  - Lv2
+    - `git name-rev [--tags] --all|<commit-ish>`
   - Lv3
     - `git describe [--all] [--always] [<commit-ish>]` - 留空表示HEAD
     - `git describe [--all] [--always] --dirty`
