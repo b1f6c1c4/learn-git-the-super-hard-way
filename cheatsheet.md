@@ -34,23 +34,39 @@
 
 ## 操纵引用（第2章）
 
-- Lv2
-  - `git rev-parse <object|ref>`
-  - `git show-ref [--head] [<ref>...]`
-  - `git for-each-ref [<ref-pattern>...]`
-  - `git update-ref --no-deref <ref> [-d|<new>]` - 修改`<ref>`
-  - `git update-ref <ref> [-d|<new>]` - 修改`<ref>`或者其引用的引用
-  - `git symbolic-ref <ref>`
-  - `git symbolic-ref --delete <ref>`
-  - `git symbolic-ref <from> <to>`
-  - `git name-rev [--tags] --all|<commit-ish>`
-- Lv3
-  - `git branch -av`
-  - `git branch -avl <branch-pattern>`
-  - `git branch -avl <tag-pattern>`
-  - `git branch -f <branch> <commit-ish>` - 只能操纵`refs/heads/s`
-  - `git branch -D <branch>` - 只能操纵`refs/heads/s`
-  - `git describe [--all] [--always] --dirty`
+- 添加/修改/删除
+  - Lv2
+    - `git rev-parse <object>`
+    - `git update-ref --no-deref <ref> [-d|<new>]` - 修改`<ref>`
+    - `git update-ref <ref> [-d|<new>]` - 修改`<ref>`或者其引用的引用
+    - `git symbolic-ref --delete <ref>`
+    - `git symbolic-ref <from> <to>`
+  - Lv3
+    - `git branch -f <branch> <commit-ish>` - 只能操纵`refs/heads/`
+    - `git branch -D <branch>` - 只能操纵`refs/heads/`
+    - `git tag -f <tag> <commit-ish>` - 只能操纵`refs/tags/`
+    - `git tag -d <tag>` - 只能操纵`refs/tags/`
+- 查看历史记录
+  - Lv3
+    - `git reflog`
+- 单独查看
+  - Lv2
+    - `git rev-parse <ref>` - 可以接多个但是不如`git show-ref`好用
+    - `git symbolic-ref <ref>`
+- 批量查看
+  - Lv2
+    - `git show-ref [--head] [<ref>...]`
+    - `git for-each-ref [<ref-pattern>...]`
+  - Lv3
+    - `git branch -av`
+    - `git branch -avl <branch-pattern>`
+    - `git branch -avl <tag-pattern>`
+- 给定commit-ish，逆向查找引用
+  - Lv2
+    - `git name-rev [--tags] --all|<commit-ish>`
+  - Lv3
+    - `git describe [--all] [--always] [<commit-ish>]` - 留空表示HEAD
+    - `git describe [--all] [--always] --dirty`
 
 ## 操纵索引（第3章）
 
@@ -234,7 +250,7 @@
     - 删除`.git/config`和worktree
   - 其他部分需要逐一删除
 
-## 批处理与自动化（第9章）
+## 批处理与自动化（第10章）
 
 - `git for-each-ref` - 对每个引用进行处理（比`git show-ref`更灵活）
 - `git filter-branch` - 对每个commit进行处理（比`git rebase`更灵活）
