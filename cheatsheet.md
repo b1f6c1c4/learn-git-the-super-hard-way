@@ -31,6 +31,7 @@
   - `git replace --edit <original>`
   - `git replace -l --format=long`
   - `git replace --delete <original>`
+  - `git notes add | list | show <object> | remove <object>`
 
 ## 操纵引用（第2章）
 

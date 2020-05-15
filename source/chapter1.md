@@ -347,6 +347,90 @@ rm -f refs/replace/efd4f82f6151bd20b167794bc57c66bbf82ce7dd
 git replace --delete efd4
 ```
 
+## 给对象添加备注
+
+Git支持给任意对象添加备注，其本质是一个commit，其tree列出了备注内容blob和对应的对象SHA1（作为文件名）。
+每个对象至多有一个备注。
+
+### 添加备注
+
+- Lv1
+```bash
+echo 'additional notes' | git hash-object -t blob --stdin -w
+git mktree <<EOF
+100644 blob 095f841daf9333f3addfbc44d49efab0be903bfe$(printf '\t')efd4f82f6151bd20b167794bc57c66bbf82ce7dd
+EOF
+git hash-object -t commit --stdin -w <<EOF
+tree 9b13933df415639aefdd0ac135b9f68fbdad8bac
+author author <author@gmail.com> 1234567890 +0800
+committer committer <committer@gmail.com> 1514736120 +0800
+
+Notes added by 'git notes add'
+EOF
+mkdir -p ./refs/notes/
+echo 'a692dfc071d3e1043cb69b57d5f43b01335066f3' >>./refs/notes/commits
+```
+
+- Lv3
+```bash
+GIT_AUTHOR_NAME=author \
+GIT_AUTHOR_EMAIL=author@gmail.com \
+GIT_AUTHOR_DATE='1234567890 +0800' \
+GIT_COMMITTER_NAME=committer \
+GIT_COMMITTER_EMAIL=committer@gmail.com \
+GIT_COMMITTER_DATE='1514736120 +0800' \
+git notes add -f -m 'notes for blob' ce01
+```
+
+`git notes edit`会打开vim并编辑notes。
+
+### 查看备注
+
+- Lv2
+```bash
+git cat-file commit refs/notes/commits
+git ls-tree refs/notes/commits
+git cat-file blob 095f
+git cat-file blob c5a9
+```
+
+- Lv3
+```bash
+git notes list
+git notes show efd4
+git notes show ce01
+git show efd4
+```
+
+### 删除备注
+
+- Lv1
+```bash
+git ls-tree refs/notes/commits | sed '/efd4f82f6151bd20b167794bc57c66bbf82ce7dd/d' | git mktree
+git hash-object -t commit --stdin -w <<EOF
+tree 121f227d991dbea1913c226305db1aa724ae72df
+author author <author@gmail.com> 1234567890 +0800
+committer committer <committer@gmail.com> 1514736120 +0800
+
+Notes added by 'git notes add'
+EOF
+git update-ref refs/notes/commits cb132dbe2c9e9f8d684452078ba659242d5b9cb7
+git notes list
+```
+
+- Lv3
+```bash
+# 由于需要重新创建commit，必须指定author和committer
+GIT_AUTHOR_NAME=author \
+GIT_AUTHOR_EMAIL=author@gmail.com \
+GIT_AUTHOR_DATE='1234567890 +0800' \
+GIT_COMMITTER_NAME=committer \
+GIT_COMMITTER_EMAIL=committer@gmail.com \
+GIT_COMMITTER_DATE='1514736120 +0800' \
+git notes remove ce01
+git notes list
+```
+
 ## 总结
 
 - Lv1
@@ -369,4 +453,5 @@ git replace --delete efd4
   - `git replace --edit <original>`
   - `git replace -l --format=long`
   - `git replace --delete <original>`
+  - `git notes add | list | show <object> | remove <object>`
 
