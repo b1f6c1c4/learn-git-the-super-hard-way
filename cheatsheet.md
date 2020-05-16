@@ -61,7 +61,7 @@
   - Lv3
     - `git branch -av`
     - `git branch -avl <branch-pattern>`
-    - `git branch -avl <tag-pattern>`
+    - `git tag -l <tag-pattern>`
 - 给定commit-ish，逆向查找引用
   - Lv2
     - `git name-rev [--tags] --all|<commit-ish>`

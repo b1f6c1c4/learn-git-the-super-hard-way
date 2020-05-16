@@ -69,7 +69,7 @@ git rev-parse refs/tags/tg1
 # 此处必须省略refs/heads/
 git branch -avl br1
 # 此处必须省略refs/tags/
-git branch -avl tg1 # 注意，依然用 git branch
+git tag -l tg1
 ```
 
 ### 创建间接引用
@@ -255,7 +255,7 @@ git describe --always d4da~
   - Lv3
     - `git branch -av`
     - `git branch -avl <branch-pattern>`
-    - `git branch -avl <tag-pattern>`
+    - `git tag -l <tag-pattern>`
 - 给定commit-ish，逆向查找引用
   - Lv2
     - `git name-rev [--tags] --all|<commit-ish>`
