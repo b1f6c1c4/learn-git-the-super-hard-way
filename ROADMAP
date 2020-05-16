@@ -60,7 +60,7 @@ TODO  status               Show the working tree status
 01    replace              Create, list, delete refs to replace objects
 
    Ancillary Commands / Interrogators
-      annotate             Annotate file lines with commit information
+08    annotate             Annotate file lines with commit information
 08    blame                Show what revision and author last modified each line of a file
 01    count-objects        Count unpacked number of objects and their disk consumption
       difftool             Show changes using common diff tools

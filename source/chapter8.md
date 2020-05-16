@@ -68,6 +68,7 @@ git log --color --graph --pretty=tformat:'%Cred%h%Creset -%C(magenta)%d %Cgreen(
 ### 内容视角：对文件的每一行列出哪个commit修改了它
 
 - Lv3: `git blame -n -- <path>`
+换一种输出格式：`git annotate -- <path>`
 
 ## 寻找文件
 
@@ -162,6 +163,7 @@ git log --color --graph --pretty=tformat:'%Cred%h%Creset -%C(magenta)%d %Cgreen(
 - 检查文件的历史
   - Lv3
     - `git blame -n -- <path>` - 对每一行找出最近一次修改它的commit
+    - `git annotate -- <path>` - 同上，换一种输出格式
   - Lv4
     - `git lf [--follow] -- <path>` - 列出相关commit
 - 寻找文件

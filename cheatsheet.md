@@ -196,6 +196,7 @@
 - 检查文件的历史
   - Lv3
     - `git blame -n -- <path>` - 对每一行找出最近一次修改它的commit
+    - `git annotate -- <path>` - 同上，换一种输出格式
   - Lv4
     - `git lf [--follow] -- <path>` - 列出相关commit
 - 寻找文件
