@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y \
         dh-autoreconf libcurl4-gnutls-dev libexpat1-dev \
         gettext libz-dev libssl-dev \
         asciidoc xmlto docbook2x \
-        install-info
+        install-info gnupg
 
 WORKDIR /opt
 RUN curl -fsSL https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.26.0.tar.xz | tar xJ

@@ -71,8 +71,8 @@ TODO  help                 Display help information about Git
 06    merge-tree           Show three-way merge without touching index
 TODO  rerere               Reuse recorded resolution of conflicted merges
 08    show-branch          Show branches and their commits
-      verify-commit        Check the GPG signature of commits
-      verify-tag           Check the GPG signature of tags
+13    verify-commit        Check the GPG signature of commits
+13    verify-tag           Check the GPG signature of tags
       whatchanged          Show logs with difference each commit introduces
 
    Interacting with Others

@@ -158,8 +158,8 @@
     - `git read-tree -m A C B`
     - `git merge-index -o git-merge-one-file -a`
   - Lv3
-    - `git merge-resolve [--no-ff] [--no-commit] B`
-    - `git merge-octopus [--no-ff] [--no-commit] B*`
+    - `git merge -s resolve [--no-ff] [--no-commit] B`
+    - `git merge -s octopus [--no-ff] [--no-commit] B*`
     - `git merge -s ours [--no-ff] [--no-commit] B*`
     - `git merge -s recursive [--no-ff] [--no-commit] B`
     - `git merge -s subtree [--no-ff] [--no-commit] B`
@@ -264,3 +264,21 @@
 - `git config --global core.autocrlf true|false|input`
 - `git stripspace`
 - `git config --global core.whitespace ...`
+
+# GPG签名（第13章）
+
+- 创建签名
+  - Lv2
+    - `git commit-tree -S[<keyid>] ...`
+  - Lv3
+    - `git commit -S[<keyid>] ...`
+    - `git tag -a -s [-u <keyid>]`
+- 验证签名
+  - Lv2
+    - `git verify-commit <commit-ish>`
+    - `git verify-tag <tag-ish>`
+  - Lv3
+    - `git show -s --show-signature <commit-ish>`
+    - `git tag --verify <tag-ish>`
+    - `git log --show-signature ...`
+

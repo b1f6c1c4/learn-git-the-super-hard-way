@@ -13,6 +13,8 @@ Git对象放在`<repo>/objects/`中，分四种：
   - parent(s)：其他commit的SHA1
   - author：姓名、邮箱、秒时间戳、时区
   - committer：姓名、邮箱、秒时间戳、时区
+  - mergetag(s)：见第13章
+  - gpgsig：见第13章
   - message：任意字节流
 - tag：本质是经过zlib deflate处理的以\n换行的纯文本，包括以下信息：
   - object：给谁做标记，可以是任意对象的SHA1
@@ -20,6 +22,7 @@ Git对象放在`<repo>/objects/`中，分四种：
   - tag：标记名称
   - tagger：姓名、邮箱、秒时间戳、时区
   - message：任意字节流
+  - signature：见第13章
 
 本章所有命令都不涉及worktree。后续章节会介绍如何利用worktree来操纵对象（Lv3）。
 
@@ -209,9 +212,6 @@ EOF
 *特别注意：`git tag -a`命令不仅仅创建了tag对象，还建立了新的引用在`refs/tags/the-tag`。*
 ```bash
 # 该命令没有输出
-GIT_AUTHOR_NAME=b1f6c1c4 \
-GIT_AUTHOR_EMAIL=b1f6c1c4@gmail.com \
-GIT_AUTHOR_DATE='1600000000 +0800' \
 GIT_COMMITTER_NAME=b1f6c1c4 \
 GIT_COMMITTER_EMAIL=b1f6c1c4@gmail.com \
 GIT_COMMITTER_DATE='1600000000 +0800' \

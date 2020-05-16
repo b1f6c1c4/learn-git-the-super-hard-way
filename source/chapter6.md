@@ -356,14 +356,14 @@ git merge-base -a afc3 d2b7
 而所谓的subtree merge，本质上就是subtree shift非空的recursive merge。
 git会自动计算给B添加的prefix，但也可以通过`-Xsubtree=`来手动指定。
 
-`git merge-resolve --no-ff --no-commit`实际上就是
+`git merge -s resolve --no-ff --no-commit`实际上就是
 （参见[`git-merge-resolve`源码](https://github.com/git/git/blob/master/git-merge-resolve.sh)）
 - （需要手工指定C）
 - 先执行`git read-tree -u -m --aggressive A C B`
 - 再执行`git merge-index -o git-merge-one-file -a`
 - 在git dir中生成`MERGE_HEAD` `MERGE_MODE` `MERGE_MSG`三个文件
 
-`git merge-octopus --no-ff --no-commit`实际上就是
+`git merge -s octopus --no-ff --no-commit`实际上就是
 （参见[`git-merge-octopus`源码](https://github.com/git/git/blob/master/git-merge-octopus.sh)）
 - 用`git merge-base`算出C
 - 先执行`git read-tree -u -m --aggressive A C B`
@@ -418,6 +418,89 @@ git-mnfss() {
 }
 ```
 
+## 关于merge信息的完整性
+
+在执行`git merge --no-ff B*`的时候，新创建的commit中包括多个parent，用来记录谁和谁进行了merge。
+这是为了能够在以后追溯到当初merge时候的细节。
+然而受限于parent的格式，parent只能记录哪些commit进行了merge，与commit相关的其他信息就无法记录了：
+附于该commit上的note，指向该commit的tag(s)，以及该commit所属的refs。
+
+* 对于notes，可以直接忽略，因为note里面的信息几乎都是本机使用
+* 对于tag，存储于新创建的commit的message body中
+* 对于带有签名（见第13章）的tag，存储于新创建的commit的mergetag中
+* 对于ref，存储于message中（Merge xxx branch）
+
+首先创建若干空commit和tag：
+```bash
+printf '' | git mktree
+git hash-object -t commit --stdin -w <<EOF
+tree 4b825dc642cb6eb9a060e54bf8d69288fbee4904
+author b1f6c1c4 <b1f6c1c4@gmail.com> 1514736000 +0800
+committer b1f6c1c4 <b1f6c1c4@gmail.com> 1514736000 +0800
+
+A
+EOF
+echo $'100644 blob 0cfbf08886fca9a91cb753ec8734c84fcbe52c9f\tB.txt' | git mktree
+git hash-object -t commit --stdin -w <<EOF
+tree 6f707a369aa805c91f6d737ccda037d137d0ef93
+parent 6784b23b1a03700628d8adb65b57b5b4816caa01
+author b1f6c1c4 <b1f6c1c4@gmail.com> 1514736000 +0800
+committer b1f6c1c4 <b1f6c1c4@gmail.com> 1514736000 +0800
+
+B
+EOF
+echo $'100644 blob 00750edc07d6415dcc07ae0351e9397b0222b7ba\tC.txt' | git mktree
+git hash-object -t commit --stdin -w <<EOF
+tree f6ab164f6371575aff1ce5c21441835e5568b182
+parent 6784b23b1a03700628d8adb65b57b5b4816caa01
+author b1f6c1c4 <b1f6c1c4@gmail.com> 1514736000 +0800
+committer b1f6c1c4 <b1f6c1c4@gmail.com> 1514736000 +0800
+
+C
+EOF
+git branch br-C 28c0
+echo $'100644 blob b8626c4cff2849624fb67f87cd0ad72b163671ad\tD.txt' | git mktree
+git hash-object -t commit --stdin -w <<EOF
+tree 2cff17f83cfc5f0cd3af03f99257e35906e6fb7c
+parent 6784b23b1a03700628d8adb65b57b5b4816caa01
+author b1f6c1c4 <b1f6c1c4@gmail.com> 1514736000 +0800
+committer b1f6c1c4 <b1f6c1c4@gmail.com> 1514736000 +0800
+
+D
+EOF
+git tag tag-D 7f24
+echo $'100644 blob 7ed6ff82de6bcc2a78243fc9c54d3ef5ac14da69\tE.txt' | git mktree
+git hash-object -t commit --stdin -w <<EOF
+tree 4ff6131a9638bb0a38917c72255c3c0635d0f464
+parent 6784b23b1a03700628d8adb65b57b5b4816caa01
+author b1f6c1c4 <b1f6c1c4@gmail.com> 1514736000 +0800
+committer b1f6c1c4 <b1f6c1c4@gmail.com> 1514736000 +0800
+
+E
+EOF
+GIT_COMMITTER_NAME=b1f6c1c4 \
+GIT_COMMITTER_EMAIL=b1f6c1c4@gmail.com \
+GIT_COMMITTER_DATE='1600000000 +0800' \
+git tag -a -m 'Tag for E' tag-obj-E 1a16
+```
+
+然后进行merge：
+```bash
+git update-ref --no-deref HEAD 6784
+git -C ../default-tree reset --hard
+git -C ../default-tree clean -fdx
+GIT_AUTHOR_NAME=b1f6c1c4 \
+GIT_AUTHOR_EMAIL=b1f6c1c4@gmail.com \
+GIT_AUTHOR_DATE='1600000000 +0800' \
+GIT_COMMITTER_NAME=b1f6c1c4 \
+GIT_COMMITTER_EMAIL=b1f6c1c4@gmail.com \
+GIT_COMMITTER_DATE='1600000000 +0800' \
+git -C ../default-tree merge --no-ff tag-obj-E f1d1 br-C tag-D
+git cat-file commit HEAD
+```
+注意观察commit message中对于各parent的不同的描述。
+另外，commit message中还包含了tag message。
+
 ## 总结
 
 - 查看和处理修改
@@ -440,8 +523,8 @@ git-mnfss() {
     - `git read-tree -m A C B`
     - `git merge-index -o git-merge-one-file -a`
   - Lv3
-    - `git merge-resolve [--no-ff] [--no-commit] B`
-    - `git merge-octopus [--no-ff] [--no-commit] B*`
+    - `git merge -s resolve [--no-ff] [--no-commit] B`
+    - `git merge -s octopus [--no-ff] [--no-commit] B*`
     - `git merge -s ours [--no-ff] [--no-commit] B*`
     - `git merge -s recursive [--no-ff] [--no-commit] B`
     - `git merge -s subtree [--no-ff] [--no-commit] B`

@@ -23,7 +23,7 @@ Lv3的`git log`的基本语法是`git log <commit-ish> [-- <path>]`。
 - Lv4: `git lg`
 
 ```sh
-git log --color --graph --pretty=tformat:'%Cred%h%Creset -%C(magenta)%d %Cgreen(%aI)%Creset %s %C(bold blue)<%an>%Creset' --abbrev-commit
+git log --color --graph --pretty=tformat:'%Cred%h%Creset -%C(magenta)%d %Cgreen(%aI)%Creset %s %C(bold blue)%G?<%an>%Creset' --abbrev-commit
 ```
 
 ### 查看整个repo的简要历史
@@ -38,7 +38,7 @@ git show-branch -a
 - Lv4: `git la`
 
 ```sh
-git log --color --graph --pretty=tformat:'%Cred%h%Creset -%C(magenta)%d %Cgreen(%aI)%Creset %s %C(bold blue)<%an>%Creset' --abbrev-commit --all
+git log --color --graph --pretty=tformat:'%Cred%h%Creset -%C(magenta)%d %Cgreen(%aI)%Creset %s %C(bold blue)%G?<%an>%Creset' --abbrev-commit --all
 ```
 
 ### 查看当前分支的历史文件修改摘要
@@ -46,7 +46,7 @@ git log --color --graph --pretty=tformat:'%Cred%h%Creset -%C(magenta)%d %Cgreen(
 - Lv4: `git ls`
 
 ```sh
-git log --color --graph --pretty=tformat:'%Cred%h%Creset -%C(magenta)%d %Cgreen(%aI)%Creset %s %C(bold blue)<%an>%Creset' --abbrev-commit --decorate --numstat
+git log --color --graph --pretty=tformat:'%Cred%h%Creset -%C(magenta)%d %Cgreen(%aI)%Creset %s %C(bold blue)%G?<%an>%Creset' --abbrev-commit --decorate --numstat
 ```
 
 ### 查看当前分支的历史文件修改详情

@@ -15,6 +15,7 @@
 10. [批处理与自动化](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter10.md)
 11. [配置和alias](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter11.md)（`git config`）
 12. [单repo多分支工作流](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter12.md)
+13. [GPG签名](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter13.md)
 
 **本教程还提供了[cheatsheet](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/cheatsheet.md)**，可以用来复习并检查学习效果。
 
