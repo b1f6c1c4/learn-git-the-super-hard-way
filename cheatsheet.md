@@ -186,7 +186,7 @@
   - Lv2
     - `git rev-list [-v] <commit-ish>`
   - Lv3
-    - `git log`
+    - `git log` / `git whatchanged`
     - `git show-branch` - 另一种方式查看整个repo的历史
   - Lv4
     - `git lg` - HEAD的简要历史

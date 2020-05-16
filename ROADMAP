@@ -36,7 +36,7 @@ TODO  gitk                 The Git repository browser
 03    restore              Restore working tree files
 07    revert               Revert some existing commits
 03    rm                   Remove files from the working tree and from the index
-      shortlog             Summarize 'git log' output
+08    shortlog             Summarize 'git log' output
 01    show                 Show various types of objects
 TODO  sparse-checkout      Initialize and modify the sparse-checkout
 03    stash                Stash the changes in a dirty working directory away
@@ -73,7 +73,7 @@ TODO  rerere               Reuse recorded resolution of conflicted merges
 08    show-branch          Show branches and their commits
 13    verify-commit        Check the GPG signature of commits
 13    verify-tag           Check the GPG signature of tags
-      whatchanged          Show logs with difference each commit introduces
+08    whatchanged          Show logs with difference each commit introduces
 
    Interacting with Others
 14    archimport           Import a GNU Arch repository into Git

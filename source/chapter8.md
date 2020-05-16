@@ -15,6 +15,7 @@
 
 Lv3的`git log`的基本语法是`git log <commit-ish> [-- <path>]`。
 但是依然没有好到哪里去。
+上古命令`git whatchanged`约等于`git log --raw`，也不能满足所有需求。
 我们必须添加一些参数，最好封装成Lv4。
 根据实际使用需求，分成4种情况：
 
@@ -54,6 +55,10 @@ git log --color --graph --pretty=tformat:'%Cred%h%Creset -%C(magenta)%d %Cgreen(
 - Lv4: `git lf`
 
 `git log -p`
+
+### 统计commit
+
+- Lv3: `git shortlog --all [-s]`
 
 ## 检查某个文件的历史
 
@@ -153,8 +158,9 @@ git log --color --graph --pretty=tformat:'%Cred%h%Creset -%C(magenta)%d %Cgreen(
   - Lv2
     - `git rev-list [-v] <commit-ish>`
   - Lv3
-    - `git log`
+    - `git log` / `git whatchanged`
     - `git show-branch` - 另一种方式查看整个repo的历史
+    - `git shortlog --all [-s]` - 统计commit
   - Lv4
     - `git lg` - HEAD的简要历史
     - `git la` - 整个repo的简要历史

@@ -11,7 +11,9 @@ Git引用常规放在`<repo>/refs/`中，可以有任意层次的文件夹结构
     - 各远程分支
 - tags
   - 各标签
-- stash - 暂存
+- stash - 见第3章`git stash`
+- replace - 见第1章`git replace`
+- notes - 见第1章`git notes`
 
 Git特别引用直接放在`<repo>`下，一般包括`HEAD`等。
 
