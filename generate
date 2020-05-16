@@ -14,7 +14,7 @@ while [ "$#" -gt 1 ]; do
     shift
 done
 echo 'ENABLE-ECHO'
-[ "$#" -gt 0 ] && cat "$1" || true
+([ "$#" -gt 0 ] && cat "$1") || true
 ) | while IFS= read -r line; do
     if [ "$line" = 'ENABLE-ECHO' ]; then
         printf 'printf "%%s\\n" %q \n' "$line"
@@ -38,17 +38,17 @@ echo 'ENABLE-ECHO'
                 STATE=TEXT
             else
                 printf 'printf "%%s\\n" %q \n' "$line"
-                if [ -z "$(printf '%s' "$line" | grep '^#')" ]; then
-                    if [ -z "$(printf '%s' "$line" | grep -e '^cd ' -e '\\$' -e ';$')" ]; then
+                if ! printf '%s' "$line" | grep -q '^#'; then
+                    if ! printf '%s' "$line" | grep -q -e '^cd ' -e '\\$' -e ';$'; then
                         OUT="$line"' | sed "s/^/# /; s/^# $/#/"'"$LF"
                     else
                         OUT="$line$LF"
                     fi
-                    if [ -z "$(printf '%s' "$line" | grep -e '\\$' -e ';$' -e 'EOF$')" ]; then
+                    if ! printf '%s' "$line" | grep -q -e '\\$' -e ';$' -e '<<EOF\>'; then
                         printf '%s' "$BUFFER"
                         BUFFER=
                         printf '%s' "$OUT"
-                    elif [ -z "$(printf '%s' "$line" | grep -e 'EOF$')" ]; then
+                    elif ! printf '%s' "$line" | grep -q -e '<<EOF\>'; then
                         BUFFER="$BUFFER$OUT"
                     else
                         STATE=LITERAL
@@ -77,8 +77,8 @@ done | docker run --rm -i learn-git-generate 1> >(
             ECHO=YES
             continue
         fi
-        [ ! -z "$ECHO" ] && printf '%s\n' "$line" >&3
-        [ ! -z "$ECHO" ] && printf '%s\n' "$line" >&4
+        [ -n "$ECHO" ] && printf '%s\n' "$line" >&3
+        [ -n "$ECHO" ] && printf '%s\n' "$line" >&4
     done
 ) 2> >(
     ECHO=
@@ -87,7 +87,7 @@ done | docker run --rm -i learn-git-generate 1> >(
             ECHO=YES
             continue
         fi
-        [ ! -z "$ECHO" ] && printf '# %s\n' "$line" >&3
-        [ ! -z "$ECHO" ] && printf '# \e[01;31m%s\e[0m\n' "$line" >&4
+        [ -n "$ECHO" ] && printf '# %s\n' "$line" >&3
+        [ -n "$ECHO" ] && printf '# \e[01;31m%s\e[0m\n' "$line" >&4
     done
 )
