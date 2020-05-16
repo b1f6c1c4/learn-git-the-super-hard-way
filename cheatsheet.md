@@ -282,3 +282,12 @@
     - `git tag --verify <tag-ish>`
     - `git log --show-signature ...`
 
+# 数据的导入和导出（第14章）
+
+- 常用Lv3
+  - `git archive [--prefix=<prefix>] [-o <output>] <tree-ish> -- <path>...`
+- 不常用
+  - `git bundle create` / `git bundle unbundle` - 参见第5章
+  - `git fast-export` / ` git fast-import`
+  - `git format-patch` / `git am` / `git request-pull` / `git send-email` / `git imap-send`
+

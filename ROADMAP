@@ -4,8 +4,8 @@ $ git help -a
 
    Main Porcelain Commands
 03    add                  Add file contents to the index
-      am                   Apply a series of patches from a mailbox
-TODO  archive              Create an archive of files from a named tree
+14    am                   Apply a series of patches from a mailbox
+14    archive              Create an archive of files from a named tree
 09    bisect               Use binary search to find the commit that introduced a bug
 02    branch               List, create, or delete branches
 05    bundle               Move objects and refs by archive
@@ -18,7 +18,7 @@ TODO  archive              Create an archive of files from a named tree
 02    describe             Give an object a human readable name based on an available ref
 06    diff                 Show changes between commits, commit and working tree, etc
 05    fetch                Download objects and refs from another repository
-      format-patch         Prepare patches for e-mail submission
+14    format-patch         Prepare patches for e-mail submission
       gc                   Cleanup unnecessary files and optimize the local repository
 TODO  gitk                 The Git repository browser
 08    grep                 Print lines matching a pattern
@@ -38,7 +38,7 @@ TODO  gitk                 The Git repository browser
 03    rm                   Remove files from the working tree and from the index
       shortlog             Summarize 'git log' output
 01    show                 Show various types of objects
-      sparse-checkout      Initialize and modify the sparse-checkout
+TODO  sparse-checkout      Initialize and modify the sparse-checkout
 03    stash                Stash the changes in a dirty working directory away
 TODO  status               Show the working tree status
 09    submodule            Initialize, update or inspect submodules
@@ -48,8 +48,8 @@ TODO  status               Show the working tree status
 
    Ancillary Commands / Manipulators
 10    config               Get and set repository or global options
-      fast-export          Git data exporter
-      fast-import          Backend for fast Git data importers
+14    fast-export          Git data exporter
+14    fast-import          Backend for fast Git data importers
 09    filter-branch        Rewrite branches
       mergetool            Run merge conflict resolution tools to resolve merge conflicts
       pack-refs            Pack heads and tags for efficient repository access
@@ -76,16 +76,16 @@ TODO  rerere               Reuse recorded resolution of conflicted merges
       whatchanged          Show logs with difference each commit introduces
 
    Interacting with Others
-      archimport           Import a GNU Arch repository into Git
-      cvsexportcommit      Export a single commit to a CVS checkout
-      cvsimport            Salvage your data out of another SCM people love to hate
-      cvsserver            A CVS server emulator for Git
-      imap-send            Send a collection of patches from stdin to an IMAP folder
-      p4                   Import from and submit to Perforce repositories
-      quiltimport          Applies a quilt patchset onto the current branch
-      request-pull         Generates a summary of pending changes
-      send-email           Send a collection of patches as emails
-      svn                  Bidirectional operation between a Subversion repository and Git
+14    archimport           Import a GNU Arch repository into Git
+14    cvsexportcommit      Export a single commit to a CVS checkout
+14    cvsimport            Salvage your data out of another SCM people love to hate
+14    cvsserver            A CVS server emulator for Git
+14    imap-send            Send a collection of patches from stdin to an IMAP folder
+14    p4                   Import from and submit to Perforce repositories
+14    quiltimport          Applies a quilt patchset onto the current branch
+14    request-pull         Generates a summary of pending changes
+14    send-email           Send a collection of patches as emails
+14    svn                  Bidirectional operation between a Subversion repository and Git
 
    Low-level Commands / Manipulators
 06    apply                Apply a patch to files and/or to the index
@@ -115,7 +115,7 @@ TODO  rerere               Reuse recorded resolution of conflicted merges
 06    diff-index           Compare a tree to the working tree or index
 06    diff-tree            Compares the content and mode of blobs found via two tree objects
 10    for-each-ref         Output information on each ref
-      get-tar-commit-id    Extract commit ID from an archive created using git-archive
+14    get-tar-commit-id    Extract commit ID from an archive created using git-archive
 03    ls-files             Show information about files in the index and the working tree
 05    ls-remote            List references in a remote repository
 01    ls-tree              List the contents of a tree object
