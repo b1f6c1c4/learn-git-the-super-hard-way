@@ -2,23 +2,23 @@
 
 ## 目录
 
-0. [创建工作环境](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter0.md)（`git init`）
-1. [直接操纵对象](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter1.md)（`git commit`）
-2. [直接操纵引用](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter2.md)（`git branch`）
-3. [直接操纵索引](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter3.md)（`git add / restore`）
-4. [直接操纵HEAD](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter4.md)（`git switch`）
-5. [直接操纵远程](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter5.md)（`git pull / push`）
-6. [直接操纵merge](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter6.md)（`git diff / merge`）
-7. [直接操纵commit](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter7.md)（`git rebase`）
-8. [检索与查看历史](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter8.md)（`git log / blame / grep`）
-9. [邪恶的submodule](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter9.md)（`git submodule`）
-10. [批处理与自动化](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter10.md)
-11. [配置和alias](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter11.md)（`git config`）
-12. [单repo多分支工作流](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter12.md)
-13. [GPG签名](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter13.md)
-14. [数据的导入和导出](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/chapter14.md)（`git archive`）
+0. [创建工作环境](chapter0.md)（`git init`）
+1. [直接操纵对象](chapter1.md)（`git commit`）
+2. [直接操纵引用](chapter2.md)（`git branch`）
+3. [直接操纵索引](chapter3.md)（`git add / restore`）
+4. [直接操纵HEAD](chapter4.md)（`git switch`）
+5. [直接操纵远程](chapter5.md)（`git pull / push`）
+6. [直接操纵merge](chapter6.md)（`git diff / merge`）
+7. [直接操纵commit](chapter7.md)（`git rebase`）
+8. [检索与查看历史](chapter8.md)（`git log / blame / grep`）
+9. [邪恶的submodule](chapter9.md)（`git submodule`）
+10. [批处理与自动化](chapter10.md)
+11. [配置和alias](chapter11.md)（`git config`）
+12. [单repo多分支工作流](chapter12.md)
+13. [GPG签名](chapter13.md)
+14. [数据的导入和导出](chapter14.md)（`git archive`）
 
-**本教程还提供了[cheatsheet](https://github.com/b1f6c1c4/learn-git-the-super-hard-way/blob/master/cheatsheet.md)**，可以用来复习并检查学习效果。
+**本教程还提供了[cheatsheet](cheatsheet.md)**，可以用来复习并检查学习效果。
 
 如果你完全没有听说过cheatsheet里面的任何一条命令，那么你可能需要先学习一些基础教程：[入门](https://try.github.io)、[初级](https://learngitbranching.js.org)、[高级](https://git-scm.com/book/en/v2)。其中高级可以跟本教程同时学习。
 
