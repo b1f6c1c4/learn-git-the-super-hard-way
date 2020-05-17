@@ -5,8 +5,6 @@
 - Lv3
   - `git init --bare <repo>`
   - `git init [--separate-git-dir <repo>] <worktree>`
-  - `git clone --mirror|--bare <url> <repo>`
-  - `git clone [--no-checkout] [--branch <ref>] [--separate-git-dir <repo>] <url> <worktree>`
   - `git worktree list|add|prune`
 
 ## 操纵对象（第1章）
@@ -133,6 +131,8 @@
   - `git push [-u] <remote> <local-ref>:<remote-ref>`
   - `git fetch <remote> <remote-ref>:<local-ref>`
   - `git pull --ff-only`
+  - `git clone --mirror|--bare <url> <repo>`
+  - `git clone [--no-checkout] [--branch <ref>] [--separate-git-dir <repo>] <url> <worktree>`
 - Lv3(不推荐使用的邪恶命令)
   - `git pull [--rebase]`
 

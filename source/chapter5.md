@@ -225,6 +225,86 @@ cat ./config
 由于这个命令高度不可控，非常不推荐使用。
 然而`git pull --ff-only`却非常有用，是先`git fetch`再`git merge --ff-only FETCH_HEAD`。
 
+## 复制repo：`git clone`
+
+（参见第5章）
+
+### `git clone --mirror`
+
+复制另一个repo的大多数对象、所有普通引用、特殊引用HEAD
+
+- Lv2
+```bash
+(rm -rf *) # 删掉之前所有东西
+# 先准备好
+git init --bare copy.git
+cat >>./copy.git/config <<EOF
+[remote "origin"]
+  url = git@github.com:b1f6c1c4/learn-git-the-super-hard-way.git
+  fetch = +refs/*:refs/*
+  mirror = true
+EOF
+git --git-dir=copy.git fetch origin refs/heads/master:refs/heads/master
+git --git-dir=copy.git fetch origin refs/heads/dev:refs/heads/dev
+git --git-dir=copy.git symbolic-ref HEAD refs/heads/master
+```
+
+- Lv3
+```bash
+rm -rf copy.git
+git clone --mirror git@github.com:b1f6c1c4/learn-git-the-super-hard-way.git copy.git
+```
+
+### `git clone --bare`
+
+与`--mirror`类似，但是四不像（没有config）
+
+- Lv2
+```bash
+rm -rf copy.git
+git init --bare copy.git
+tee -a ./copy.git/config <<EOF
+[remote "origin"]
+  url = git@github.com:b1f6c1c4/learn-git-the-super-hard-way.git
+EOF
+git --git-dir=copy.git fetch origin refs/heads/master:refs/heads/master
+git --git-dir=copy.git fetch origin refs/heads/dev:refs/heads/dev
+git --git-dir=copy.git symbolic-ref HEAD refs/heads/master
+```
+
+- Lv3
+```bash
+rm -rf copy.git
+git clone --bare git@github.com:b1f6c1c4/learn-git-the-super-hard-way.git copy.git
+```
+
+### `git clone`
+
+- Lv2
+```bash
+rm -rf copy-wt
+git init copy-wt
+tee -a ./copy-wt/.git/config <<EOF
+[remote "origin"]
+  url = git@github.com:b1f6c1c4/learn-git-the-super-hard-way.git
+  fetch = +refs/*:refs/*
+[branch "dev"]
+  remote = origin
+  merge = refs/heads/dev
+EOF
+git --git-dir=copy-wt/.git fetch origin
+git --git-dir=copy-wt/.git update-ref refs/heads/dev refs/remotes/origin/dev
+git --git-dir=copy-wt/.git symbolic-ref HEAD refs/heads/dev
+# 如果指定了--no-checkout，省略这一行
+git --git-dir=copy-wt/.git --work-tree=copy-wt checkout-index -fua
+```
+
+- Lv3
+```bash
+rm -rf copy-wt
+git clone --branch dev git@github.com:b1f6c1c4/learn-git-the-super-hard-way.git copy-wt
+```
+
 ## 总结
 
 - Lv2
@@ -249,6 +329,10 @@ cat ./config
     - `git fetch <remote> <remote-ref>:<local-ref>`
   - 一键跟上进度
     - `git pull --ff-only`
+  - 基于远程创建repo
+    - `git clone --mirror <url> <repo>`
+    - `git clone --bare <url> <repo>`
+    - `git clone [--no-checkout] [--branch <ref>] [--separate-git-dir <repo>] <url> <worktree>`
   - 不推荐使用的邪恶命令
     - `git pull [--rebase]`
 

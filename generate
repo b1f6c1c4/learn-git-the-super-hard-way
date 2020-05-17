@@ -36,6 +36,8 @@ echo 'ENABLE-ECHO'
                 echo ')'
                 printf 'printf "%%s\\n" %q \n' "$line"
                 STATE=TEXT
+            elif [ "$line" = '' ]; then
+                printf 'printf "%%s\\n" %q \n' "$line"
             else
                 printf 'printf "%%s\\n" %q \n' "$line"
                 L="${line%%#*}"
