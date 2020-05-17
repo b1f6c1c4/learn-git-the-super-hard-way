@@ -1,5 +1,7 @@
 # learn-git-the-super-hard-way
 
+[GitBook](https://app.gitbook.com/@b1f6c1c4/s/learn-git-the-super-hard-way/)
+
 ## 目录
 
 0. [创建工作环境](chapter0.md)（`git init`）

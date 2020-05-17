@@ -7,6 +7,7 @@ make -j32
 
 git read-tree "$(git mktree </dev/null)"
 git add -f \
+    .gitbook.yaml \
     chapter*.md \
     cheatsheet.md \
     README.md \
