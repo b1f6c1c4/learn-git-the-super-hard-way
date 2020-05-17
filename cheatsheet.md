@@ -150,6 +150,9 @@
     - `git show <commit-ish> -- <path>`
     - `git diff [--cached] <tree-ish> -- <path>`
     - `git diff -- <path>`
+    - `git status`
+  - Lv4
+    - `git st`
 - 合并修改
   - Lv2
     - `git merge-file [--ours|--theirs|--union] C A B`

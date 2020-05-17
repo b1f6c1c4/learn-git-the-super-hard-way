@@ -80,6 +80,13 @@ git --work-tree=../default-tree diff-files
 * `git diff [<tree-ish>] -- [<path>]` 相当于 `git diff-index -p [<tree-ish>] -- [<path>]`
 * `git diff --cached [<tree-ish>] -- [<path>]` 相当于 `git diff-index -p --cached [<tree-ish>] -- [<path>]`
 * `git diff -- <path>` 相当于 `git diff-files -p <path>`
+* `git status` 相当于 `git diff-index HEAD`、`git diff-index --cached HEAD`、`git clean -nd`
+    * 注意这里没有`-p`，意味着仅仅列出哪些文件发生了变化，但并不列出具体差异
+    * `git clean -nd`意味着还要列出新增了哪些文件
+
+- Lv4: `git st`
+
+`git status -sb`，比起`git status`要简明扼要一些。
 
 ## 处理修改
 
@@ -515,6 +522,9 @@ git cat-file commit HEAD
     - `git show <commit-ish> -- <path>`
     - `git diff [--cached] <tree-ish> -- <path>`
     - `git diff -- <path>`
+    - `git status`
+  - Lv4
+    - `git st`
 - 合并修改
   - Lv2
     - `git merge-file [--ours|--theirs|--union] C A B`
