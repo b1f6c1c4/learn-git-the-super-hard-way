@@ -5,8 +5,14 @@ set -euxo pipefail
 make docker
 make -j32
 
-git add -f chapter*.md
+git read-tree "$(git mktree </dev/null)"
+git add -f \
+    chapter*.md \
+    cheatsheet.md \
+    README.md \
+    ROADMAP \
+    LICENSE
 TREE="$(git write-tree)"
-COMMIT="$(git commit-tree "$TREE" -p HEAD -m "publish")"
+COMMIT="$(git commit-tree "$TREE" -p HEAD -m "publish" -S)"
 git push --force-with-lease origin "$COMMIT:master"
-git update-index --force-remove -- chapter*.md
+git reset --mixed
