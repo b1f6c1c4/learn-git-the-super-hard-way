@@ -22,14 +22,16 @@
 15. [数据抢修与急救](chapter15.md)
 
 **本教程还提供了[cheatsheet](cheatsheet.md)**，可以用来复习并检查学习效果。
-
-如果你完全没有听说过cheatsheet里面的任何一条命令，那么你可能需要先学习一些基础教程：[入门](https://try.github.io)、[初级](https://learngitbranching.js.org)、[高级](https://git-scm.com/book/en/v2)。其中高级可以跟本教程同时学习。
-
 如果你已经完全掌握cheatsheet里面的所有命令，那么此教程可能对你来说太过浅显，建议移步[Git Reference](https://git-scm.com/docs)、[Git源码](https://github.com/git/git)。
 
-学习完本教程以后，你应该掌握了git的全部用法的1%。
+学习完本教程以后，你应该掌握了git的全部用法的2%。
 
 备注：`git reset`/`git checkout`的详解在第4章。强烈推荐改用功能更强大更直观的`git restore`和`git switch`。
+
+## 先修课程
+
+本教程要求学习者提前学习Linux命令行的基础知识。
+请参考[第-1章：Linux命令行复习](chapter-1.md)。
 
 ## 基本约定
 
