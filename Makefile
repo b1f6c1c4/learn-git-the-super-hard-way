@@ -1,6 +1,10 @@
 CHAPTERS=$(patsubst source/%,%,$(wildcard source/chapter*.md))
+TESTS=$(wildcard test/*.src.md)
+REPORTS=$(patsubst %.src.md,%.output.md,$(TESTS))
 
-all: $(CHAPTERS)
+all: $(CHAPTERS) test
+
+test: $(REPORTS)
 
 docker:
 	docker build -t learn-git-generate ./docker
@@ -24,9 +28,13 @@ chapter14.md: source/chapter1.md source/chapter14.md
 $(CHAPTERS): generate
 	./$^ >$@
 
+test/%.output.md: generate test/%.src.md test/%.dst.md
+	./$< $(word 2,$^) >$@
+	cmp --silent $@ $(word 3,$^)
+
 clean:
-	rm -f ./chapter*.md
+	rm -f ./chapter*.md ./test/*.output.md
 
-.PHONY: all docker clean
+.PHONY: all docker clean test
 
-.DELETE_ON_ERROR: $(CHAPTERS)
+.DELETE_ON_ERROR: $(CHAPTERS) $(REPORTS)

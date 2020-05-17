@@ -1,0 +1,5 @@
+```bash
+whoami \
+    # comment
+# root
+```

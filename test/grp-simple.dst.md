@@ -1,0 +1,4 @@
+```bash
+(whoami)
+# root
+```
