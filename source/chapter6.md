@@ -8,7 +8,7 @@
 本章中涉及worktree的命令会明确标出。
 
 ```bash
-git init --separate-git-dir "$PWD" ../default-tree
+git init --separate-git-dir "$(pwd)" ../default-tree
 ```
 
 ## 查看更改

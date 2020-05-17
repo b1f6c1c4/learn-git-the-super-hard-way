@@ -124,7 +124,7 @@ git -C whatever/path config branch.master.remote origin
 git -C whatever/path config branch.master.merge refs/heads/master
 # 然后switch到目标commit
 git -C whatever/path switch --detach \
-  "$(git ls-files -s -- whatever/path | cut -d ' ' -f 2)"
+  "$(git ls-files -s -- whatever/path | awk "{ print $2; }")"
 git -C whatever/path branch -av
 ls -A whatever/path
 cat .git/modules/static/name/config
@@ -161,7 +161,7 @@ git -C parent update-index --cacheinfo 160000,e97348c1ba3072a1c108218f6ba88c3177
 ```bash
 cd parent
 git -C whatever/path switch -f --detach \
-  "$(git ls-files -s -- whatever/path | cut -d ' ' -f 2)"
+  "$(git ls-files -s -- whatever/path | awk "{ print $2; }")"
 git -C whatever/path status
 ```
 

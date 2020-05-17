@@ -91,9 +91,9 @@ git --git-dir=../another-repo.git config uploadpack.allowAnySHA1InWant true
 
 直接索要对象（若不加`--keep`则直接解Packfile）：
 ```bash
-git --git-dir=../another-repo.git fetch-pack --keep --no-progress "$PWD" 187e91589a3f4f248f4cc8b1a1eca65b5161cc7b
+git --git-dir=../another-repo.git fetch-pack --keep --no-progress "$(pwd)" 187e91589a3f4f248f4cc8b1a1eca65b5161cc7b
 ```
-注意：`$PWD`还可以是URL，用于跨域对象传输
+注意：`$(pwd)`还可以是URL，用于跨域对象传输
 
 ## 跨库直接引用传输
 
@@ -111,7 +111,7 @@ git update-ref refs/heads/itst bb6d
 
 直接索要引用及其对象：
 ```bash
-git --git-dir=../another-repo.git fetch-pack --no-progress "$PWD" refs/heads/itst
+git --git-dir=../another-repo.git fetch-pack --no-progress "$(pwd)" refs/heads/itst
 ```
 
 直接推送引用及其对象：
