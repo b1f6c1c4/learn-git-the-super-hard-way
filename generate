@@ -38,17 +38,18 @@ echo 'ENABLE-ECHO'
                 STATE=TEXT
             else
                 printf 'printf "%%s\\n" %q \n' "$line"
-                if ! printf '%s' "$line" | grep -q '^#'; then
-                    if ! printf '%s' "$line" | grep -q -e '^cd ' -e '\\$' -e ';$'; then
-                        OUT="$line"' | sed "s/^/# /; s/^# $/#/"'"$LF"
+                L="${line%%#*}"
+                if [ -n "$L" ]; then
+                    if ! printf '%s' "$L" | grep -q -e '^cd ' -e '\\$' -e ';$'; then
+                        OUT="$L"' | sed "s/^/# /; s/^# $/#/"'"$LF"
                     else
-                        OUT="$line$LF"
+                        OUT="$L$LF"
                     fi
-                    if ! printf '%s' "$line" | grep -q -e '\\$' -e ';$' -e '<<EOF\>'; then
+                    if ! printf '%s' "$L" | grep -q -e '\\$' -e ';$' -e '<<EOF\>'; then
                         printf '%s' "$BUFFER"
                         BUFFER=
                         printf '%s' "$OUT"
-                    elif ! printf '%s' "$line" | grep -q -e '<<EOF\>'; then
+                    elif ! printf '%s' "$L" | grep -q -e '<<EOF\>'; then
                         BUFFER="$BUFFER$OUT"
                     else
                         STATE=LITERAL

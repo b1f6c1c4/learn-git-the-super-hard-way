@@ -21,8 +21,8 @@ chapter12.md: source/chapter12.md
 chapter13.md: source/chapter6.md source/chapter13.md
 chapter14.md: source/chapter1.md source/chapter14.md
 
-$(CHAPTERS):
-	./generate $^ >$@
+$(CHAPTERS): generate
+	./$^ >$@
 
 clean:
 	rm -f ./chapter*.md
