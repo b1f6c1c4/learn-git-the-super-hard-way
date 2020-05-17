@@ -1,5 +1,0 @@
-```bash
-whoami \
-    # comment
-# root
-```

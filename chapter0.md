@@ -27,6 +27,7 @@ echo 'ref: refs/heads/master' > the-repo.git/HEAD
 至此一个最简单的Git repo创建完毕，采用`git symbolic-ref`（Lv2）检验是否创建成功：
 ```bash
 git --git-dir=the-repo.git symbolic-ref HEAD
+# refs/heads/master
 ```
 
 现在添加worktree：
@@ -41,6 +42,11 @@ mkdir default-tree
 git --git-dir=the-repo.git --work-tree=default-tree status --porcelain
 # 没有输出表明worktree是干净的
 git --git-dir=the-repo.git --work-tree=default-tree status
+# On branch master
+#
+# No commits yet
+#
+# nothing to commit (create/copy files and use "git add" to track)
 ```
 
 为了简化命令行调用方式，在worktree下添加.git文件：
@@ -52,6 +58,11 @@ echo "gitdir: $(pwd)/the-repo.git" > default-tree/.git
 ```bash
 cd default-tree
 git status
+# On branch master
+#
+# No commits yet
+#
+# nothing to commit (create/copy files and use "git add" to track)
 ```
 
 #### 合并repo和worktree
@@ -66,6 +77,11 @@ mv the-repo.git default-tree/.git
 ```bash
 cd default-tree
 git status
+# On branch master
+#
+# No commits yet
+#
+# nothing to commit (create/copy files and use "git add" to track)
 ```
 
 ### Lv3
@@ -74,18 +90,21 @@ git status
 ```bash
 rm -rf the-repo.git
 git init --bare the-repo.git
+# Initialized empty Git repository in /root/the-repo.git/
 ```
 
 日常创建repo、选配worktree、把repo放在worktree里面：
 ```bash
 rm -rf default-tree
 git init default-tree
+# Initialized empty Git repository in /root/default-tree/.git/
 ```
 
 日常创建repo、选配worktree但不把repo放在worktree里面：
 ```bash
 rm -rf the-repo.git default-tree
 git init --separate-git-dir the-repo.git default-tree
+# Initialized empty Git repository in /root/the-repo.git/
 ```
 
 ## 添加新repo并链接到原repo，以实现“一个repo多个worktree”
@@ -94,6 +113,7 @@ git init --separate-git-dir the-repo.git default-tree
 
 ```bash
 git init --bare the-repo.git
+# Reinitialized existing Git repository in /root/the-repo.git/
 # 惯例是将小repo放在这个位置：
 mkdir -p the-repo.git/worktrees/another/
 # 为了和大repo建立起联系，创建commondir文件：
@@ -108,6 +128,7 @@ echo 'ref: refs/heads/another' > the-repo.git/worktrees/another/HEAD
 ```bash
 # 特别注意此处的git-dir已经发生变化
 git --git-dir=the-repo.git/worktrees/another symbolic-ref HEAD
+# refs/heads/another
 ```
 
 和普通repo一样，添加worktree非常简单：
@@ -118,6 +139,11 @@ mkdir another-tree
 采用`git status`（Lv3）检验是否创建成功：
 ```bash
 git --git-dir=the-repo.git/worktrees/another --work-tree=another-tree status
+# On branch another
+#
+# No commits yet
+#
+# nothing to commit (create/copy files and use "git add" to track)
 ```
 
 给小repo简化命令行调用方式完全相同：
@@ -130,7 +156,11 @@ echo "gitdir: $(pwd)/the-repo.git/worktrees/another" > another-tree/.git
 echo "$(pwd)/another-tree/.git" > the-repo.git/worktrees/another/gitdir
 # 注意此处git-dir写大repo小repo都能得到一样的结果
 git --git-dir=the-repo.git worktree list
+# /root/the-repo.git  (bare)
+# /root/another-tree  0000000 [another]
 git --git-dir=the-repo.git/worktrees/another worktree list
+# /root/the-repo.git  (bare)
+# /root/another-tree  0000000 [another]
 ```
 
 ### Lv3
@@ -174,14 +204,23 @@ git --git-dir=the-repo.git worktree prune
 ```bash
 rm -rf copy.git
 git init --bare copy.git
+# Initialized empty Git repository in /root/copy.git/
 tee -a ./copy.git/config <<EOF
 [remote "origin"]
   url = git@github.com:b1f6c1c4/learn-git-the-super-hard-way.git
   fetch = +refs/*:refs/*
   mirror = true
 EOF
+# [remote "origin"]
+#   url = git@github.com:b1f6c1c4/learn-git-the-super-hard-way.git
+#   fetch = +refs/*:refs/*
+#   mirror = true
 git --git-dir=copy.git fetch origin refs/heads/master:refs/heads/master
+# error: cannot run ssh: No such file or directory
+# fatal: unable to fork
 git --git-dir=copy.git fetch origin refs/heads/dev:refs/heads/dev
+# error: cannot run ssh: No such file or directory
+# fatal: unable to fork
 git --git-dir=copy.git symbolic-ref HEAD refs/heads/master
 ```
 
@@ -189,6 +228,9 @@ git --git-dir=copy.git symbolic-ref HEAD refs/heads/master
 ```bash
 rm -rf copy.git
 git clone --mirror git@github.com:b1f6c1c4/learn-git-the-super-hard-way.git copy.git
+# Cloning into bare repository 'copy.git'...
+# error: cannot run ssh: No such file or directory
+# fatal: unable to fork
 ```
 
 ### `git clone --bare`
@@ -199,19 +241,29 @@ git clone --mirror git@github.com:b1f6c1c4/learn-git-the-super-hard-way.git copy
 ```bash
 rm -rf copy.git
 git init --bare copy.git
+# Initialized empty Git repository in /root/copy.git/
 tee -a ./copy.git/config <<EOF
 [remote "origin"]
   url = git@github.com:b1f6c1c4/learn-git-the-super-hard-way.git
 EOF
+# [remote "origin"]
+#   url = git@github.com:b1f6c1c4/learn-git-the-super-hard-way.git
 git --git-dir=copy.git fetch origin refs/heads/master:refs/heads/master
 git --git-dir=copy.git fetch origin refs/heads/dev:refs/heads/dev
 git --git-dir=copy.git symbolic-ref HEAD refs/heads/master
+# error: cannot run ssh: No such file or directory
+# fatal: unable to fork
+# error: cannot run ssh: No such file or directory
+# fatal: unable to fork
 ```
 
 - Lv3
 ```bash
 rm -rf copy.git
 git clone --bare git@github.com:b1f6c1c4/learn-git-the-super-hard-way.git copy.git
+# Cloning into bare repository 'copy.git'...
+# error: cannot run ssh: No such file or directory
+# fatal: unable to fork
 ```
 
 ### `git clone`
@@ -220,6 +272,7 @@ git clone --bare git@github.com:b1f6c1c4/learn-git-the-super-hard-way.git copy.g
 ```bash
 rm -rf copy-wt
 git init copy-wt
+# Initialized empty Git repository in /root/copy-wt/.git/
 tee -a ./copy-wt/.git/config <<EOF
 [remote "origin"]
   url = git@github.com:b1f6c1c4/learn-git-the-super-hard-way.git
@@ -228,9 +281,18 @@ tee -a ./copy-wt/.git/config <<EOF
   remote = origin
   merge = refs/heads/dev
 EOF
+# [remote "origin"]
+#   url = git@github.com:b1f6c1c4/learn-git-the-super-hard-way.git
+#   fetch = +refs/*:refs/*
+# [branch "dev"]
+#   remote = origin
+#   merge = refs/heads/dev
 git --git-dir=copy-wt/.git fetch origin
 git --git-dir=copy-wt/.git update-ref refs/heads/dev refs/remotes/origin/dev
 git --git-dir=copy-wt/.git symbolic-ref HEAD refs/heads/dev
+# error: cannot run ssh: No such file or directory
+# fatal: unable to fork
+# fatal: refs/remotes/origin/dev: not a valid SHA1
 # 如果指定了--no-checkout，省略这一行
 git --git-dir=copy-wt/.git --work-tree=copy-wt checkout-index -fua
 ```
@@ -239,6 +301,9 @@ git --git-dir=copy-wt/.git --work-tree=copy-wt checkout-index -fua
 ```bash
 rm -rf copy-wt
 git clone --branch dev git@github.com:b1f6c1c4/learn-git-the-super-hard-way.git copy-wt
+# Cloning into 'copy-wt'...
+# error: cannot run ssh: No such file or directory
+# fatal: unable to fork
 ```
 
 ## 总结

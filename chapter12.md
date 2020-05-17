@@ -89,6 +89,7 @@
 ```bash
 mkdir the-project
 git init --bare the-project/the-project.git
+# Initialized empty Git repository in /root/the-project/the-project.git/
 # git -C the-project/the-project.git remote add origin https://github.com/...
 ```
 
@@ -100,16 +101,22 @@ git hash-object -t commit -w --stdin <<EOF
 tree 0000000000000000000000000000000000000000
 
 EOF
+# 60bc2812cc97ab2d2f2c7168aa101f7bfabcbf88
 git update-ref refs/workaround 60bc2812cc97ab2d2f2c7168aa101f7bfabcbf88
 git worktree add --no-checkout --detach ../doc refs/workaround
+# Preparing worktree (detached HEAD 60bc281)
 git --git-dir=worktrees/doc symbolic-ref HEAD refs/heads/doc
 git worktree add --no-checkout --detach ../component1 refs/workaround
+# Preparing worktree (detached HEAD 60bc281)
 git --git-dir=worktrees/component1 symbolic-ref HEAD refs/heads/component1
 git worktree add --no-checkout --detach ../component2 refs/workaround
+# Preparing worktree (detached HEAD 60bc281)
 git --git-dir=worktrees/component2 symbolic-ref HEAD refs/heads/component2
 git worktree add --no-checkout --detach ../component3 refs/workaround
+# Preparing worktree (detached HEAD 60bc281)
 git --git-dir=worktrees/component3 symbolic-ref HEAD refs/heads/component3
 git worktree add --no-checkout --detach ../component4 refs/workaround
+# Preparing worktree (detached HEAD 60bc281)
 git --git-dir=worktrees/component4 symbolic-ref HEAD refs/heads/component4
 git update-ref -d refs/workaround
 rm -f objects/60/bc2812cc97ab2d2f2c7168aa101f7bfabcbf88
@@ -135,6 +142,7 @@ committer b1f6c1c4 <b1f6c1c4@gmail.com> 1514736000 +0800
 
 Write documents
 EOF
+# ffe7520ba83e48bb254b9eb0fd07390d98124ede
 git reset --soft ffe7520b
 ```
 
@@ -156,6 +164,7 @@ committer b1f6c1c4 <b1f6c1c4@gmail.com> 1514736010 +0800
 
 Setup environment
 EOF
+# 4dbe0f181e875f7a96b3f6079038d353c239a6f4
 git reset --soft 4dbe0f1
 ```
 
@@ -174,6 +183,7 @@ committer b1f6c1c4 <b1f6c1c4@gmail.com> 1514736010 +0800
 
 Merge branch doc
 EOF
+# 9f1f329f771711c7160c0784d4cf8a7f157d5c27
 git reset --soft 9f1f329
 ```
 
@@ -183,6 +193,7 @@ git reset --soft 9f1f329
 ```bash
 cd the-project/doc
 git rm -f documents.txt
+# rm 'documents.txt'
 echo 'New documents' > new-documents.txt
 git add new-documents.txt
 git hash-object -t commit --stdin -w <<EOF
@@ -193,6 +204,7 @@ committer b1f6c1c4 <b1f6c1c4@gmail.com> 1514736000 +0800
 
 Move to new documents
 EOF
+# 9584d01267d5f16c581e521d3bb401f211508eee
 git reset --soft 9584d012
 ```
 
@@ -200,6 +212,7 @@ git reset --soft 9584d012
 ```bash
 cd the-project/component1
 git rm -rf doc/
+# rm 'doc/documents.txt'
 git read-tree --prefix=doc/ doc
 git checkout-index -fua
 git hash-object -t commit --stdin -w <<EOF
@@ -211,9 +224,17 @@ committer b1f6c1c4 <b1f6c1c4@gmail.com> 1514736010 +0800
 
 Merge branch doc
 EOF
+# 7ad8da3b9f5825c63247bf655ef6da68b637453b
 git reset --soft 7ad8da3
 git config alias.lg "log --graph --pretty=tformat:'%h -%d (%an/%cn) %s' --abbrev-commit"
 git lg
+# *   7ad8da3 - (HEAD -> component1) (b1f6c1c4/b1f6c1c4) Merge branch doc
+# |\  
+# | * 9584d01 - (doc) (b1f6c1c4/b1f6c1c4) Move to new documents
+# * | 9f1f329 - (b1f6c1c4/b1f6c1c4) Merge branch doc
+# |\| 
+# | * ffe7520 - (b1f6c1c4/b1f6c1c4) Write documents
+# * 4dbe0f1 - (b1f6c1c4/b1f6c1c4) Setup environment
 ```
 
 ### master

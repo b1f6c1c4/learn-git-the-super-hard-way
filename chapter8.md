@@ -33,7 +33,37 @@ git log --color --graph --pretty=tformat:'%Cred%h%Creset -%C(magenta)%d %Cgreen(
 
 ```bash
 (git log --graph --pretty=tformat:'h -%d (%aI) %s <%an>' --abbrev-commit --all)
+# * h - (HEAD -> br4) (2018-01-01T00:00:06+08:00) commit G <b1f6c1c4>
+# * h - (2018-01-01T00:00:04+08:00) commit E <b1f6c1c4>
+# * h - (2018-01-01T00:00:01+08:00) commit B <b1f6c1c4>
+# * h - (2018-01-01T00:00:00+08:00) commit A <b1f6c1c4>
+# * h - (br1) (2018-01-01T00:00:07+08:00) commit H <b1f6c1c4>
+# | * h - (br3) (2018-01-01T00:00:05+08:00) commit F <b1f6c1c4>
+# | * h - (2018-01-01T00:00:04+08:00) commit E <b1f6c1c4>
+# | | * h - (br2) (2018-01-01T00:00:03+08:00) commit D <b1f6c1c4>
+# | |/  
+# |/|   
+# * | h - (2018-01-01T00:00:02+08:00) commit C <b1f6c1c4>
+# |/  
+# * h - (2018-01-01T00:00:01+08:00) commit B <b1f6c1c4>
+# * h - (2018-01-01T00:00:00+08:00) commit A <b1f6c1c4>
 git show-branch -a
+# ! [br1] commit H
+#  ! [br2] commit D
+#   ! [br3] commit F
+#    * [br4] commit G
+# ----
+#    * [br4] commit G
+#    * [br4^] commit E
+#    * [br4~2] commit B
+#    * [br4~3] commit A
+# +    [br1] commit H
+#   +  [br3] commit F
+#   +  [br3^] commit E
+#  +   [br2] commit D
+# ++   [br1^] commit C
+# +++  [br1~2] commit B
+# +++  [br1~3] commit A
 ```
 
 - Lv4: `git la`
