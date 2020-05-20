@@ -30,7 +30,7 @@
   - 旧语法`git checkout -b <branch> <commit-ish> --`
 
 
-## 设置HEAD指向某一个间接引用
+## 设置HEAD指向某一个直接引用
 
 - Lv2
   - `git symbolic-ref HEAD <ref>`
