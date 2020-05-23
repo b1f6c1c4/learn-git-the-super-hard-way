@@ -19,6 +19,7 @@
 12. [单repo多分支工作流](chapter12.md)
 13. [GPG签名](chapter13.md)
 14. [数据的导入和导出](chapter14.md)（`git archive`）
+15. [数据抢修与急救](chapter15.md)
 
 **本教程还提供了[cheatsheet](cheatsheet.md)**，可以用来复习并检查学习效果。
 
