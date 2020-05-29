@@ -269,7 +269,7 @@
 - `git stripspace`
 - `git config --global core.whitespace ...`
 
-# GPG签名（第13章）
+## GPG签名（第13章）
 
 - 创建签名
   - Lv2
@@ -286,7 +286,7 @@
     - `git tag --verify <tag-ish>`
     - `git log --show-signature ...`
 
-# 数据的导入和导出（第14章）
+## 数据的导入和导出（第14章）
 
 - 常用Lv3
   - `git archive [--prefix=<prefix>] [-o <output>] <tree-ish> -- <path>...`
