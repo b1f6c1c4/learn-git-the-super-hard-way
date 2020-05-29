@@ -1,3 +1,6 @@
+注：命令前的编号是本教程中出现该命令的章数
+
+```
 $ git help -a
 
    See 'git help <command>' to read about a specific subcommand
@@ -155,3 +158,4 @@ TODO  rerere               Reuse recorded resolution of conflicted merges
       sh-i18n              Git's i18n setup code for shell scripts
       sh-setup             Common Git shell script setup code
 10    stripspace           Remove unnecessary whitespace
+```
