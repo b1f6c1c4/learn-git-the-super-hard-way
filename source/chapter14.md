@@ -1,6 +1,4 @@
-# 第14章：数据的导入和导出
-
-## 基础知识
+# 基础知识
 
 Git对象采用独特的方式存放。
 理论上说，有了`git hash-object`和`git cat-file`，任何数据都可以导入导出。
@@ -9,7 +7,7 @@ Git对象采用独特的方式存放。
 
 本章在第1章的基础之上继续。
 
-## tree导入导出：`git archive`
+# tree导入导出：`git archive`
 
 - Lv2
 使用`git checkout-index`即可
@@ -34,7 +32,7 @@ git get-tar-commit-id <ar.tar
 git get-tar-commit-id <ar-c.tar
 ```
 
-## 任意对象导入导出
+# 任意对象导入导出
 
 - 二进制格式 - `git bundle create` / `git bundle unbundle` - 参见第5章
 - 适合于机器的文本格式（类似与脚本） - `git fast-export` / ` git fast-import`
@@ -46,7 +44,7 @@ git get-tar-commit-id <ar-c.tar
 然而真正需要这些的场景实在太罕见了——上传至GitHub就可以非常好地完成数据的导入导出功能——
 这些命令也就不再介绍了。
 
-## 与其他版本控制软件交互操作
+# 与其他版本控制软件交互操作
 
 节选自`git help -a`：
 ```
@@ -60,7 +58,7 @@ git get-tar-commit-id <ar-c.tar
       svn                  Bidirectional operation between a Subversion repository and Git
 ```
 
-## 总结
+# 总结
 
 - 常用Lv3
   - `git archive [--prefix=<prefix>] [-o <output>] <tree-ish> -- <path>...`

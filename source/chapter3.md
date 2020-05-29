@@ -1,6 +1,4 @@
-# 第3章：直接操纵索引
-
-## 基础知识
+# 基础知识
 
 Git索引位于`<repo>/index`，本质是一个复杂的二进制文件。
 具体格式参见[这里](https://github.com/git/git/blob/master/Documentation/technical/index-format.txt)，大概包括以下内容：
@@ -21,7 +19,7 @@ git init .
 ```
 也就意味着忽略掉`--git-dir`和`--work-tree`也能正常工作。读者需要判断哪些命令可以不依赖`--work-tree`。
 
-## 添加/修改index
+# 添加/修改index
 
 - Lv1
 ```bash
@@ -55,7 +53,7 @@ git add -f dir/fn
 
 如果想只添加一部分内容，使用`git add -p`
 
-## 删除index
+# 删除index
 
 - Lv2
 ```bash
@@ -69,13 +67,13 @@ git update-index --force-remove -- dir/fn
 git rm --cached -- dir/fn
 ```
 
-## 移动index
+# 移动index
 
 没有简单办法。
 Lv2方法，使用`git update-index --cacheinfo`无法指定文件stat信息
 Lv3方法，使用`git mv`不仅移动了index还移动了worktree里的文件
 
-## 查看index
+# 查看index
 
 - Lv2
 （其中0为stage数，正常情况为0）
@@ -84,7 +82,7 @@ Lv3方法，使用`git mv`不仅移动了index还移动了worktree里的文件
 git ls-files -s
 ```
 
-## 利用tree更新index
+# 利用tree更新index
 
 先弄一个tree：
 ```bash
@@ -121,7 +119,7 @@ git restore --source 5841 --staged -- name.ext
 git ls-files -s
 ```
 
-## 利用index更新worktree
+# 利用index更新worktree
 
 注意：添加修改都可以，但是无法删除worktree里面多出来的文件。
 请参阅本章最后一节（`git clean`）。
@@ -147,7 +145,7 @@ git restore --worktree -- name.ext
 # git checkout -f -- name.ext
 ```
 
-## 利用index创建tree
+# 利用index创建tree
 
 - Lv2
 ```bash
@@ -168,7 +166,7 @@ git write-tree --prefix=dir/
 git commit --allow-empty -m 'The message'
 ```
 
-## 利用tree更新worktree
+# 利用tree更新worktree
 
 - Lv1
 ```bash
@@ -202,7 +200,7 @@ git cat-file blob $(git ls-files -s -- f | awk '{ print $2; }')
 cat f
 ```
 
-## 利用tree同时更新index和worktree
+# 利用tree同时更新index和worktree
 
 - Lv2
 一步一步来即可
@@ -225,7 +223,7 @@ cat f
 
 注意：`git restore --worktree`没有对应的旧语法。
 
-## 详解`git restore`
+# 详解`git restore`
 
 - `git restore [--source <tree-ish>] [--staged] [--worktree] -- <path>`
   - 若`<tree-ish>`留空：
@@ -242,12 +240,12 @@ cat f
 - `git restore --source <tree-ish> --staged --worktree -- <path>`=`git checkout -f <tree-ish> -- <path>`
 - `git restore --source <tree-ish> [--worktree] -- <path>` 没有等价的旧语法！
 
-## 交互式修改index
+# 交互式修改index
 
 有时候我们希望将一个文件的部分更改放入index中，此时使用`git add -p`即可。
 如果不小心放多了，使用`git restore -p`即可。（旧语法`git reset -p`）
 
-## 将index和worktree中的更改暂存起来以备日后使用
+# 将index和worktree中的更改暂存起来以备日后使用
 
 - Lv3
 
@@ -266,7 +264,7 @@ git status
 
 `git stash pop`本质是`git merge`。参见第6章处理冲突。
 
-## 删除worktree中多出来的文件（`git clean`）
+# 删除worktree中多出来的文件（`git clean`）
 
 **警告：该命令十分危险，可能一瞬删掉你的全部心血！**
 
@@ -293,7 +291,7 @@ git clean -ndx
 git clean -ndX
 ```
 
-## 总结
+# 总结
 
 - Lv1
   - `git update-index --add --cacheinfo <mode>,<SHA1>,<path>`

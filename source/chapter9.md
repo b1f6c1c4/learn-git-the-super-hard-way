@@ -1,6 +1,4 @@
-# 第9章：邪恶的submodule
-
-## 基础知识
+# 基础知识
 
 在worktree内部创建新的repo/worktree是坏的，因为一个文件受两个repo管辖。
 一个workaround是将这个小的repo/worktree变成大repo的一个submodule。
@@ -26,7 +24,7 @@
 git config --global alias.lg "log --graph --pretty=tformat:'%h -%d <%an/%cn> %s' --abbrev-commit"
 ```
 
-## 添加/更新submodule的静态部分（`.gitmodules`/index）
+# 添加/更新submodule的静态部分（`.gitmodules`/index）
 
 非常简单，直接修改`.gitmodules`和index：
 
@@ -61,7 +59,7 @@ git ls-files -s
 
 非常遗憾的是，没有Lv3的方法能够做到这一点。
 
-## 用`.gitmodules`来更新`.git/config`
+# 用`.gitmodules`来更新`.git/config`
 
 - Lv2
 
@@ -84,7 +82,7 @@ git submodule init -- whatever/path
 cat .git/config
 ```
 
-## 用`.git/config`和index来更新repo和worktree
+# 用`.git/config`和index来更新repo和worktree
 
 `git submodule update`是实现这个功能的Lv3命令。
 其基本语法是
@@ -98,7 +96,7 @@ cat .git/config
 
 下面将分别介绍。
 
-### `git submodule update --checkout == git clone`
+## `git submodule update --checkout == git clone`
 
 - Lv2
 
@@ -148,7 +146,7 @@ cat .git/modules/static/name/config
 
 - Lv5: [git-get](https://github.com/b1f6c1c4/git-get)
 
-### `git submodule update --checkout [-f] == git switch [-f] <commit>`
+## `git submodule update --checkout [-f] == git switch [-f] <commit>`
 
 假设index发生了变动：
 
@@ -173,7 +171,7 @@ git submodule update --checkout -f -- whatever/path
 git -C whatever/path status
 ```
 
-### `git submodule update --rebase == git rebase <commit>`
+## `git submodule update --rebase == git rebase <commit>`
 
 （先回到原来的HEAD位置）
 ```bash
@@ -221,7 +219,7 @@ git submodule update --rebase -- whatever/path 2>/dev/null
 git -C whatever/path lg HEAD e973
 ```
 
-### `git submodule update --merge == git merge <commit>`
+## `git submodule update --merge == git merge <commit>`
 
 （先回到原来的HEAD位置）
 ```bash
@@ -275,7 +273,7 @@ git submodule update --merge -- whatever/path
 git -C whatever/path lg HEAD e973
 ```
 
-### 其他两种`git config submodule.<name>.update`
+## 其他两种`git config submodule.<name>.update`
 
 ```bash
 cd parent
@@ -293,7 +291,7 @@ git config submodule.static/name.update '!echo'
 git submodule update -- whatever/path
 ```
 
-## 用`.gitmodules`和index来创建repo和worktree
+# 用`.gitmodules`和index来创建repo和worktree
 
 分两步：用`.gitmodules`来更新`.git/config`；再用`.git/config`和index来更新repo和worktree。
 Lv2不再赘述。
@@ -305,7 +303,7 @@ cd parent
 git submodule update --init --checkout -- whatever/path
 ```
 
-## 用repo来更新index
+# 用repo来更新index
 
 （先回到原来的HEAD位置）
 ```bash
@@ -351,7 +349,7 @@ git add whatever/path
 git ls-files -s
 ```
 
-## 用`.gitmodules`来更新`.git/config`和repo的URL
+# 用`.gitmodules`来更新`.git/config`和repo的URL
 
 ```bash
 cd parent
@@ -377,7 +375,7 @@ git config --get submodule.static/name.url
 git -C whatever/path remote -v
 ```
 
-## 一次性添加`.gitmodules`、`.git/config`、index、repo、worktree
+# 一次性添加`.gitmodules`、`.git/config`、index、repo、worktree
 
 - Lv2
 
@@ -400,7 +398,7 @@ ls -A .git/modules/static/name
 ls -A whatever/path
 ```
 
-## 删除`.git/config`和worktree
+# 删除`.git/config`和worktree
 
 - Lv2
 
@@ -423,7 +421,7 @@ ls -A .git/modules/static/name
 ls -A whatever/path
 ```
 
-## 删除`.gitmodules`和index
+# 删除`.gitmodules`和index
 
 - Lv2
 
@@ -459,7 +457,7 @@ ls -A whatever/path
 
 非常遗憾的是，repo必须手工`rm -rf`。
 
-## 由repo和worktree创建`.gitmodules`和index
+# 由repo和worktree创建`.gitmodules`和index
 
 假设如此创建repo和worktree：
 ```bash
@@ -500,7 +498,7 @@ git submodule absorbgitdirs -- whatever/path
 git submodule status
 ```
 
-## 总结
+# 总结
 
 - 一次性添加submodule的五个部分：
   - `git submodule add [-b <branch>] [--name <name>] -- <url> <path>`

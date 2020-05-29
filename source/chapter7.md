@@ -1,6 +1,4 @@
-# 第7章：直接操纵commit
-
-## 基础知识
+# 基础知识
 
 从物理结构上讲，一个commit表示一个完整的版本；
 但是，从逻辑结构上讲，一个commit还可以表示 *相比于之前进行了哪些修改* 。
@@ -15,7 +13,7 @@ git init .
 git config alias.lg "log --graph --pretty=tformat:'%h -%d <%an/%cn> %s' --abbrev-commit"
 ```
 
-## 复制逻辑commit
+# 复制逻辑commit
 
 在开始之前，先创建几个commit：
 ```bash
@@ -124,7 +122,7 @@ git cat-file commit HEAD~
 git cat-file commit HEAD
 ```
 
-## 逻辑撤销commit
+# 逻辑撤销commit
 
 逻辑撤销即添加逆向修改。
 你完全可以添加不在本分支上的commit的逆。
@@ -161,9 +159,9 @@ git lg
 
 遗憾的是，`git revert`并不支持`--allow-empty`，这里就不演示了。
 
-## 详解`git rebase`
+# 详解`git rebase`
 
-### 基本语义
+## 基本语义
 
 为了更方便地执行大规模commit复制，`git rebase`应运而生。
 基本用法是：
@@ -232,7 +230,7 @@ git lg
     * `git commit-tree $(git write-tree) -p HEAD~`
   * `git reset --soft <new-commit>`
 
-### 示例
+## 示例
 
 ```bash
 git update-ref --no-deref refs/heads/br1 f071f8ea
@@ -285,11 +283,10 @@ GIT_COMMITTER_NAME=committer \
 GIT_COMMITTER_EMAIL=committer@gmail.com \
 GIT_COMMITTER_DATE='1514736120 +0800' \
 git rebase --quiet --no-ff --keep-empty --root br4
-#（注意：commit A - commit H 其实是断开的）
 git lg br1 br2 br3 br4
 ```
 
-## 对merge的处理
+# 对merge的处理
 
 `git rebase`有四种处理merge的模式。
 其中`--preserve-merge`由于bug连篇建议在任何情况下都不要使用。
@@ -334,7 +331,7 @@ git lg br1 br2 br3 br4
     - 原没有parent，现依然没有parent
     - 原以`<branch>`为直接parent，现以新创建的相应commit为parent
 
-## 总结
+# 总结
 
 - Lv2
   - `git cherry-pick --keep-redundant-commits <commit-ish>...`

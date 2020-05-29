@@ -1,12 +1,10 @@
-# 第4章：直接操纵HEAD
-
-## 基础知识
+# 基础知识
 
 每个repo必须有一个HEAD，无论是否选配了worktree。
 
 本章不介绍新的Lv2命令，但将常用的Lv3命令进行了Lv2的表示，以方便读者理解工作原理。
 
-## 设置HEAD指向某一个commit
+# 设置HEAD指向某一个commit
 
 注意：`<commit-ish>`如果是一个间接引用，那么会被解引用
 - Lv2
@@ -18,7 +16,7 @@
     - `git checkout-index -a` - 修改worktree
   - 旧语法`git checkout --detach <commit-ish> --`
 
-## 创建直接引用并设置HEAD指向它
+# 创建直接引用并设置HEAD指向它
 
 - Lv2：一步一步来即可
 - Lv3
@@ -30,7 +28,7 @@
   - 旧语法`git checkout -b <branch> <commit-ish> --`
 
 
-## 设置HEAD指向某一个直接引用
+# 设置HEAD指向某一个直接引用
 
 - Lv2
   - `git symbolic-ref HEAD <ref>`
@@ -41,7 +39,7 @@
     - `git checkout-index -a` - 修改worktree
   - 旧语法`git checkout <ref> --`
 
-## 详解`git checkout`
+# 详解`git checkout`
 
 注意：该命令只有旧语法，请避免使用。
 
@@ -53,7 +51,7 @@
 - `git checkout <commit-ish> -- <path>` - 根据tree更新index和worktree，见第3章
   - 请使用新语法：`git restore --source <commit-ish> --stage --worktree -- <path>`
 
-## 详解`git reset`
+# 详解`git reset`
 
 必须在以下几种用法中选一种：
 - `git reset [<tree-ish>] -- <path>` - 根据`<commit-ish>`修改index，见第3章
@@ -67,14 +65,14 @@
   - `git update-ref HEAD <commit-ish>` - 修改HEAD*或者*HEAD指向的引用
   - `git restore --staged --worktree -- :/` - 根据HEAD修改index，见第3章
 
-## 详解`git commit`
+# 详解`git commit`
 
 相当于依次执行以下命令：
 - `git write-tree`
 - `git commit-tree <new-tree> -p HEAD`
 - `git update-ref HEAD <new-commit>` - 修改HEAD*或者*HEAD指向的引用
 
-## 备注
+# 备注
 
 - 以下几个命令效果相同：
   - `git restore --source HEAD --stage --worktree -- :/
@@ -93,7 +91,7 @@
   - `git switch --detach <commit-ish>`
   - （旧语法）`git checkout -f --detach <commit-ish>`
 
-## 总结
+# 总结
 
 - Lv3
   - `git switch --detach <commit-ish>`

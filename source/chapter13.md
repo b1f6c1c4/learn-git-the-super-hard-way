@@ -1,6 +1,4 @@
-# 第13章：GPG签名
-
-## 基础知识
+# 基础知识
 
 GnuPG (`gpg`) 可以用来对任意信息对称/非对称加密、签名。
 在Git中再次加密意义不大（`git fetch`/`git push`时信道已经是安全的了），但是签名却有很大用处。
@@ -51,7 +49,7 @@ gpg --list-secret-keys
 
 本章在第6章的基础之上继续。
 
-## 创建带签名的commit
+# 创建带签名的commit
 
 - Lv1
 ```bash
@@ -95,7 +93,7 @@ git cat-file commit $(cat commit2-a237)
 git commit -SB34F764F595C11CA966F696BBBB866D93074FF5F
 ```
 
-## 验证commit的签名
+# 验证commit的签名
 
 - Lv1
 ```bash
@@ -110,7 +108,7 @@ rm sig cnt
 git verify-commit $(cat commit1-a237)
 ```
 
-## 创建带签名的tag
+# 创建带签名的tag
 
 - Lv1
 ```bash
@@ -148,7 +146,7 @@ git tag -a -m 'The tag message' tag2-0cfb 0cfb -s -u B34F764F595C11CA966F696BBBB
 git cat-file tag tag2-0cfb
 ```
 
-## 验证tag的签名
+# 验证tag的签名
 
 - Lv1
 ```bash
@@ -168,7 +166,7 @@ git verify-tag tag1-efd4
 git tag --verify tag1-efd4
 ```
 
-## 带签名的tag与merge
+# 带签名的tag与merge
 
 第6章中提到，对于带有签名（见第13章）的tag，其被merge时会将其信息存储于新创建的commit的mergetag中，以备后续检查。
 
@@ -212,22 +210,22 @@ git cat-file commit HEAD
 git show -s --show-signature HEAD
 ```
 
-## 其他
+# 其他
 
-### 关于`git log`
+## 关于`git log`
 可以在`git log`中检查签名：
 ```sh
 git log --show-signature
 ```
 然而第8章中的`git lg/la/ls`均已将签名检查融入其中，无需再添加`--show-signature`。
 
-### 关于`git config`
+## 关于`git config`
 
 设置`user.signingKey`可以省去每次输入`<keyid>`。
 设置`commit.gpgSign`可以在每次`git commit`时都`-S`。
 设置`tag.gpgSign`可以在每次`git tag`时都`-a -s`；注意这导致无法创建普通的`refs/tags/...`而不创建tag object。
 
-### 关于GitHub
+## 关于GitHub
 
 GitHub对于在网页上作出的更改，会使用以下信息进行签名：
 ```
@@ -241,7 +239,7 @@ curl https://github.com/web-flow.gpg | gpg --import
 gpg --search-keys 5DE3E0509C47EA3CF04A42D34AEE18F83AFDEB23
 ```
 
-## 总结
+# 总结
 
 - 创建签名
   - Lv2

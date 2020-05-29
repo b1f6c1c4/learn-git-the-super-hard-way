@@ -1,6 +1,4 @@
-# 第0章：创建工作环境
-
-## 基础知识
+# 基础知识
 
 - Git是一个著名的版本控制软件。它将软件的版本（代码+配置+测试+……）存放在一种特殊的数据库（Git repo）中。通过执行一些命令用户可以对数据库中的软件的版本进行增删改查等操作。
 - 在绝大多数情况下，Git repo的具体形式是硬盘上的一个文件夹。
@@ -8,9 +6,9 @@
 - 为了方便多个repo之间共享数据，一个repo可以放弃所有对象（第1章）和绝大部分引用（第2章）等信息的所有权，将其全权托管给另一个repo。这种所谓链接只能在同一台计算机上实现。
   - 很多人认为一个repo可以有多个worktree，严格意义上讲其实是有好多个repo都链接到了同一个repo，每一个小repo贡献一个worktree，看起来是一个大repo有多个worktree的样子。
 
-## 创建Git repo并选配worktree
+# 创建Git repo并选配worktree
 
-### Lv0
+## Lv0
 
 ```bash
 # Git repo以.git结尾只是惯例
@@ -91,7 +89,7 @@ git -C default-tree/.git symbolic-ref HEAD
 git -C default-tree/.git status
 ```
 
-### Lv3
+## Lv3
 
 日常创建repo、不选配worktree：
 ```bash
@@ -111,9 +109,9 @@ git init default-tree
 git init --separate-git-dir the-repo.git default-tree
 ```
 
-## 添加新repo并链接到原repo，以实现“一个repo多个worktree”
+# 添加新repo并链接到原repo，以实现“一个repo多个worktree”
 
-### Lv0
+## Lv0
 
 ```bash
 (rm -rf the-repo.git default-tree) # 删掉之前的东西
@@ -214,7 +212,7 @@ git --git-dir=third-repo.git worktree list
 可以看到，虽然不在常规位置的小repo能够被成功识别，
 但是`git worktree list`却无法正确列出其HEAD的内容。
 
-### Lv3
+## Lv3
 
 使用`git worktree add`可以添加小repo并选配worktree。
 然而该命令至少需要一个commit对象才能正常工作。
@@ -225,9 +223,9 @@ git --git-dir=the-repo.git worktree add [--no-checkout] <worktree> <commit-ish>
 ```
 此处的`--no-checkout`是用来指示是否要在创建完worktree以后执行`git restore -W`。参见第3章。
 
-## 删除小repo
+# 删除小repo
 
-### Lv0
+## Lv0
 
 ```sh
 # 直接删掉
@@ -238,7 +236,7 @@ rm -rf the-repo.git/worktrees/another
 rm -f another-tree/.git
 ```
 
-### Lv3
+## Lv3
 
 ```bash
 # 删掉the-repo.git/worktrees/another/gitdir所指向的对象
@@ -252,12 +250,12 @@ git --git-dir=the-repo.git worktree prune
 git --git-dir=the-repo.git worktree list
 ```
 
-## 基于别的repo创建新的repo
+# 基于别的repo创建新的repo
 
 除了创建空白repo以外，还有一种方法是基于另一个repo创建新的repo。这个功能非常有用：GitHub上有很多repo，如果能够直接将其复制下来，或者说基于它创建自己的repo，那么就能够在别人的基础之上进行修改了。
 这个功能涉及到远程文件传输，因此在第5章中会详细介绍。
 
-## 总结
+# 总结
 
 （以下均为Lv3）
 - 创建空repo，选配worktree
@@ -269,7 +267,7 @@ git --git-dir=the-repo.git worktree list
   - `git worktree add [--no-checkout] <worktree> <commit-ish>`
   - `git worktree prune`
 
-## 扩展阅读
+# 扩展阅读
 
 [gitrepository-layout](https://git-scm.com/docs/gitrepository-layout)
 

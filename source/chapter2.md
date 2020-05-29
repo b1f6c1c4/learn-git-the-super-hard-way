@@ -1,6 +1,4 @@
-# 第2章：直接操纵引用
-
-## 基础知识
+# 基础知识
 
 Git引用常规放在`<repo>/refs/`中，可以有任意层次的文件夹结构。
 惯例如下：
@@ -21,7 +19,7 @@ Git特别引用直接放在`<repo>`下，一般包括`HEAD`等。
 
 本章所有命令都不涉及worktree。后续章节会介绍如何利用worktree来操纵对象（Lv3）。
 
-## 创建直接引用
+# 创建直接引用
 
 注：若引用已存在，则会覆盖
 
@@ -52,7 +50,7 @@ git branch -f br1 d4da
 git tag -f tg1 d4da
 ```
 
-### 查看直接引用
+## 查看直接引用
 
 - Lv0
 ```bash
@@ -74,7 +72,7 @@ git branch -avl br1
 git tag -l tg1
 ```
 
-### 创建间接引用
+## 创建间接引用
 
 - Lv0
 ```bash
@@ -86,7 +84,7 @@ echo 'ref: refs/heads/br1' > ./refs/heads/br2
 git symbolic-ref refs/heads/br2 refs/heads/br1
 ```
 
-### 查看间接引用
+## 查看间接引用
 
 - Lv0
 ```bash
@@ -108,7 +106,7 @@ git branch -avl br1
 git branch -avl br2
 ```
 
-### 删除引用
+## 删除引用
 
 - Lv0
 ```bash
@@ -141,7 +139,7 @@ git branch -D br2
 git tag -d tg1
 ```
 
-## 关于`update-ref`的特别备注
+# 关于`update-ref`的特别备注
 
 带`--no-deref`表明修改引用本身（不论其是什么类型的）
 不带`--no-deref`表明修改引用本身（如果其不存在或者是直接引用）或者引用的引用（如果其是间接引用）
@@ -154,7 +152,7 @@ git update-ref refs/heads/br2 efd4 # 注意--no-deref的作用
 git update-ref --no-deref refs/heads/br2 efd4
 ```
 
-## 查看历史记录
+# 查看历史记录
 
 ```bash
 git update-ref --no-deref refs/heads/br1 d4da
@@ -173,7 +171,7 @@ cat ./logs/refs/heads/br1
 git reflog refs/heads/br1
 ```
 
-## 批量查看引用
+# 批量查看引用
 
 - Lv2
 
@@ -197,7 +195,7 @@ git for-each-ref refs/remotes/
 
 两个都不能列出`$GIT_DIR`下的引用！
 
-## 给定commit-ish，逆向查找引用
+# 给定commit-ish，逆向查找引用
 
 - Lv1
 
@@ -223,7 +221,7 @@ git describe --always d4da~
 
 添加`--dirty`可以在结果后面添加`-dirty`，特别适用于版本号。
 
-## 总结
+# 总结
 
 - 添加/修改/删除
   - Lv0
@@ -265,7 +263,7 @@ git describe --always d4da~
     - `git describe [--all] [--always] [<commit-ish>]` - 留空表示HEAD
     - `git describe [--all] [--always] --dirty`
 
-## 扩展阅读
+# 扩展阅读
 
 [git-rev-parse: specifying revisions](https://git-scm.com/docs/git-rev-parse#_specifying_revisions)
 

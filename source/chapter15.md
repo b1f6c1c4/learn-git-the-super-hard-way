@@ -1,14 +1,12 @@
-# 第15章：数据的抢修与急救
-
-## 基础知识
+# 基础知识
 
 误操作可能引起数据丢失或者软件版本错误。
 Git有许多机制可以最小化误操作引起的实际损失。
 而灵活运用各种Git命令也可以修正各种错误。
 
-## 可能引起数据丢失的误操作
+# 可能引起数据丢失的误操作
 
-### 严重误操作
+## 严重误操作
 
 - 误删整个repo（`rm -rf .git`）
     - 立即备份worktree，避免进一步损失
@@ -20,7 +18,7 @@ Git有许多机制可以最小化误操作引起的实际损失。
 - 误删整个repo和整个worktree
     - 参考以上两条
 
-### 引用误操作
+## 引用误操作
 
 - 在HEAD是直接引用时执行了`git switch`
     - 查看误操作命令的输出，其中包含了HEAD曾经指向的SHA1
@@ -37,7 +35,7 @@ Git有许多机制可以最小化误操作引起的实际损失。
     - 若rebase还在进行，立刻`git rebase --abort`
     - `git reflog`
 
-### worktree的误操作
+## worktree的误操作
 
 - 误操作`rm -rf`了worktree的文件
     - 如果尚未`git add`，请参考[File recovery](https://wiki.archlinux.org/index.php/File_recovery)；否则：
@@ -48,7 +46,7 @@ Git有许多机制可以最小化误操作引起的实际损失。
 - 误操作`git restore --worktree`
     - **这是最危险的情况之一**，唯一的希望是编辑器的缓存。在编辑器里面看一看相应的文件是否从硬盘上重新读取了；如果有，尝试撤销再保存；如果没有，尝试保存。
 
-### index的误操作
+## index的误操作
 
 - 误操作`git add`覆盖了index中的记录
     - 一般来说index中的记录的对象都应该在repo中存在，故`git fsck`列出所有blob然后再逐一检查即可
@@ -62,7 +60,7 @@ Git有许多机制可以最小化误操作引起的实际损失。
 - 误操作`git restore --staged`或者`git read-tree`
     - 同之前关于误操作`git add`的讨论
 
-### index和worktree同时误操作
+## index和worktree同时误操作
 
 思路是完全一致的：优先解决worktree的问题，然后再找回index。
 

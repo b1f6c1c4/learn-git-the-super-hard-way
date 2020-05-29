@@ -1,6 +1,4 @@
-# 第6章：直接操纵merge
-
-## 基础知识
+# 基础知识
 
 从物理结构上讲，一个commit表示一个完整的版本；
 但是，从逻辑结构上讲，一个commit还可以表示 *相比于之前进行了哪些修改* 。
@@ -11,7 +9,7 @@
 git init --separate-git-dir "$(pwd)" ../default-tree
 ```
 
-## 查看更改
+# 查看更改
 
 在开始之前，先创建几个对象：
 ```bash
@@ -88,7 +86,7 @@ git --work-tree=../default-tree diff-files
 
 `git status -sb`，比起`git status`要简明扼要一些。
 
-## 处理修改
+# 处理修改
 
 类似于`git bundle create`将若干对象打包成字节流以便离线传送，`git diff-* -p|--patch`将修改打包成字节流以便离线传送。
 类似于`git bundle unbundle`将字节流解包成对象，`git apply`将字节流解包出修改。
@@ -118,7 +116,7 @@ git ls-files -s
 ls ../default-tree
 ```
 
-## Merge相关概念简介
+# Merge相关概念简介
 
 Merge是git里面最为复杂也最为重要的部分。
 在具体讲解每一个命令之前，先看一下Lv2的big picture：
@@ -139,7 +137,7 @@ Merge是git里面最为复杂也最为重要的部分。
 - 同一个tree，已知原始版本，如何把多人独自进行的修改整合？
   - 多次执行`git read-tree -m A C B`即可
 
-## 3-Way merge基本概念之文件层面的`git merge-file`
+# 3-Way merge基本概念之文件层面的`git merge-file`
 
 重要Lv2工具`git merge-file`（无需git dir也无需worktree）：
 ```bash
@@ -180,7 +178,7 @@ git merge-file --stdout --their fileD fileA fileB
 git merge-file --stdout --union fileD fileA fileB
 ```
 
-### tree层面：`git merge-tree`
+## tree层面：`git merge-tree`
 
 在开始之前，先创建几个对象：
 ```bash
@@ -220,7 +218,7 @@ EOF
 git merge-tree 47e3 a237 aa25
 ```
 
-### `git read-tree -m`的Two Tree Merge
+## `git read-tree -m`的Two Tree Merge
 
 `git read-tree -m <tree-ish-H> <tree-ish-M>`试图执行`index=index+(M-H)`。
 对于每一个文件，考虑到H、M、index、worktree四处的状态，有22种具体情况，具体处置方法如下表所示（0表示不存在，不同小写字母表示不同版本）（摘自`man git-read-tree`）：
@@ -278,7 +276,7 @@ ls ../default-tree
 # 4.txt ii00 -> keep (#4)
 ```
 
-### `git read-tree -m`的3-Way Merge
+## `git read-tree -m`的3-Way Merge
 
 `git read-tree -m [--aggressive] <tree-ish-A> <tree-ish-C> <tree-ish-B>`的意思是：
 
@@ -319,7 +317,7 @@ git write-tree
 git --work-tree=../default-tree checkout-index --stage=all -f --all
 ```
 
-### `git merge-index`和`git merge-one-file`
+## `git merge-index`和`git merge-one-file`
 
 前述`git read-tree`只解决了最最简单的冲突。为了解决更多冲突，要么手工编辑好再`git update-index`或者`git add`，要么采用自动化工具。
 
@@ -348,7 +346,7 @@ git --work-tree=../default-tree merge-index git-merge-one-file -a
 * 问题：在使用外部工具的情况下，有没有更好的解决冲突的办法？
 * 回答：有，即著名的recursive merge。但是由于该算法非常复杂，没有Lv2命令。此处不介绍Lv1实现，而只介绍Lv3的使用方法。
 
-## 原始版本的选择：`git merge-base`
+# 原始版本的选择：`git merge-base`
 
 为了减少花在查找原始版本（A）的努力，`git merge-base -a <commit>*`可以直接计算出多个commit的极近公共祖先（在偏序关系下没有“最”，只能有“极”）。
 
@@ -356,7 +354,7 @@ git --work-tree=../default-tree merge-index git-merge-one-file -a
 git merge-base -a afc3 d2b7
 ```
 
-## Lv3
+# Lv3
 
 `git merge -s <strategy>`（除了recursive、subtree、ours以外）实际上就是调用`git merge-<strategy>`。
 
@@ -398,7 +396,7 @@ git会自动计算给B添加的prefix，但也可以通过`-Xsubtree=`来手动�
 
 需要注意的是，在`MERGE_HEAD`等文件存在时，`git commit`调用`git commit-tree`时会自动带上几个`-p`参数，生成多个parent的commit，其中第1个parent是HEAD，余下的是`MERGE_HEAD`的内容，也即`git merge`的参数。
 
-## Lv4
+# Lv4
 
 由于很多时候我们希望主动控制要不要创建merge commit（也即手动决定`--ff-only`或者`--no-ff`，且希望在commit之前仔细检查合并是否正确（如跑单元测试），故本文建议使用如下alias：
 ```
@@ -409,7 +407,7 @@ alias.mnfnc=merge --no-ff --no-commit
 
 其中`git mf`用于`git fetch`之后，`git mnf`用于日常merge其他简单分支，而`git mnfnc`用于尝试merge（也即`git read-tree -u -m`）、跑单元测试再commit的情况。
 
-## Lv5
+# Lv5
 
 有一类merge情况是，需要用其他分支 *完全取代* 当前分支的某一目录。（第12章整章建立在此基础之上）
 然而，即便`git merge --no-ff -s subtree -Xsubtree=<prefix>`有时也会出错（毕竟是`git read-tree -m`）。
@@ -425,7 +423,7 @@ git-mnfss() {
 }
 ```
 
-## 关于merge信息的完整性
+# 关于merge信息的完整性
 
 在执行`git merge --no-ff B*`的时候，新创建的commit中包括多个parent，用来记录谁和谁进行了merge。
 这是为了能够在以后追溯到当初merge时候的细节。
@@ -508,7 +506,7 @@ git cat-file commit HEAD
 注意观察commit message中对于各parent的不同的描述。
 另外，commit message中还包含了tag message。
 
-## 总结
+# 总结
 
 - 查看和处理修改
   - Lv2

@@ -1,6 +1,4 @@
-# 第11章：配置和alias
-
-## 全局gitignore
+# 全局gitignore
 
 ```bash
 cat - >~/.gitignore <<EOF
@@ -11,11 +9,11 @@ EOF
 git config --global core.excludesfile ~/.gitignore
 ```
 
-## Lv3, Lv4
+# Lv3, Lv4
 
 * [shared-git-config](https://github.com/b1f6c1c4/shared-git-config)
 
-## Lv5
+# Lv5
 
 （摘自第6章）
 有一类merge情况是，需要用其他分支 *完全取代* 当前分支的某一目录。

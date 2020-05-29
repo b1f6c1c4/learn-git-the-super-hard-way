@@ -1,13 +1,11 @@
-# learn git the super hard way cheatsheet
-
-## 操纵repo（第0章）
+# 操纵repo（第0章）
 
 - Lv3
   - `git init --bare <repo>`
   - `git init [--separate-git-dir <repo>] <worktree>`
   - `git worktree list|add|prune`
 
-## 操纵对象（第1章）
+# 操纵对象（第1章）
 
 - Lv1
   - `git hash-object -t <type> [--stdin|<file>] -w`
@@ -31,7 +29,7 @@
   - `git replace --delete <original>`
   - `git notes add | list | show <object> | remove <object>`
 
-## 操纵引用（第2章）
+# 操纵引用（第2章）
 
 - 添加/修改/删除
   - Lv2
@@ -67,7 +65,7 @@
     - `git describe [--all] [--always] [<commit-ish>]` - 留空表示HEAD
     - `git describe [--all] [--always] --dirty`
 
-## 操纵索引（第3章）
+# 操纵索引（第3章）
 
 - Lv1
   - `git update-index --add --cacheinfo <mode>,<SHA1>,<path>`
@@ -94,7 +92,7 @@
   - `git add -p`
   - `git restore -p`
 
-## 操纵HEAD（第4章）
+# 操纵HEAD（第4章）
 
 - Lv3
   - `git switch --detach <commit-ish>`
@@ -122,7 +120,7 @@
     - `git update-ref HEAD <commit-ish>` - 修改HEAD*或者*HEAD指向的引用
     - `git restore --staged --worktree -- :/` - 根据HEAD修改index，见第3章
 
-## 操纵远程（第5章）
+# 操纵远程（第5章）
 
 - Lv2
   - `git ls-remote <url>`
@@ -136,7 +134,7 @@
 - Lv3(不推荐使用的邪恶命令)
   - `git pull [--rebase]`
 
-## 操纵merge（第6章）
+# 操纵merge（第6章）
 
 - 查看和处理修改
   - Lv2
@@ -173,7 +171,7 @@
   - Lv5
     - `git-mnfss`
 
-## 操纵commit（第7章）
+# 操纵commit（第7章）
 
 - Lv2
   - `git cherry-pick --keep-redundant-commits <commit-ish>...`
@@ -183,7 +181,7 @@
     - `[--no-ff]`
     - `[--rebase-merges[=[no-]rebase-cousins]]`
 
-## 检索与查看历史（第8章）
+# 检索与查看历史（第8章）
 
 - 列出commit
   - Lv2
@@ -216,7 +214,7 @@
   - Lv4
     - `git greps [-i] [-w] [-P] <regex>`
 
-## 邪恶的submodule（第9章）
+# 邪恶的submodule（第9章）
 
 - 一次性添加submodule的五个部分：
   - `git submodule add [-b <branch>] [--name <name>] -- <url> <path>`
@@ -255,7 +253,7 @@
     - 删除`.git/config`和worktree
   - 其他部分需要逐一删除
 
-## 批处理与自动化（第10章）
+# 批处理与自动化（第10章）
 
 - `git for-each-ref` - 对每个引用进行处理（比`git show-ref`更灵活）
 - `git filter-branch` - 对每个commit进行处理（比`git rebase`更灵活）
@@ -269,7 +267,7 @@
 - `git stripspace`
 - `git config --global core.whitespace ...`
 
-## GPG签名（第13章）
+# GPG签名（第13章）
 
 - 创建签名
   - Lv2
@@ -286,7 +284,7 @@
     - `git tag --verify <tag-ish>`
     - `git log --show-signature ...`
 
-## 数据的导入和导出（第14章）
+# 数据的导入和导出（第14章）
 
 - 常用Lv3
   - `git archive [--prefix=<prefix>] [-o <output>] <tree-ish> -- <path>...`

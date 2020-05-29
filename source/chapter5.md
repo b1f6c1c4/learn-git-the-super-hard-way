@@ -1,6 +1,4 @@
-# 第5章：直接操纵远程
-
-## 基础知识
+# 基础知识
 
 每个repo可以引用（注意不是第0章中的“放弃对象和引用的所有权并链接”）其它repo。
 这种对repo的引用称为remote。每个remote包括以下信息：
@@ -15,7 +13,7 @@ git init --bare .
 ls
 ```
 
-## Packfile
+# Packfile
 研究Git remotes之前需要先研究packfile。
 由于packfile内部格式相当复杂，本节不介绍Lv0命令。
 以下命令均为Lv2。
@@ -40,7 +38,7 @@ git ls-tree -r 187e
 find objects -type f
 ```
 
-### 创建Packfile
+## 创建Packfile
 
 ```bash
 mkdir -p ../somewhere-else/
@@ -52,7 +50,7 @@ EOF
 ls ../somewhere-else/
 ```
 
-### 自动列出应该打包哪些对象
+## 自动列出应该打包哪些对象
 
 前述方法手工指定了打包的文件；然而，由于没有打包blob 5ff3和tree 2da9，即便接收者拿到了对象也没有什么卵用（还原不出整个tree 187e，在`git checkout-index`时会失败）。
 此时需要祭出Git最复杂的Lv2命令之一：`git rev-list`
@@ -63,7 +61,7 @@ git rev-list --objects 187e
 git rev-list --objects 187e | git pack-objects ../somewhere-else/prefix
 ```
 
-### 查看Packfile
+## 查看Packfile
 
 ```bash
 git verify-pack -v ../somewhere-else/prefix-2b2d8ce85275da98291c5ad8f60680b2dec81ba4.idx
@@ -71,14 +69,14 @@ git verify-pack -v ../somewhere-else/prefix-a451aab5615fb6d97e2ecb337b7f1d783ed6
 ```
 对于复杂的packfile，可能出现链状结构（只保存了增量修改信息）。详情参见[这里](https://git-scm.com/book/en/v2/Git-Internals-Packfiles)。
 
-### 解压缩Packfile
+## 解压缩Packfile
 
 （先删除所有objects：`rm -rf objects/*`)
 ```bash
 git unpack-objects < ../somewhere-else/prefix-a451aab5615fb6d97e2ecb337b7f1d783ed66a70.pack
 ```
 
-## 跨库直接对象传输
+# 跨库直接对象传输
 
 首先创建另一个repo：
 ```bash
@@ -95,7 +93,7 @@ git --git-dir=../another-repo.git fetch-pack --keep --no-progress "$(pwd)" 187e9
 ```
 注意：`$(pwd)`还可以是URL，用于跨域对象传输
 
-## 跨库直接引用传输
+# 跨库直接引用传输
 
 创建引用：
 ```bash
@@ -124,7 +122,7 @@ git send-pack --force --no-progress ../another-repo.git refs/heads/itst
 git ls-remote ../another-repo.git
 ```
 
-## 跨库间接传输
+# 跨库间接传输
 
 跨域但无法建立网络连接时，先创建bundle：
 ```bash
@@ -135,11 +133,11 @@ git bundle create ../the-bundle refs/heads/itst
 git --git-dir=../another-repo.git bundle unbundle ../the-bundle
 ```
 
-## Lv3命令
+# Lv3命令
 
 首先用Lv0命令修改设置，以讨论设置对Lv3的影响。
 
-### 指明remote的`git push`和`git fetch`
+## 指明remote的`git push`和`git fetch`
 
 裸remote：
 ```bash
@@ -174,7 +172,7 @@ git push another itst
 git push another
 ```
 
-### 未指明remote的`git push`和`git fetch`
+## 未指明remote的`git push`和`git fetch`
 
 ```bash
 cat >./config <<EOF
@@ -202,7 +200,7 @@ git fetch --verbose
 # 与git push无关
 ```
 
-### 使用Lv3命令修改设置
+## 使用Lv3命令修改设置
 
 ```bash
 (rm -f ./config)
@@ -218,18 +216,18 @@ git remote add another --mirror=push ../another-repo.git
 cat ./config
 ```
 
-### 关于`git pull`
+## 关于`git pull`
 
 `git pull`基本上是先`git fetch`再`git merge FETCH_HEAD`；
 `git pull --rebase`基本上是先`git fetch`再`git rebase FETCH_HEAD`。
 由于这个命令高度不可控，非常不推荐使用。
 然而`git pull --ff-only`却非常有用，是先`git fetch`再`git merge --ff-only FETCH_HEAD`。
 
-## 复制repo：`git clone`
+# 复制repo：`git clone`
 
 （参见第5章）
 
-### `git clone --mirror`
+## `git clone --mirror`
 
 复制另一个repo的大多数对象、所有普通引用、特殊引用HEAD
 
@@ -255,7 +253,7 @@ rm -rf copy.git
 git clone --mirror git@github.com:b1f6c1c4/learn-git-the-super-hard-way.git copy.git
 ```
 
-### `git clone --bare`
+## `git clone --bare`
 
 与`--mirror`类似，但是四不像（没有config）
 
@@ -278,7 +276,7 @@ rm -rf copy.git
 git clone --bare git@github.com:b1f6c1c4/learn-git-the-super-hard-way.git copy.git
 ```
 
-### `git clone`
+## `git clone`
 
 - Lv2
 ```bash
@@ -305,7 +303,7 @@ rm -rf copy-wt
 git clone --branch dev git@github.com:b1f6c1c4/learn-git-the-super-hard-way.git copy-wt
 ```
 
-## 总结
+# 总结
 
 - Lv2
   - Packfile

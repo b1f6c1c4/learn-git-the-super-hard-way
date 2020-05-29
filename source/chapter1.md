@@ -1,6 +1,4 @@
-# 第1章：直接操纵对象
-
-## 基础知识
+# 基础知识
 
 Git对象放在`<repo>/objects/`中，分四种：
 - blob：文件内容，本质是前缀和文件原文
@@ -33,7 +31,7 @@ Git对象放在`<repo>/objects/`中，分四种：
 git init --bare .
 ```
 
-## 创建blob
+# 创建blob
 
 - Lv1
 ```bash
@@ -46,7 +44,7 @@ echo 'hello' > temp-file
 git hash-object -t blob temp-file -w
 ```
 
-## 查看blob
+# 查看blob
 
 - Lv0
 ```bash
@@ -67,7 +65,7 @@ git cat-file blob ce01
 git show ce01
 ```
 
-## 创建tree
+# 创建tree
 
 - Lv1
 注意：要先对文件名排序，再使用`git hash-object`
@@ -88,7 +86,7 @@ git mktree --missing <<EOF
 EOF
 ```
 
-## 查看tree
+# 查看tree
 
 - Lv0
 ```bash
@@ -115,7 +113,7 @@ git ls-tree 5841
 git show 5841
 ```
 
-## 创建commit
+# 创建commit
 
 - Lv1
 ```bash
@@ -145,7 +143,7 @@ or by the option '-m'
 EOF
 ```
 
-## 查看commit
+# 查看commit
 
 - Lv0
 ```bash
@@ -167,7 +165,7 @@ git cat-file commit efd4
 git show efd4~
 ```
 
-## 从commit找到tree和blob
+# 从commit找到tree和blob
 
 - Lv2
 ```bash
@@ -190,7 +188,7 @@ git show efd4^{tree}
 git show efd4:name.ext
 ```
 
-## 创建tag
+# 创建tag
 
 注意：你可以让tag指向tag，虽然没有什么卵用
 
@@ -220,7 +218,7 @@ git tag -a -m 'The tag message' the-tag efd4:name.ext
 git rev-parse the-tag
 ```
 
-## 查看tag
+# 查看tag
 
 - Lv0 模仿commit的查看方法即可
 
@@ -237,7 +235,7 @@ git cat-file blob 9cb6
 git show 9cb6
 ```
 
-## 检查文件系统
+# 检查文件系统
 
 查找并删除无用对象：（**有一定危险，可能会删掉有用的东西**）
 - Lv2
@@ -264,7 +262,7 @@ mv ../evil objects/ce/013625030ba8dba906f756967f9e9ca394464a
 git fsck --connectivity-only
 ```
 
-## “修改”对象
+# “修改”对象
 
 Git对象本身是无法修改的，但是Git提供了一种机制使得我们可以用一个新的对象来覆盖某个现成对象，
 在访问原对象的时候会被自动定向到新的对象中。
@@ -281,7 +279,7 @@ OOF.. This is a fake one... hahahaha!
 EOF
 ```
 
-### 添加replace
+## 添加replace
 
 - Lv0
 ```bash
@@ -310,14 +308,14 @@ git cat-file commit efd4
 git replace --edit efd4
 ```
 
-### 列出所有replace
+## 列出所有replace
 
 - Lv3
 ```bash
 git replace -l --format=long
 ```
 
-### 分别访问新旧对象
+## 分别访问新旧对象
 
 除非使用Lv0方式或者`--no-replace-objects`，否则访问efd4的时候总会被重定向到9f31：
 
@@ -334,7 +332,7 @@ git show efd4
 git --no-replace-objects show efd4
 ```
 
-### 取消replace，保留新旧两个对象
+## 取消replace，保留新旧两个对象
 
 - Lv0
 ```bash
@@ -347,12 +345,12 @@ rm -f refs/replace/efd4f82f6151bd20b167794bc57c66bbf82ce7dd
 git replace --delete efd4
 ```
 
-## 给对象添加备注
+# 给对象添加备注
 
 Git支持给任意对象添加备注，其本质是一个commit，其tree列出了备注内容blob和对应的对象SHA1（作为文件名）。
 每个对象至多有一个备注。
 
-### 添加备注
+## 添加备注
 
 - Lv1
 ```bash
@@ -384,7 +382,7 @@ git notes add -f -m 'notes for blob' ce01
 
 `git notes edit`会打开vim并编辑notes。
 
-### 查看备注
+## 查看备注
 
 - Lv2
 ```bash
@@ -402,7 +400,7 @@ git notes show ce01
 git show efd4
 ```
 
-### 删除备注
+## 删除备注
 
 - Lv1
 ```bash
@@ -431,7 +429,7 @@ git notes remove ce01
 git notes list
 ```
 
-## 总结
+# 总结
 
 - Lv1
   - `git hash-object -t <type> [--stdin|<file>] -w`
