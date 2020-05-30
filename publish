@@ -12,6 +12,7 @@ git add -f \
     cheatsheet.md \
     README.md \
     ROADMAP.md \
+    SUMMARY.md \
     LICENSE
 TREE="$(git write-tree)"
 COMMIT="$(git commit-tree "$TREE" -p HEAD -m "publish" -S)"

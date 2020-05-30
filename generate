@@ -32,6 +32,7 @@ echo 'ENABLE-ECHO'
         CODE)
             if [ "$line" = '```' ]; then
                 printf '%s' "$BUFFER"
+                printf 'sleep 0.01\n'
                 BUFFER=
                 echo ')'
                 printf 'printf "%%s\\n" %q \n' "$line"
@@ -51,6 +52,7 @@ echo 'ENABLE-ECHO'
                         printf '%s' "$BUFFER"
                         BUFFER=
                         printf '%s' "$OUT"
+                        printf 'sleep 0.005\n'
                     elif ! printf '%s' "$L" | grep -q -e '<<EOF\>'; then
                         BUFFER="$BUFFER$OUT"
                     else
@@ -59,6 +61,7 @@ echo 'ENABLE-ECHO'
                     fi
                 else
                     printf '%s' "$BUFFER"
+                    printf 'sleep 0.005\n'
                     BUFFER=
                 fi
             fi
@@ -69,6 +72,7 @@ echo 'ENABLE-ECHO'
             if [ "$line" = 'EOF' ]; then
                 STATE=CODE
                 printf '%s' "$BUFFER"
+                printf 'sleep 0.005\n'
                 BUFFER=
             fi
             ;;

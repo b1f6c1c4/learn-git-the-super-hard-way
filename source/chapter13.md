@@ -163,7 +163,10 @@ git verify-tag tag1-efd4
 
 - Lv3
 ```bash
-git tag --verify tag1-efd4
+# stdout输出tag内容，stderr输出签名信息
+git tag --verify tag1-efd4 2>tmp
+cat tmp
+rm tmp
 ```
 
 # 带签名的tag与merge

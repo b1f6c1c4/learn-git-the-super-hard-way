@@ -16,6 +16,7 @@
 * [第12章：单repo多分支工作流](chapter12.md)
 * [第13章：GPG签名](chapter13.md)
 * [第14章：数据的导入和导出](chapter14.md)
+* [第15章：数据抢修与急救](chapter15.md)
 * [总结/cheatsheet](cheatsheet.md)
 * [索引/Roadmap](ROADMAP.md)
 

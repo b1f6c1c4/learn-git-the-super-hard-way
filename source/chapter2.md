@@ -43,9 +43,6 @@ git update-ref --no-deref refs/tags/tg1 d4da
 ```bash
 # 此处必须省略refs/heads/
 git branch -f br1 d4da
-```
-
-```bash
 # 此处必须省略refs/tags/
 git tag -f tg1 d4da
 ```
@@ -72,7 +69,7 @@ git branch -avl br1
 git tag -l tg1
 ```
 
-## 创建间接引用
+# 创建间接引用
 
 - Lv0
 ```bash
@@ -84,7 +81,7 @@ echo 'ref: refs/heads/br1' > ./refs/heads/br2
 git symbolic-ref refs/heads/br2 refs/heads/br1
 ```
 
-## 查看间接引用
+# 查看间接引用
 
 - Lv0
 ```bash
@@ -106,7 +103,7 @@ git branch -avl br1
 git branch -avl br2
 ```
 
-## 删除引用
+# 删除引用
 
 - Lv0
 ```bash
