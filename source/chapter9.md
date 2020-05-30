@@ -45,6 +45,7 @@ git ls-files -s
 ```
 
 - Lv2
+
 ```bash
 (rm -rf parent)
 git init parent
@@ -297,6 +298,7 @@ git submodule update -- whatever/path
 Lv2不再赘述。
 
 - Lv3
+
 ```bash
 cd parent
 (rm -rf .git/modules whatever/path)

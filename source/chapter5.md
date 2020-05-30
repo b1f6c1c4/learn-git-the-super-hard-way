@@ -271,6 +271,7 @@ git --git-dir=copy.git symbolic-ref HEAD refs/heads/master
 ```
 
 - Lv3
+
 ```bash
 rm -rf copy.git
 git clone --bare git@github.com:b1f6c1c4/learn-git-the-super-hard-way.git copy.git
@@ -279,6 +280,7 @@ git clone --bare git@github.com:b1f6c1c4/learn-git-the-super-hard-way.git copy.g
 ## `git clone`
 
 - Lv2
+
 ```bash
 rm -rf copy-wt
 git init copy-wt

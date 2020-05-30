@@ -77,6 +77,7 @@ echo 'ref: refs/heads/br1' > ./refs/heads/br2
 ```
 
 - Lv2
+
 ```bash
 git symbolic-ref refs/heads/br2 refs/heads/br1
 ```
@@ -84,6 +85,7 @@ git symbolic-ref refs/heads/br2 refs/heads/br1
 # 查看间接引用
 
 - Lv0
+
 ```bash
 cat ./refs/heads/br2
 ```
@@ -106,6 +108,7 @@ git branch -avl br2
 # 删除引用
 
 - Lv0
+
 ```bash
 rm ./refs/heads/br1
 rm ./refs/heads/br2
@@ -113,6 +116,7 @@ rm ./refs/tags/tg1
 ```
 
 - Lv2
+
 ```bash
 # 以下操作会删除refs/heads/br1
 git update-ref -d refs/heads/br1
@@ -125,6 +129,7 @@ git symbolic-ref --delete refs/heads/br2
 ```
 
 - Lv3
+
 ```bash
 # 此处必须省略refs/heads/
 (git update-ref --no-deref refs/heads/br1 d4da)

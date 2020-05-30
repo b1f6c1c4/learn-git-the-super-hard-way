@@ -43,6 +43,7 @@ git update-index --add -- dir/fn
 若想手动改变mode，只需`git update-index --chmod +x -- <path>`
 
 - Lv3
+
 ```bash
 # 要先有文件才能添加到index
 mkdir -p dir
@@ -56,12 +57,14 @@ git add -f dir/fn
 # 删除index
 
 - Lv2
+
 ```bash
 (git add -f dir/fn)
 git update-index --force-remove -- dir/fn
 ```
 
 - Lv3
+
 ```bash
 (git add -f dir/fn)
 git rm --cached -- dir/fn
@@ -94,6 +97,7 @@ EOF
 ```
 
 - Lv2
+
 ```bash
 # 整个index替换掉
 git read-tree 5841
@@ -109,6 +113,7 @@ git ls-files -s
 ```
 
 - Lv3
+
 ```bash
 # 整个index替换掉
 git restore --source 5841 --staged -- :/
@@ -125,6 +130,7 @@ git ls-files -s
 请参阅本章最后一节（`git clean`）。
 
 - Lv2
+
 ```bash
 # 整个worktree替换掉
 git checkout-index -fu -a
@@ -135,6 +141,7 @@ git checkout-index -fu -- name.ext
 ```
 
 - Lv3
+
 ```bash
 # 整个worktree替换掉
 git restore --worktree -- :/
@@ -148,6 +155,7 @@ git restore --worktree -- name.ext
 # 利用index创建tree
 
 - Lv2
+
 ```bash
 (git read-tree --prefix=dir/ 5841)
 git ls-files -s
@@ -169,6 +177,7 @@ git commit --allow-empty -m 'The message'
 # 利用tree更新worktree
 
 - Lv1
+
 ```bash
 # 准备：
 echo 0 >f
@@ -185,6 +194,7 @@ cat f
 ```
 
 - Lv3
+
 ```bash
 # 准备：
 echo 0 >f
@@ -206,6 +216,7 @@ cat f
 一步一步来即可
 
 - Lv3
+
 ```bash
 # 准备：
 echo 0 >f

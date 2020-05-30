@@ -39,6 +39,7 @@ echo 'hello' | git hash-object -t blob --stdin -w
 ```
 
 - Lv2
+
 ```bash
 echo 'hello' > temp-file
 git hash-object -t blob temp-file -w
@@ -47,6 +48,7 @@ git hash-object -t blob temp-file -w
 # 查看blob
 
 - Lv0
+
 ```bash
 # 注意：不可将gunzip的输出直接打印到控制台，否则会因为遇到\0而中止
 printf '\x1f\x8b\x08\x00\x00\x00\x00\x00' \
@@ -55,11 +57,13 @@ printf '\x1f\x8b\x08\x00\x00\x00\x00\x00' \
 ```
 
 - Lv2
+
 ```bash
 git cat-file blob ce01
 ```
 
 - Lv3
+
 ```bash
 # 将git show直接作用在blob上，等价于git cat-file blob
 git show ce01
@@ -89,6 +93,7 @@ EOF
 # 查看tree
 
 - Lv0
+
 ```bash
 # 注意：不可将gunzip的输出直接打印到控制台，否则会因为遇到\0而中止
 printf '\x1f\x8b\x08\x00\x00\x00\x00\x00' \
@@ -97,6 +102,7 @@ printf '\x1f\x8b\x08\x00\x00\x00\x00\x00' \
 ```
 
 - Lv1
+
 ```bash
 git cat-file tree 5841 | xxd
 ```
@@ -116,6 +122,7 @@ git show 5841
 # 创建commit
 
 - Lv1
+
 ```bash
 git hash-object -t commit --stdin -w <<EOF
 tree 58417991a0e30203e7e9b938f62a9a6f9ce10a9a
@@ -129,6 +136,7 @@ EOF
 ```
 
 - Lv2
+
 ```bash
 GIT_AUTHOR_NAME=b1f6c1c4 \
 GIT_AUTHOR_EMAIL=b1f6c1c4@gmail.com \
@@ -177,6 +185,7 @@ git ls-tree efd4 -- name.ext
 ```
 
 - Lv3
+
 ```bash
 # 找到commit efd4对应的tree：
 # 注意：运行结果与只写efd4有本质差异
@@ -195,6 +204,7 @@ git show efd4:name.ext
 - Lv1 模仿commit的创建方法即可创建
 
 - Lv2
+
 ```bash
 git mktag <<EOF
 object efd4f82f6151bd20b167794bc57c66bbf82ce7dd
@@ -223,6 +233,7 @@ git rev-parse the-tag
 - Lv0 模仿commit的查看方法即可
 
 - Lv2
+
 ```bash
 git cat-file tag 9cb6
 # 注意：如果想要查看tag指向的对象，只需要修改type即可：
@@ -230,6 +241,7 @@ git cat-file blob 9cb6
 ```
 
 - Lv3
+
 ```bash
 # 注意：git show同时显示tag本身和tag指向的对象的信息
 git show 9cb6
@@ -239,6 +251,7 @@ git show 9cb6
 
 查找并删除无用对象：（**有一定危险，可能会删掉有用的东西**）
 - Lv2
+
 ```bash
 (git update-ref HEAD efd4)
 git count-objects
@@ -255,6 +268,7 @@ git fsck
 
 检查文件系统完整性：
 - Lv2
+
 ```bash
 mv objects/ce/013625030ba8dba906f756967f9e9ca394464a ../evil
 git fsck --connectivity-only
@@ -282,12 +296,14 @@ EOF
 ## 添加replace
 
 - Lv0
+
 ```bash
 mkdir -p refs/replace/
 echo '9f3162e7fd9f1d41b704c0064c62714d7e699643' >refs/replace/efd4f82f6151bd20b167794bc57c66bbf82ce7dd
 ```
 
 - Lv2
+
 ```bash
 (git replace --delete efd4 >/dev/null)
 git replace -f efd4 9f31
@@ -311,6 +327,7 @@ git replace --edit efd4
 ## 列出所有replace
 
 - Lv3
+
 ```bash
 git replace -l --format=long
 ```
@@ -320,6 +337,7 @@ git replace -l --format=long
 除非使用Lv0方式或者`--no-replace-objects`，否则访问efd4的时候总会被重定向到9f31：
 
 - Lv2
+
 ```bash
 git cat-file commit efd4
 # 注意--no-replace-objects是总的参数，不是cat-file自己的
@@ -327,6 +345,7 @@ git --no-replace-objects cat-file commit efd4
 ```
 
 - Lv3
+
 ```bash
 git show efd4
 git --no-replace-objects show efd4
@@ -335,11 +354,13 @@ git --no-replace-objects show efd4
 ## 取消replace，保留新旧两个对象
 
 - Lv0
+
 ```bash
 rm -f refs/replace/efd4f82f6151bd20b167794bc57c66bbf82ce7dd
 ```
 
 - Lv3
+
 ```bash
 (git replace -f efd4 9f31)
 git replace --delete efd4
@@ -353,6 +374,7 @@ Git支持给任意对象添加备注，其本质是一个commit，其tree列出�
 ## 添加备注
 
 - Lv1
+
 ```bash
 echo 'additional notes' | git hash-object -t blob --stdin -w
 git mktree <<EOF
@@ -370,6 +392,7 @@ echo 'a692dfc071d3e1043cb69b57d5f43b01335066f3' >>./refs/notes/commits
 ```
 
 - Lv3
+
 ```bash
 GIT_AUTHOR_NAME=author \
 GIT_AUTHOR_EMAIL=author@gmail.com \
@@ -385,6 +408,7 @@ git notes add -f -m 'notes for blob' ce01
 ## 查看备注
 
 - Lv2
+
 ```bash
 git cat-file commit refs/notes/commits
 git ls-tree refs/notes/commits
@@ -393,6 +417,7 @@ git cat-file blob c5a9
 ```
 
 - Lv3
+
 ```bash
 git notes list
 git notes show efd4
@@ -403,6 +428,7 @@ git show efd4
 ## 删除备注
 
 - Lv1
+
 ```bash
 git ls-tree refs/notes/commits | sed '/efd4f82f6151bd20b167794bc57c66bbf82ce7dd/d' | git mktree
 git hash-object -t commit --stdin -w <<EOF
@@ -417,6 +443,7 @@ git notes list
 ```
 
 - Lv3
+
 ```bash
 # 由于需要重新创建commit，必须指定author和committer
 GIT_AUTHOR_NAME=author \

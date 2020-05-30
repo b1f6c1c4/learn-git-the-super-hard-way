@@ -75,6 +75,7 @@ git cat-file commit $(cat commit1-a237)
 ```
 
 - Lv2
+
 ```bash
 GIT_AUTHOR_NAME=b1f6c1c4 \
 GIT_AUTHOR_EMAIL=b1f6c1c4@gmail.com \
@@ -96,6 +97,7 @@ git commit -SB34F764F595C11CA966F696BBBB866D93074FF5F
 # 验证commit的签名
 
 - Lv1
+
 ```bash
 git cat-file commit $(cat commit2-a237) | awk 'BEGIN { a=1; } ! /^ / { a=1; } /^gpgsig/ { a=0; } { if (a) print $0; }' | tee cnt
 git cat-file commit $(cat commit2-a237) | awk 'BEGIN { a=0; } ! /^ / { a=0; } { if (a) print "gpgsig" $0; if ($1=="gpgsig") { a=$1; print $0; } }' | sed 's/^gpgsig //' | tee sig
@@ -104,6 +106,7 @@ rm sig cnt
 ```
 
 - Lv2
+
 ```bash
 git verify-commit $(cat commit1-a237)
 ```
@@ -111,6 +114,7 @@ git verify-commit $(cat commit1-a237)
 # 创建带签名的tag
 
 - Lv1
+
 ```bash
 # 首先用gpg对tag的内容进行签名
 gpg --armor --detach-sign <<EOF | tee sig
@@ -149,6 +153,7 @@ git cat-file tag tag2-0cfb
 # 验证tag的签名
 
 - Lv1
+
 ```bash
 git cat-file tag tag2-0cfb | awk 'BEGIN { a=1; } /^-----BEGIN PGP SIGNATURE-----/ { a=0; } { if (a) print $0; }' | tee cnt
 git cat-file tag tag2-0cfb | awk 'BEGIN { a=0; } /^-----BEGIN PGP SIGNATURE-----/ { a=1; } { if (a) print $0; }' | tee sig
@@ -157,6 +162,7 @@ rm sig cnt
 ```
 
 - Lv2
+
 ```bash
 git verify-tag tag1-efd4
 ```
