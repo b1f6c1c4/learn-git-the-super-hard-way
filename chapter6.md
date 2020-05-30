@@ -7,6 +7,7 @@
 
 ```bash
 git init --separate-git-dir "$(pwd)" ../default-tree
+# Initialized empty Git repository in /root/
 ```
 
 # 查看更改
@@ -14,20 +15,29 @@ git init --separate-git-dir "$(pwd)" ../default-tree
 在开始之前，先创建几个对象：
 ```bash
 echo '1' | git hash-object -t blob --stdin -w
+# d00491fd7e5bb6fa28c517a0bb32b8b506539d4d
 echo '2' | git hash-object -t blob --stdin -w
+# 0cfbf08886fca9a91cb753ec8734c84fcbe52c9f
 echo '3' | git hash-object -t blob --stdin -w
+# 00750edc07d6415dcc07ae0351e9397b0222b7ba
 echo '4' | git hash-object -t blob --stdin -w
+# b8626c4cff2849624fb67f87cd0ad72b163671ad
 echo '5' | git hash-object -t blob --stdin -w
+# 7ed6ff82de6bcc2a78243fc9c54d3ef5ac14da69
 echo '6' | git hash-object -t blob --stdin -w
+# 1e8b314962144c26d5e0e50fd29d2ca327864913
 echo '7' | git hash-object -t blob --stdin -w
+# 7f8f011eb73d6043d2e6db9d2c101195ae2801f2
 git mktree <<EOF
 100644 blob d00491fd7e5bb6fa28c517a0bb32b8b506539d4d$(printf '\t')1.txt
 100755 blob 0cfbf08886fca9a91cb753ec8734c84fcbe52c9f$(printf '\t')2.txt
 EOF
+# a237e8338c09e7d1b2f9749f73f4f583f19fc626
 git mktree <<EOF
 100644 blob d00491fd7e5bb6fa28c517a0bb32b8b506539d4d$(printf '\t')1.txt
 100755 blob 00750edc07d6415dcc07ae0351e9397b0222b7ba$(printf '\t')3.txt
 EOF
+# aa250e2798646facc12686e4403ccadbf1565d51
 git hash-object -t commit --stdin -w <<EOF
 tree a237e8338c09e7d1b2f9749f73f4f583f19fc626
 author b1f6c1c4 <b1f6c1c4@gmail.com> 1514736000 +0800
@@ -35,6 +45,7 @@ committer b1f6c1c4 <b1f6c1c4@gmail.com> 1514736000 +0800
 
 1=1 2=2
 EOF
+# 4cfe841426d0435270d049625a766130c108f4c8
 git hash-object -t commit --stdin -w <<EOF
 tree aa250e2798646facc12686e4403ccadbf1565d51
 parent 4cfe841426d0435270d049625a766130c108f4c8
@@ -43,6 +54,7 @@ committer b1f6c1c4 <b1f6c1c4@gmail.com> 1514736000 +0800
 
 1=1 3=3
 EOF
+# afc38c96c82ea65991322a5d28995b0851ff7edd
 ```
 
 - Lv2
@@ -50,25 +62,37 @@ EOF
 基于第一个tree-ish，查看第二个tree-ish的修改：
 ```bash
 git diff-tree a237 aa25
+# :100755 000000 0cfbf08886fca9a91cb753ec8734c84fcbe52c9f 0000000000000000000000000000000000000000 D	2.txt
+# :000000 100755 0000000000000000000000000000000000000000 00750edc07d6415dcc07ae0351e9397b0222b7ba A	3.txt
 git diff-tree a237 aa25 -- 2.txt
+# :100755 000000 0cfbf08886fca9a91cb753ec8734c84fcbe52c9f 0000000000000000000000000000000000000000 D	2.txt
 git diff-tree afc3
+# afc38c96c82ea65991322a5d28995b0851ff7edd
+# :100755 000000 0cfbf08886fca9a91cb753ec8734c84fcbe52c9f 0000000000000000000000000000000000000000 D	2.txt
+# :000000 100755 0000000000000000000000000000000000000000 00750edc07d6415dcc07ae0351e9397b0222b7ba A	3.txt
 ```
 
 基于tree-ish，查看index的修改：
 ```bash
 git read-tree a237
 git diff-index --cached aa25
+# :000000 100755 0000000000000000000000000000000000000000 0cfbf08886fca9a91cb753ec8734c84fcbe52c9f A	2.txt
+# :100755 000000 00750edc07d6415dcc07ae0351e9397b0222b7ba 0000000000000000000000000000000000000000 D	3.txt
 ```
 
 基于tree-ish，查看worktree的修改：
 ```bash
 rm -rf ../default-tree/*
 git --work-tree=../default-tree diff-index aa25
+# :100644 000000 d00491fd7e5bb6fa28c517a0bb32b8b506539d4d 0000000000000000000000000000000000000000 D	1.txt
+# :100755 000000 00750edc07d6415dcc07ae0351e9397b0222b7ba 0000000000000000000000000000000000000000 D	3.txt
 ```
 
 基于index，查看worktree的修改：
 ```bash
 git --work-tree=../default-tree diff-files
+# :100644 000000 d00491fd7e5bb6fa28c517a0bb32b8b506539d4d 0000000000000000000000000000000000000000 D	1.txt
+# :100755 000000 0cfbf08886fca9a91cb753ec8734c84fcbe52c9f 0000000000000000000000000000000000000000 D	2.txt
 ```
 
 - Lv3
@@ -95,6 +119,20 @@ git --work-tree=../default-tree diff-files
 打包修改：
 ```bash
 git diff-tree --patch a237 aa25 | tee ../the.patch
+# diff --git a/2.txt b/2.txt
+# deleted file mode 100755
+# index 0cfbf08..0000000
+# --- a/2.txt
+# +++ /dev/null
+# @@ -1 +0,0 @@
+# -2
+# diff --git a/3.txt b/3.txt
+# new file mode 100755
+# index 0000000..00750ed
+# --- /dev/null
+# +++ b/3.txt
+# @@ -0,0 +1 @@
+# +3
 ```
 
 解包修改至worktree:
@@ -103,17 +141,29 @@ rm -rf ../default-tree/*
 git read-tree a237
 git --work-tree=../default-tree checkout-index -fu -a
 ls ../default-tree
+# 1.txt
+# 2.txt
 git -C ../default-tree apply ../the.patch
 ls ../default-tree
+# 1.txt
+# 3.txt
 git ls-files -s
+# 100644 d00491fd7e5bb6fa28c517a0bb32b8b506539d4d 0	1.txt
+# 100755 0cfbf08886fca9a91cb753ec8734c84fcbe52c9f 0	2.txt
 ```
 
 解包修改至index：
 ```bash
 git ls-files -s
+# 100644 d00491fd7e5bb6fa28c517a0bb32b8b506539d4d 0	1.txt
+# 100755 0cfbf08886fca9a91cb753ec8734c84fcbe52c9f 0	2.txt
 git apply --cached ../the.patch
 git ls-files -s
+# 100644 d00491fd7e5bb6fa28c517a0bb32b8b506539d4d 0	1.txt
+# 100755 00750edc07d6415dcc07ae0351e9397b0222b7ba 0	3.txt
 ls ../default-tree
+# 1.txt
+# 3.txt
 ```
 
 # Merge相关概念简介
@@ -163,19 +213,48 @@ lineC
 EOF
 # 计算 fileC + (fileB - fileA)
 git merge-file --stdout fileC fileA fileB
+# lineBB
+# ...some stuff...
+# lineCC
 ```
 
 在遇到冲突的情况下，标记出来手工解决：
 ```bash
 git merge-file --stdout fileD fileA fileB
+# <<<<<<< fileD
+# lineBD
+# =======
+# lineBB
+# >>>>>>> fileB
+# ...some stuff...
+# lineC
 git merge-file --stdout --diff3 fileD fileA fileB
+# <<<<<<< fileD
+# lineBD
+# ||||||| fileA
+# lineB
+# =======
+# lineBB
+# >>>>>>> fileB
+# ...some stuff...
+# lineC
 ```
 
 在遇到冲突的情况下，自动解决：
 ```bash
 git merge-file --stdout --our fileD fileA fileB
+# lineBD
+# ...some stuff...
+# lineC
 git merge-file --stdout --their fileD fileA fileB
+# lineBB
+# ...some stuff...
+# lineC
 git merge-file --stdout --union fileD fileA fileB
+# lineBD
+# lineBB
+# ...some stuff...
+# lineC
 ```
 
 ## tree层面：`git merge-tree`
@@ -187,6 +266,7 @@ git mktree <<EOF
 100755 blob 0cfbf08886fca9a91cb753ec8734c84fcbe52c9f$(printf '\t')2.txt
 100755 blob b8626c4cff2849624fb67f87cd0ad72b163671ad$(printf '\t')4.txt
 EOF
+# 5de99716b8dd347ce09718e5f628b8c78e656b8c
 git hash-object -t commit --stdin -w <<EOF
 tree 5de99716b8dd347ce09718e5f628b8c78e656b8c
 parent 4cfe841426d0435270d049625a766130c108f4c8
@@ -195,16 +275,37 @@ committer b1f6c1c4 <b1f6c1c4@gmail.com> 1514736000 +0800
 
 1=1 2=2 4=4
 EOF
+# d2b78d09d49d1f9b4ae260cf98657de9a2fedaa6
 ```
 
 `git merge-tree C A B`的意义是`(C+(B-A))-C`，参见以下示例
 ```bash
 git ls-tree a237
+# 100644 blob d00491fd7e5bb6fa28c517a0bb32b8b506539d4d	1.txt
+# 100755 blob 0cfbf08886fca9a91cb753ec8734c84fcbe52c9f	2.txt
 git ls-tree aa25
+# 100644 blob d00491fd7e5bb6fa28c517a0bb32b8b506539d4d	1.txt
+# 100755 blob 00750edc07d6415dcc07ae0351e9397b0222b7ba	3.txt
 git ls-tree 5de9
+# 100644 blob d00491fd7e5bb6fa28c517a0bb32b8b506539d4d	1.txt
+# 100755 blob 0cfbf08886fca9a91cb753ec8734c84fcbe52c9f	2.txt
+# 100755 blob b8626c4cff2849624fb67f87cd0ad72b163671ad	4.txt
 git merge-tree 5de9 a237 aa25
+# removed in remote
+#   base   100755 0cfbf08886fca9a91cb753ec8734c84fcbe52c9f 2.txt
+#   our    100755 0cfbf08886fca9a91cb753ec8734c84fcbe52c9f 2.txt
+# @@ -1 +0,0 @@
+# -2
+# added in remote
+#   their  100755 00750edc07d6415dcc07ae0351e9397b0222b7ba 3.txt
+# @@ -0,0 +1 @@
+# +3
 git merge-tree 5de9 aa25 a237
 git merge-tree a237 aa25 5de9
+# added in remote
+#   their  100755 b8626c4cff2849624fb67f87cd0ad72b163671ad 4.txt
+# @@ -0,0 +1 @@
+# +4
 ```
 
 当同时存在tree层面和文件层面的修改时，参见以下示例
@@ -214,8 +315,12 @@ git mktree <<EOF
 100644 blob d00491fd7e5bb6fa28c517a0bb32b8b506539d4d$(printf '\t')1.txt
 100755 blob b8626c4cff2849624fb67f87cd0ad72b163671ad$(printf '\t')3.txt
 EOF
+# 47e3b7857c03c35eae515b36fe3828ef073cc2aa
 # merge-tree产生非常规输出（removed in local），暗示需要处理冲突
 git merge-tree 47e3 a237 aa25
+# removed in local
+#   base   100755 b8626c4cff2849624fb67f87cd0ad72b163671ad 3.txt
+#   their  100755 00750edc07d6415dcc07ae0351e9397b0222b7ba 3.txt
 ```
 
 ## `git read-tree -m`的Two Tree Merge
@@ -263,12 +368,28 @@ git read-tree 5de9
 # 此处要加-u，来确保index和worktree在stat意义下一致
 git --work-tree=../default-tree checkout-index -fu -a
 git ls-files -s
+# 100644 d00491fd7e5bb6fa28c517a0bb32b8b506539d4d 0	1.txt
+# 100755 0cfbf08886fca9a91cb753ec8734c84fcbe52c9f 0	2.txt
+# 100755 b8626c4cff2849624fb67f87cd0ad72b163671ad 0	4.txt
 ls ../default-tree
+# 1.txt
+# 2.txt
+# 4.txt
 git ls-tree a237
+# 100644 blob d00491fd7e5bb6fa28c517a0bb32b8b506539d4d	1.txt
+# 100755 blob 0cfbf08886fca9a91cb753ec8734c84fcbe52c9f	2.txt
 git ls-tree aa25
+# 100644 blob d00491fd7e5bb6fa28c517a0bb32b8b506539d4d	1.txt
+# 100755 blob 00750edc07d6415dcc07ae0351e9397b0222b7ba	3.txt
 git --work-tree=../default-tree read-tree -m a237 aa25
 git ls-files -s
+# 100644 d00491fd7e5bb6fa28c517a0bb32b8b506539d4d 0	1.txt
+# 100755 00750edc07d6415dcc07ae0351e9397b0222b7ba 0	3.txt
+# 100755 b8626c4cff2849624fb67f87cd0ad72b163671ad 0	4.txt
 ls ../default-tree
+# 1.txt
+# 2.txt
+# 4.txt
 # 总结：
 # 1.txt hhhh -> keep (#14)
 # 2.txt hhh0 -> index = 0 (#10)
@@ -300,21 +421,37 @@ ls ../default-tree
 举例如下：
 ```bash
 git ls-tree a237
+# 100644 blob d00491fd7e5bb6fa28c517a0bb32b8b506539d4d	1.txt
+# 100755 blob 0cfbf08886fca9a91cb753ec8734c84fcbe52c9f	2.txt
 git ls-tree 47e3
+# 100644 blob d00491fd7e5bb6fa28c517a0bb32b8b506539d4d	1.txt
+# 100755 blob b8626c4cff2849624fb67f87cd0ad72b163671ad	3.txt
 git ls-tree aa25
+# 100644 blob d00491fd7e5bb6fa28c517a0bb32b8b506539d4d	1.txt
+# 100755 blob 00750edc07d6415dcc07ae0351e9397b0222b7ba	3.txt
 rm -rf ../default-tree/*
 git read-tree 47e3
 git --work-tree=../default-tree checkout-index -fu -a
 git --work-tree=../default-tree read-tree -m a237 47e3 aa25
 # 此时可以看见非0的stage数
 git ls-files -s
+# 100644 d00491fd7e5bb6fa28c517a0bb32b8b506539d4d 0	1.txt
+# 100755 0cfbf08886fca9a91cb753ec8734c84fcbe52c9f 1	2.txt
+# 100755 b8626c4cff2849624fb67f87cd0ad72b163671ad 2	3.txt
+# 100755 00750edc07d6415dcc07ae0351e9397b0222b7ba 3	3.txt
 # 总结：
 # 1.txt aaa, collapse
 # 2.txt a00, non-collapse
 # 3.txt 0cb, non-collapse
 # 此时无法write-tree：
 git write-tree
+# 2.txt: unmerged (0cfbf08886fca9a91cb753ec8734c84fcbe52c9f)
+# 3.txt: unmerged (b8626c4cff2849624fb67f87cd0ad72b163671ad)
+# 3.txt: unmerged (00750edc07d6415dcc07ae0351e9397b0222b7ba)
+# fatal: git-write-tree: error building trees
 git --work-tree=../default-tree checkout-index --stage=all -f --all
+# .merge_file_jqYDDB . .	2.txt
+# . .merge_file_QlEQOo .merge_file_Kl73Zb	3.txt
 ```
 
 ## `git merge-index`和`git merge-one-file`
@@ -325,6 +462,8 @@ git --work-tree=../default-tree checkout-index --stage=all -f --all
 ```bash
 # 注意空格
 git merge-index echo -a
+# 0cfbf08886fca9a91cb753ec8734c84fcbe52c9f   2.txt 100755  
+#  b8626c4cff2849624fb67f87cd0ad72b163671ad 00750edc07d6415dcc07ae0351e9397b0222b7ba 3.txt  100755 100755
 ```
 
 一种（没有卵用的）操作是调用自带工具`git-merge-one-file`：
@@ -334,8 +473,16 @@ git read-tree 47e3
 git --work-tree=../default-tree checkout-index -fu -a
 git --work-tree=../default-tree read-tree -m --aggressive a237 47e3 aa25
 git ls-files -s
+# 100644 d00491fd7e5bb6fa28c517a0bb32b8b506539d4d 0	1.txt
+# 100755 b8626c4cff2849624fb67f87cd0ad72b163671ad 2	3.txt
+# 100755 00750edc07d6415dcc07ae0351e9397b0222b7ba 3	3.txt
 # 这个自带工具非常弱，解决不了什么问题，真心不比--aggressive强多少
 git --work-tree=../default-tree merge-index git-merge-one-file -a
+# fatal: unable to read blob object e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+# error: Could not stat : No such file or directory
+# ERROR: content conflict in 3.txt
+# fatal: merge program failed
+# Added 3.txt in both, but differently.
 ```
 
 注意：若提示错误
@@ -352,6 +499,7 @@ git --work-tree=../default-tree merge-index git-merge-one-file -a
 
 ```bash
 git merge-base -a afc3 d2b7
+# 4cfe841426d0435270d049625a766130c108f4c8
 ```
 
 # Lv3
@@ -438,6 +586,7 @@ git-mnfss() {
 首先创建若干空commit和tag：
 ```bash
 printf '' | git mktree
+# 4b825dc642cb6eb9a060e54bf8d69288fbee4904
 git hash-object -t commit --stdin -w <<EOF
 tree 4b825dc642cb6eb9a060e54bf8d69288fbee4904
 author b1f6c1c4 <b1f6c1c4@gmail.com> 1514736000 +0800
@@ -445,7 +594,9 @@ committer b1f6c1c4 <b1f6c1c4@gmail.com> 1514736000 +0800
 
 A
 EOF
+# 6784b23b1a03700628d8adb65b57b5b4816caa01
 echo $'100644 blob 0cfbf08886fca9a91cb753ec8734c84fcbe52c9f\tB.txt' | git mktree
+# 6f707a369aa805c91f6d737ccda037d137d0ef93
 git hash-object -t commit --stdin -w <<EOF
 tree 6f707a369aa805c91f6d737ccda037d137d0ef93
 parent 6784b23b1a03700628d8adb65b57b5b4816caa01
@@ -454,7 +605,9 @@ committer b1f6c1c4 <b1f6c1c4@gmail.com> 1514736000 +0800
 
 B
 EOF
+# f1d113e4db427a1824524d17928a2cb53cd5090a
 echo $'100644 blob 00750edc07d6415dcc07ae0351e9397b0222b7ba\tC.txt' | git mktree
+# f6ab164f6371575aff1ce5c21441835e5568b182
 git hash-object -t commit --stdin -w <<EOF
 tree f6ab164f6371575aff1ce5c21441835e5568b182
 parent 6784b23b1a03700628d8adb65b57b5b4816caa01
@@ -463,8 +616,10 @@ committer b1f6c1c4 <b1f6c1c4@gmail.com> 1514736000 +0800
 
 C
 EOF
+# 28c0a4a3bab80a464dd384cf4e3d2b83cceb602b
 git branch br-C 28c0
 echo $'100644 blob b8626c4cff2849624fb67f87cd0ad72b163671ad\tD.txt' | git mktree
+# 2cff17f83cfc5f0cd3af03f99257e35906e6fb7c
 git hash-object -t commit --stdin -w <<EOF
 tree 2cff17f83cfc5f0cd3af03f99257e35906e6fb7c
 parent 6784b23b1a03700628d8adb65b57b5b4816caa01
@@ -473,8 +628,10 @@ committer b1f6c1c4 <b1f6c1c4@gmail.com> 1514736000 +0800
 
 D
 EOF
+# 7f24235935c56e397d2d1d55bb470fe1b01b8209
 git tag tag-D 7f24
 echo $'100644 blob 7ed6ff82de6bcc2a78243fc9c54d3ef5ac14da69\tE.txt' | git mktree
+# 4ff6131a9638bb0a38917c72255c3c0635d0f464
 git hash-object -t commit --stdin -w <<EOF
 tree 4ff6131a9638bb0a38917c72255c3c0635d0f464
 parent 6784b23b1a03700628d8adb65b57b5b4816caa01
@@ -483,6 +640,7 @@ committer b1f6c1c4 <b1f6c1c4@gmail.com> 1514736000 +0800
 
 E
 EOF
+# 1a1640224e55b3a7d05108c6b91e03e6cc65ffbe
 GIT_COMMITTER_NAME=b1f6c1c4 \
 GIT_COMMITTER_EMAIL=b1f6c1c4@gmail.com \
 GIT_COMMITTER_DATE='1600000000 +0800' \
@@ -493,7 +651,11 @@ git tag -a -m 'Tag for E' tag-obj-E 1a16
 ```bash
 git update-ref --no-deref HEAD 6784
 git -C ../default-tree reset --hard
+# HEAD is now at 6784b23 A
 git -C ../default-tree clean -fdx
+# Removing .merge_file_Kl73Zb
+# Removing .merge_file_QlEQOo
+# Removing .merge_file_jqYDDB
 GIT_AUTHOR_NAME=b1f6c1c4 \
 GIT_AUTHOR_EMAIL=b1f6c1c4@gmail.com \
 GIT_AUTHOR_DATE='1600000000 +0800' \
@@ -501,7 +663,33 @@ GIT_COMMITTER_NAME=b1f6c1c4 \
 GIT_COMMITTER_EMAIL=b1f6c1c4@gmail.com \
 GIT_COMMITTER_DATE='1600000000 +0800' \
 git -C ../default-tree merge --no-ff tag-obj-E f1d1 br-C tag-D
+# Fast-forwarding to: tag-obj-E
+# Trying simple merge with f1d1
+# Trying simple merge with br-C
+# Trying simple merge with tag-D
+# Merge made by the 'octopus' strategy.
+#  B.txt | 1 +
+#  C.txt | 1 +
+#  D.txt | 1 +
+#  E.txt | 1 +
+#  4 files changed, 4 insertions(+)
+#  create mode 100644 B.txt
+#  create mode 100644 C.txt
+#  create mode 100644 D.txt
+#  create mode 100644 E.txt
 git cat-file commit HEAD
+# tree ae618f9e9f1a0ce0fdc25f7e4dcfdc5bc9c09c49
+# parent 6784b23b1a03700628d8adb65b57b5b4816caa01
+# parent 1a1640224e55b3a7d05108c6b91e03e6cc65ffbe
+# parent f1d113e4db427a1824524d17928a2cb53cd5090a
+# parent 28c0a4a3bab80a464dd384cf4e3d2b83cceb602b
+# parent 7f24235935c56e397d2d1d55bb470fe1b01b8209
+# author b1f6c1c4 <b1f6c1c4@gmail.com> 1600000000 +0800
+# committer b1f6c1c4 <b1f6c1c4@gmail.com> 1600000000 +0800
+#
+# Merge branch 'br-C', tags 'tag-obj-E' and 'tag-D'; commit 'f1d1' into HEAD
+#
+# Tag for E
 ```
 注意观察commit message中对于各parent的不同的描述。
 另外，commit message中还包含了tag message。

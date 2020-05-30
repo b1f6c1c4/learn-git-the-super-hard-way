@@ -16,6 +16,7 @@ Git索引位于`<repo>/index`，本质是一个复杂的二进制文件。
 不过为了避免繁琐的`--git-dir`和`--work-tree`，本章所有命令都会在worktree里面执行：
 ```bash
 git init .
+# Initialized empty Git repository in /root/.git/
 ```
 也就意味着忽略掉`--git-dir`和`--work-tree`也能正常工作。读者需要判断哪些命令可以不依赖`--work-tree`。
 
@@ -25,6 +26,7 @@ git init .
 ```bash
 # 注意：此处故意忽略掉-w，导致blob对象并没有被真正创建
 echo 'content' | git hash-object -t blob --stdin
+# d95f3ad14dee633a758d2e331151e950dd13e4ed
 # blob不一定需要真正存在
 git update-index --add --cacheinfo 100644,d95f3ad14dee633a758d2e331151e950dd13e4ed,dir/fn
 ```
@@ -68,6 +70,7 @@ git update-index --force-remove -- dir/fn
 ```bash
 (git add -f dir/fn)
 git rm --cached -- dir/fn
+# rm 'dir/fn'
 ```
 
 # 移动index
@@ -83,6 +86,7 @@ Lv3方法，使用`git mv`不仅移动了index还移动了worktree里的文件
 ```bash
 (git add -f dir/fn)
 git ls-files -s
+# 100644 d95f3ad14dee633a758d2e331151e950dd13e4ed 0	dir/fn
 ```
 
 # 利用tree更新index
@@ -90,10 +94,12 @@ git ls-files -s
 先弄一个tree：
 ```bash
 echo 'hello' | git hash-object -t blob --stdin -w
+# ce013625030ba8dba906f756967f9e9ca394464a
 git mktree --missing <<EOF
 100644 blob ce013625030ba8dba906f756967f9e9ca394464a$(printf '\t')name.ext
 100755 blob ce013625030ba8dba906f756967f9e9ca394464a$(printf '\t')name2.ext
 EOF
+# 58417991a0e30203e7e9b938f62a9a6f9ce10a9a
 ```
 
 - Lv2
@@ -102,14 +108,21 @@ EOF
 # 整个index替换掉
 git read-tree 5841
 git ls-files -s
+# 100644 ce013625030ba8dba906f756967f9e9ca394464a 0	name.ext
+# 100755 ce013625030ba8dba906f756967f9e9ca394464a 0	name2.ext
 # 合并到某个文件夹
 (git update-index --force-remove -- name.ext name2.ext && git add -f dir/fn)
 git read-tree --prefix=dir/ 5841
 git ls-files -s
+# 100644 d95f3ad14dee633a758d2e331151e950dd13e4ed 0	dir/fn
+# 100644 ce013625030ba8dba906f756967f9e9ca394464a 0	dir/name.ext
+# 100755 ce013625030ba8dba906f756967f9e9ca394464a 0	dir/name2.ext
 # 注意特殊情况
 (git update-index --force-remove -- dir/fn dir/name.ext dir/name2.ext && git add -f dir/fn)
 git read-tree --prefix=dir/fn/ 5841
 git ls-files -s
+# 100644 ce013625030ba8dba906f756967f9e9ca394464a 0	dir/fn/name.ext
+# 100755 ce013625030ba8dba906f756967f9e9ca394464a 0	dir/fn/name2.ext
 ```
 
 - Lv3
@@ -118,10 +131,14 @@ git ls-files -s
 # 整个index替换掉
 git restore --source 5841 --staged -- :/
 git ls-files -s
+# 100644 ce013625030ba8dba906f756967f9e9ca394464a 0	name.ext
+# 100755 ce013625030ba8dba906f756967f9e9ca394464a 0	name2.ext
 # 替换掉某个文件
 (git update-index --force-remove -- name.ext)
 git restore --source 5841 --staged -- name.ext
 git ls-files -s
+# 100644 ce013625030ba8dba906f756967f9e9ca394464a 0	name.ext
+# 100755 ce013625030ba8dba906f756967f9e9ca394464a 0	name2.ext
 ```
 
 # 利用index更新worktree
@@ -159,10 +176,16 @@ git restore --worktree -- name.ext
 ```bash
 (git read-tree --prefix=dir/ 5841)
 git ls-files -s
+# 100644 ce013625030ba8dba906f756967f9e9ca394464a 0	dir/name.ext
+# 100755 ce013625030ba8dba906f756967f9e9ca394464a 0	dir/name2.ext
+# 100644 ce013625030ba8dba906f756967f9e9ca394464a 0	name.ext
+# 100755 ce013625030ba8dba906f756967f9e9ca394464a 0	name2.ext
 # 用整个index创建tree
 git write-tree
+# 34ade2bb5494b722dea8a9874afddd3562f32744
 # 用一个子目录创建tree
 git write-tree --prefix=dir/
+# 58417991a0e30203e7e9b938f62a9a6f9ce10a9a
 ```
 注意：当存在非0的stage数时（一般是由`git read-tree -m`导致的，见第6章），`git write-tree`会失败
 
@@ -172,6 +195,12 @@ git write-tree --prefix=dir/
 (git config --global user.name "b1f6c1c4")
 (git config --global user.email "b1f6c1c4@gmail.com")
 git commit --allow-empty -m 'The message'
+# [master (root-commit) 682b073] The message
+#  4 files changed, 4 insertions(+)
+#  create mode 100644 dir/name.ext
+#  create mode 100755 dir/name2.ext
+#  create mode 100644 name.ext
+#  create mode 100755 name2.ext
 ```
 
 # 利用tree更新worktree
@@ -183,6 +212,9 @@ git commit --allow-empty -m 'The message'
 echo 0 >f
 git add f
 git commit -m '0'
+# [master d32e8f0] 0
+#  1 file changed, 1 insertion(+)
+#  create mode 100644 f
 echo 1 >f
 git add f
 echo 2 >f
@@ -190,7 +222,9 @@ echo 2 >f
 git cat-file blob HEAD:f >f
 # 检查：
 git cat-file blob $(git ls-files -s -- f | awk '{ print $2; }')
+# 1
 cat f
+# 0
 ```
 
 - Lv3
@@ -200,6 +234,23 @@ cat f
 echo 0 >f
 git add f
 git commit -m '0'
+# On branch master
+# Changes not staged for commit:
+#   (use "git add/rm <file>..." to update what will be committed)
+#   (use "git restore <file>..." to discard changes in working directory)
+# 	deleted:    dir/name.ext
+# 	deleted:    dir/name2.ext
+#
+# Untracked files:
+#   (use "git add <file>..." to include in what will be committed)
+# 	-funame.ext
+# 	-funame2.ext
+# 	.bashrc
+# 	.gitconfig
+# 	.profile
+# 	dir/fn
+#
+# no changes added to commit (use "git add" and/or "git commit -a")
 echo 1 >f
 git add f
 echo 2 >f
@@ -207,7 +258,9 @@ echo 2 >f
 git restore --source HEAD --worktree -- f
 # 检查：
 git cat-file blob $(git ls-files -s -- f | awk '{ print $2; }')
+# 1
 cat f
+# 0
 ```
 
 # 利用tree同时更新index和worktree
@@ -222,6 +275,23 @@ cat f
 echo 0 >f
 git add f
 git commit -m '0'
+# On branch master
+# Changes not staged for commit:
+#   (use "git add/rm <file>..." to update what will be committed)
+#   (use "git restore <file>..." to discard changes in working directory)
+# 	deleted:    dir/name.ext
+# 	deleted:    dir/name2.ext
+#
+# Untracked files:
+#   (use "git add <file>..." to include in what will be committed)
+# 	-funame.ext
+# 	-funame2.ext
+# 	.bashrc
+# 	.gitconfig
+# 	.profile
+# 	dir/fn
+#
+# no changes added to commit (use "git add" and/or "git commit -a")
 echo 1 >f
 git add f
 echo 2 >f
@@ -229,7 +299,9 @@ echo 2 >f
 git restore --source HEAD --staged --worktree -- f
 # 检查：
 git cat-file blob $(git ls-files -s -- f | awk '{ print $2; }')
+# 0
 cat f
+# 0
 ```
 
 注意：`git restore --worktree`没有对应的旧语法。
@@ -263,10 +335,76 @@ cat f
 只需`git stash [pop]`：
 ```bash
 git status
+# On branch master
+# Changes not staged for commit:
+#   (use "git add/rm <file>..." to update what will be committed)
+#   (use "git restore <file>..." to discard changes in working directory)
+# 	deleted:    dir/name.ext
+# 	deleted:    dir/name2.ext
+#
+# Untracked files:
+#   (use "git add <file>..." to include in what will be committed)
+# 	-funame.ext
+# 	-funame2.ext
+# 	.bashrc
+# 	.gitconfig
+# 	.profile
+# 	dir/fn
+#
+# no changes added to commit (use "git add" and/or "git commit -a")
 git stash
+# Saved working directory and index state WIP on master: d32e8f0 0
 git status
+# On branch master
+# Untracked files:
+#   (use "git add <file>..." to include in what will be committed)
+# 	-funame.ext
+# 	-funame2.ext
+# 	.bashrc
+# 	.gitconfig
+# 	.profile
+# 	dir/fn
+#
+# nothing added to commit but untracked files present (use "git add" to track)
 git stash pop
+# Removing dir/name2.ext
+# Removing dir/name.ext
+# On branch master
+# Changes not staged for commit:
+#   (use "git add/rm <file>..." to update what will be committed)
+#   (use "git restore <file>..." to discard changes in working directory)
+# 	deleted:    dir/name.ext
+# 	deleted:    dir/name2.ext
+#
+# Untracked files:
+#   (use "git add <file>..." to include in what will be committed)
+# 	-funame.ext
+# 	-funame2.ext
+# 	.bashrc
+# 	.gitconfig
+# 	.profile
+# 	dir/fn
+#
+# no changes added to commit (use "git add" and/or "git commit -a")
+# Dropped refs/stash@{0} (5db4e9649c35be522077a2d312ff261dd980c28c)
 git status
+# On branch master
+# Changes not staged for commit:
+#   (use "git add/rm <file>..." to update what will be committed)
+#   (use "git restore <file>..." to discard changes in working directory)
+# 	deleted:    dir/name.ext
+# 	deleted:    dir/name2.ext
+#
+# Untracked files:
+#   (use "git add <file>..." to include in what will be committed)
+# 	-funame.ext
+# 	-funame2.ext
+# 	.bashrc
+# 	.gitconfig
+# 	.profile
+# 	dir/fn
+#
+# no changes added to commit (use "git add" and/or "git commit -a")
 ```
 
 注意：请一定认真检查`git stash`的输出！
@@ -283,8 +421,22 @@ git status
 touch extra
 # 检查多出来了什么文件
 git clean -nd
+# Would remove -funame.ext
+# Would remove -funame2.ext
+# Would remove .bashrc
+# Would remove .gitconfig
+# Would remove .profile
+# Would remove dir/fn
+# Would remove extra
 # 统统删掉
 git clean -fd
+# Removing -funame.ext
+# Removing -funame2.ext
+# Removing .bashrc
+# Removing .gitconfig
+# Removing .profile
+# Removing dir/fn
+# Removing extra
 ```
 
 把以下命令的`-n`换成`-f`就能真正删掉文件了
@@ -296,10 +448,14 @@ touch fff
 touch extra
 # 准备删掉多出来的non-ignored文件
 git clean -nd
+# Would remove extra
 # 准备删掉多出来的所有文件
 git clean -ndx
+# Would remove extra
+# Would remove fff
 # 准备删掉多出来的ignored文件
 git clean -ndX
+# Would remove fff
 ```
 
 # 总结
