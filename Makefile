@@ -9,6 +9,7 @@ test: $(REPORTS)
 docker:
 	docker build -t learn-git-generate ./docker
 
+chapter-1.md: source/chapter-1.md
 chapter0.md: source/chapter0.md
 chapter1.md: source/chapter1.md
 chapter2.md: source/chapter1.md source/chapter2.md
