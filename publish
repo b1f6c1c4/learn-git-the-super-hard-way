@@ -16,5 +16,7 @@ git add -f \
     LICENSE
 TREE="$(git write-tree)"
 COMMIT="$(git commit-tree "$TREE" -p HEAD -m "publish" -S)"
-git push --force-with-lease origin "$COMMIT:master"
-git reset --mixed
+if [ "$#" -eq 0 ] || [ ! "$1" = "--dry-run" ]; then
+    git push --force-with-lease origin "$COMMIT:master"
+    git reset --mixed
+fi
