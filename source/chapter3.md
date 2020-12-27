@@ -22,6 +22,7 @@ git init .
 # 添加/修改index
 
 - Lv1
+
 ```bash
 # 注意：此处故意忽略掉-w，导致blob对象并没有被真正创建
 echo 'content' | git hash-object -t blob --stdin
@@ -30,6 +31,7 @@ git update-index --add --cacheinfo 100644,d95f3ad14dee633a758d2e331151e950dd13e4
 ```
 
 - Lv2
+
 ```bash
 # 要先有文件才能添加到index
 mkdir -p dir
@@ -80,6 +82,7 @@ Lv3方法，使用`git mv`不仅移动了index还移动了worktree里的文件
 
 - Lv2
 （其中0为stage数，正常情况为0）
+
 ```bash
 (git add -f dir/fn)
 git ls-files -s
@@ -168,6 +171,7 @@ git write-tree --prefix=dir/
 
 - Lv3
 注意：`git commit`创建tree并创建commit
+
 ```bash
 (git config --global user.name "b1f6c1c4")
 (git config --global user.email "b1f6c1c4@gmail.com")

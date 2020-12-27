@@ -52,6 +52,7 @@ gpg --list-secret-keys
 # 创建带签名的commit
 
 - Lv1
+
 ```bash
 # 首先用gpg对commit的内容进行签名
 gpg --armor --detach-sign <<EOF | tee sig
@@ -90,6 +91,7 @@ git cat-file commit $(cat commit2-a237)
 ```
 
 - Lv3
+
 ```sh
 git commit -SB34F764F595C11CA966F696BBBB866D93074FF5F
 ```
@@ -142,6 +144,7 @@ git cat-file tag tag1-efd4
 ```
 
 - Lv3
+
 ```bash
 GIT_COMMITTER_NAME=b1f6c1c4 \
 GIT_COMMITTER_EMAIL=b1f6c1c4@gmail.com \
@@ -168,6 +171,7 @@ git verify-tag tag1-efd4
 ```
 
 - Lv3
+
 ```bash
 # stdout输出tag内容，stderr输出签名信息
 git tag --verify tag1-efd4 2>tmp

@@ -232,6 +232,7 @@ cat ./config
 复制另一个repo的大多数对象、所有普通引用、特殊引用HEAD
 
 - Lv2
+
 ```bash
 (rm -rf *) # 删掉之前所有东西
 # 先准备好
@@ -248,6 +249,7 @@ git --git-dir=copy.git symbolic-ref HEAD refs/heads/master
 ```
 
 - Lv3
+
 ```bash
 rm -rf copy.git
 git clone --mirror git@github.com:b1f6c1c4/learn-git-the-super-hard-way.git copy.git
@@ -258,6 +260,7 @@ git clone --mirror git@github.com:b1f6c1c4/learn-git-the-super-hard-way.git copy
 与`--mirror`类似，但是四不像（没有config）
 
 - Lv2
+
 ```bash
 rm -rf copy.git
 git init --bare copy.git
@@ -300,6 +303,7 @@ git --git-dir=copy-wt/.git --work-tree=copy-wt checkout-index -fua
 ```
 
 - Lv3
+
 ```bash
 rm -rf copy-wt
 git clone --branch dev git@github.com:b1f6c1c4/learn-git-the-super-hard-way.git copy-wt
