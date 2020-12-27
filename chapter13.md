@@ -72,6 +72,7 @@ gpg --list-secret-keys
 # 创建带签名的commit
 
 - Lv1
+
 ```bash
 # 首先用gpg对commit的内容进行签名
 gpg --armor --detach-sign <<EOF | tee sig
