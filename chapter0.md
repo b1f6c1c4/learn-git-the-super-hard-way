@@ -28,6 +28,7 @@ echo 'ref: refs/heads/master' > the-repo.git/HEAD
 # Git需要知道repo在哪里，用--git-dir来指定
 # 将在第2章详细介绍此命令
 git --git-dir=the-repo.git symbolic-ref HEAD
+# refs/heads/master
 ```
 
 现在添加worktree：
@@ -42,6 +43,11 @@ mkdir default-tree
 # Git需要知道worktree在哪里，用--work-tree来指定
 # 将在第3章详细介绍此命令
 git --git-dir=the-repo.git --work-tree=default-tree status
+# On branch master
+#
+# No commits yet
+#
+# nothing to commit (create/copy files and use "git add" to track)
 ```
 
 每次调用git命令都需要手工指定repo和worktree的位置非常麻烦。
@@ -54,23 +60,36 @@ echo "gitdir: $(pwd)/the-repo.git" > default-tree/.git
 然而非常遗憾的是，以下命令并不能成功：
 ```bash
 git --work-tree=default-tree status
+# fatal: not a git repository (or any of the parent directories): .git
 ```
 原因是`--work-tree`必须和`--git-dir`配合使用。
 解决办法就是`cd`过去：
 ```bash
 cd default-tree
 git status
+# On branch master
+#
+# No commits yet
+#
+# nothing to commit (create/copy files and use "git add" to track)
 ```
 另外一种办法是使用`-C`，表示先执行`cd`再执行`git`
 ```bash
 git -C default-tree status
+# On branch master
+#
+# No commits yet
+#
+# nothing to commit (create/copy files and use "git add" to track)
 ```
 
 注意`cd`进repo有时会报错，因为目前没有任何办法从repo找到worktree，
 而一部分命令必须要有worktree才能正常工作（比如`git status`）：
 ```bash
 git -C the-repo.git symbolic-ref HEAD
+# refs/heads/master
 git -C the-repo.git status
+# fatal: this operation must be run in a work tree
 ```
 
 再进一步，如果希望避免使用绝对路径（repo移动了位置依然可以找到），
@@ -83,10 +102,18 @@ mv the-repo.git default-tree/.git
 
 # 检查一下：
 git -C default-tree symbolic-ref HEAD
+# refs/heads/master
 git -C default-tree status
+# On branch master
+#
+# No commits yet
+#
+# nothing to commit (create/copy files and use "git add" to track)
 git -C default-tree/.git symbolic-ref HEAD
+# refs/heads/master
 # 下面这个命令依然报错，原因同上
 git -C default-tree/.git status
+# fatal: this operation must be run in a work tree
 ```
 
 ## Lv3
@@ -95,18 +122,21 @@ git -C default-tree/.git status
 ```bash
 (rm -rf the-repo.git) # 重新开始，删掉之前的repo
 git init --bare the-repo.git
+# Initialized empty Git repository in /root/the-repo.git/
 ```
 
 日常创建repo、选配worktree、把repo放在worktree里面：
 ```bash
 (rm -rf default-tree) # 重新开始，删掉之前的worktree
 git init default-tree
+# Initialized empty Git repository in /root/default-tree/.git/
 ```
 
 日常创建repo、选配worktree、把repo和worktree分开放置：
 ```bash
 (rm -rf the-repo.git default-tree)
 git init --separate-git-dir the-repo.git default-tree
+# Initialized empty Git repository in /root/the-repo.git/
 ```
 
 # 添加新repo并链接到原repo，以实现“一个repo多个worktree”
@@ -116,6 +146,7 @@ git init --separate-git-dir the-repo.git default-tree
 ```bash
 (rm -rf the-repo.git default-tree) # 删掉之前的东西
 (git init --bare the-repo.git) # 现在我们有一个repo但没有worktree
+# Initialized empty Git repository in /root/the-repo.git/
 
 # 惯例是将小repo放在这个位置：
 # 请注意，虽然路径名称写了个worktrees，但是这里真正放的还是repo
@@ -137,9 +168,11 @@ echo 'ref: refs/heads/another' > the-repo.git/worktrees/another/HEAD
 ```bash
 # 特别注意此处的git-dir已经发生变化
 git --git-dir=the-repo.git/worktrees/another symbolic-ref HEAD
+# refs/heads/another
 
 # 下面这样也可以
 git -C the-repo.git/worktrees/another symbolic-ref HEAD
+# refs/heads/another
 ```
 
 和普通repo一样，添加worktree非常简单：
@@ -150,12 +183,22 @@ mkdir another-tree
 采用`git status`（Lv3）检验是否创建成功：
 ```bash
 git --git-dir=the-repo.git/worktrees/another --work-tree=another-tree status
+# On branch another
+#
+# No commits yet
+#
+# nothing to commit (create/copy files and use "git add" to track)
 ```
 
 给小repo简化命令行调用方式完全相同：
 ```bash
 echo "gitdir: $(pwd)/the-repo.git/worktrees/another" > another-tree/.git
 git -C another-tree status
+# On branch another
+#
+# No commits yet
+#
+# nothing to commit (create/copy files and use "git add" to track)
 ```
 
 现在小repo知道大repo的存在，但是大repo却不知道小repo的存在。
@@ -164,21 +207,31 @@ git -C another-tree status
 ```bash
 # 在登记之前，git worktree list没有任何发现，指定小repo也没用
 git --git-dir=the-repo.git worktree list
+# /root/the-repo.git  (bare)
 git --git-dir=the-repo.git/worktrees/another worktree list
+# /root/the-repo.git  (bare)
 
 # 现在进行登记：将小repo的worktree的.git文件的绝对路径登记在小repo的gitdir中
 echo "$(pwd)/another-tree/.git" > the-repo.git/worktrees/another/gitdir
 
 # 非常令人困惑的是，这看似跟大repo没有什么关系，但这样做确实有用：
 git --git-dir=the-repo.git worktree list
+# /root/the-repo.git  (bare)
+# /root/another-tree  0000000 [another]
 
 # 注意此处git-dir写大repo还是小repo都能得到一样的结果
 git --git-dir=the-repo.git/worktrees/another worktree list
+# /root/the-repo.git  (bare)
+# /root/another-tree  0000000 [another]
 
 # 即便.git文件被删掉了，这种联系依然还能暂时存在：
 rm another-tree/.git
 git --git-dir=the-repo.git worktree list
+# /root/the-repo.git  (bare)
+# /root/another-tree  0000000 [another]
 git --git-dir=the-repo.git/worktrees/another worktree list
+# /root/the-repo.git  (bare)
+# /root/another-tree  0000000 [another]
 # 但是需要注意的是，此时执行git worktree prune将会删除整个小repo：
 # 参考本章后面关于git worktree prune的描述
 ## git --git-dir=the-repo.git worktree prune
@@ -199,6 +252,11 @@ echo "gitdir: $(pwd)/third-repo.git" > third-tree/.git
 
 # 检查小repo是否创建成功
 git -C third-tree status
+# On branch third
+#
+# No commits yet
+#
+# nothing to commit (create/copy files and use "git add" to track)
 
 # 建立联系：把gitdir放在跟之前一样的位置，即便那里不是小repo
 mkdir the-repo.git/worktrees/third/
@@ -206,8 +264,17 @@ echo "$(pwd)/third-tree/.git" > the-repo.git/worktrees/third/gitdir
 
 # 检查大小repo是否有联系
 git --git-dir=the-repo.git worktree list
+# /root/the-repo.git  (bare)
+# /root/another-tree  0000000 [another]
+# /root/third-tree    0000000 (detached HEAD)
 git --git-dir=the-repo.git/worktrees/another worktree list
+# /root/the-repo.git  (bare)
+# /root/another-tree  0000000 [another]
+# /root/third-tree    0000000 (detached HEAD)
 git --git-dir=third-repo.git worktree list
+# /root/the-repo.git  (bare)
+# /root/another-tree  0000000 [another]
+# /root/third-tree    0000000 (detached HEAD)
 ```
 可以看到，虽然不在常规位置的小repo能够被成功识别，
 但是`git worktree list`却无法正确列出其HEAD的内容。
@@ -246,8 +313,13 @@ rm -f another-tree/.git
 # 它会主动删掉对应的小repo（由于是小repo，所以基本不会损失什么数据）：
 # 注意：此处填写小repo，甚至填写另一个小repo都是可以的
 git --git-dir=the-repo.git worktree list
+# /root/the-repo.git  (bare)
+# /root/another-tree  0000000 [another]
+# /root/third-tree    0000000 (detached HEAD)
 git --git-dir=the-repo.git worktree prune
 git --git-dir=the-repo.git worktree list
+# /root/the-repo.git  (bare)
+# /root/third-tree    0000000 (detached HEAD)
 ```
 
 # 基于别的repo创建新的repo

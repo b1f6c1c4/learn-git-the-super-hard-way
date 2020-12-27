@@ -56,14 +56,18 @@ git tag -f tg1 d4da
 
 ```bash
 cat ./refs/heads/br1
+# d4dafde7cd9248ef94c0400983d51122099d312a
 cat ./refs/tags/tg1
+# d4dafde7cd9248ef94c0400983d51122099d312a
 ```
 
 - Lv2
 
 ```bash
 git rev-parse refs/heads/br1
+# d4dafde7cd9248ef94c0400983d51122099d312a
 git rev-parse refs/tags/tg1
+# d4dafde7cd9248ef94c0400983d51122099d312a
 ```
 
 - Lv3
@@ -71,8 +75,10 @@ git rev-parse refs/tags/tg1
 ```bash
 # 此处必须省略refs/heads/
 git branch -avl br1
+#   br1 d4dafde The commit message May have multiple lines!
 # 此处必须省略refs/tags/
 git tag -l tg1
+# tg1
 ```
 
 # 创建间接引用
@@ -95,6 +101,7 @@ git symbolic-ref refs/heads/br2 refs/heads/br1
 
 ```bash
 cat ./refs/heads/br2
+# ref: refs/heads/br1
 ```
 
 - Lv2
@@ -102,7 +109,9 @@ cat ./refs/heads/br2
 
 ```bash
 git symbolic-ref refs/heads/br2
+# refs/heads/br1
 git rev-parse refs/heads/br2
+# d4dafde7cd9248ef94c0400983d51122099d312a
 ```
 
 - Lv3
@@ -111,7 +120,9 @@ Lv3命令只能看到解引用后的对象，无法看清楚间接引用本身
 ```bash
 # 此处必须省略refs/heads/
 git branch -avl br1
+#   br1 d4dafde The commit message May have multiple lines!
 git branch -avl br2
+#   br2 d4dafde The commit message May have multiple lines!
 ```
 
 # 删除引用
@@ -143,11 +154,14 @@ git symbolic-ref --delete refs/heads/br2
 # 此处必须省略refs/heads/
 (git update-ref --no-deref refs/heads/br1 d4da)
 git branch -D br1
+# Deleted branch br1 (was d4dafde).
 (git symbolic-ref refs/heads/br2 refs/heads/br1)
 git branch -D br2
+# Deleted branch br2 (was refs/heads/br1).
 # 此处必须省略refs/tags/
 (git update-ref --no-deref refs/tags/tg1 d4da)
 git tag -d tg1
+# Deleted tag 'tg1' (was d4dafde)
 ```
 
 # 关于`update-ref`的特别备注
@@ -174,6 +188,7 @@ git update-ref --no-deref refs/heads/br1 efd4
 
 ```bash
 cat ./logs/refs/heads/br1
+# cat: ./logs/refs/heads/br1: No such file or directory
 ```
 
 - Lv3
@@ -196,12 +211,36 @@ git reflog refs/heads/br1
 (git update-ref --no-deref refs/remotes/origin/br3 d4da)
 (git update-ref --no-deref refs/tags/tg1 d4da)
 git show-ref --head
+# d4dafde7cd9248ef94c0400983d51122099d312a HEAD
+# d4dafde7cd9248ef94c0400983d51122099d312a refs/heads/br1
+# d4dafde7cd9248ef94c0400983d51122099d312a refs/heads/br2
+# efd4f82f6151bd20b167794bc57c66bbf82ce7dd refs/heads/master
+# e8fc2c133d02a4ffb5c5e9f9f9472410d222cea3 refs/notes/commits
+# d4dafde7cd9248ef94c0400983d51122099d312a refs/remotes/origin/br3
+# d4dafde7cd9248ef94c0400983d51122099d312a refs/tags/tg1
+# 9cb6a0ecbdc1259e0a88fa2d8ac4725195b4964d refs/tags/the-tag
 git show-ref
+# d4dafde7cd9248ef94c0400983d51122099d312a refs/heads/br1
+# d4dafde7cd9248ef94c0400983d51122099d312a refs/heads/br2
+# efd4f82f6151bd20b167794bc57c66bbf82ce7dd refs/heads/master
+# e8fc2c133d02a4ffb5c5e9f9f9472410d222cea3 refs/notes/commits
+# d4dafde7cd9248ef94c0400983d51122099d312a refs/remotes/origin/br3
+# d4dafde7cd9248ef94c0400983d51122099d312a refs/tags/tg1
+# 9cb6a0ecbdc1259e0a88fa2d8ac4725195b4964d refs/tags/the-tag
 git for-each-ref
+# d4dafde7cd9248ef94c0400983d51122099d312a commit	refs/heads/br1
+# d4dafde7cd9248ef94c0400983d51122099d312a commit	refs/heads/br2
+# efd4f82f6151bd20b167794bc57c66bbf82ce7dd commit	refs/heads/master
+# e8fc2c133d02a4ffb5c5e9f9f9472410d222cea3 commit	refs/notes/commits
+# d4dafde7cd9248ef94c0400983d51122099d312a commit	refs/remotes/origin/br3
+# d4dafde7cd9248ef94c0400983d51122099d312a commit	refs/tags/tg1
+# 9cb6a0ecbdc1259e0a88fa2d8ac4725195b4964d tag	refs/tags/the-tag
 git show-ref br1
+# d4dafde7cd9248ef94c0400983d51122099d312a refs/heads/br1
 git for-each-ref br1
 git show-ref refs/remotes/
 git for-each-ref refs/remotes/
+# d4dafde7cd9248ef94c0400983d51122099d312a commit	refs/remotes/origin/br3
 ```
 
 两个都不能列出`$GIT_DIR`下的引用！
@@ -212,22 +251,36 @@ git for-each-ref refs/remotes/
 
 ```bash
 git show-ref | grep $(git rev-parse d4da) | awk '{ print $2; }'
+# refs/heads/br1
+# refs/heads/br2
+# refs/remotes/origin/br3
+# refs/tags/tg1
 ```
 
 - Lv2
 
 ```bash
 git name-rev d4da
+# d4da tags/tg1
 git name-rev --all
+# e8fc2c133d02a4ffb5c5e9f9f9472410d222cea3 notes/commits
+# cb132dbe2c9e9f8d684452078ba659242d5b9cb7 notes/commits~1
+# efd4f82f6151bd20b167794bc57c66bbf82ce7dd master
+# d4dafde7cd9248ef94c0400983d51122099d312a tags/tg1
 ```
 
 - Lv3
 
 ```bash
 git describe d4da
+# fatal: No annotated tags can describe 'd4dafde7cd9248ef94c0400983d51122099d312a'.
+# However, there were unannotated tags: try --tags.
 git describe --always d4da
+# d4dafde
 git describe d4da~
+# fatal: Not a valid object name d4da~
 git describe --always d4da~
+# fatal: Not a valid object name d4da~
 ```
 
 添加`--dirty`可以在结果后面添加`-dirty`，特别适用于版本号。

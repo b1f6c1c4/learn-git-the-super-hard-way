@@ -16,9 +16,13 @@ Git对象采用独特的方式存放。
 
 ```bash
 date -Ins
+# 2020-12-27T22:03:27,794980462+00:00
 (git ls-tree efd4)
+# 100644 blob ce013625030ba8dba906f756967f9e9ca394464a	name.ext
+# 100755 blob ce013625030ba8dba906f756967f9e9ca394464a	name2.ext
 git archive --prefix=ar- -o ar.tar efd4^{tree} -- name2.ext
 tar tvf ar.tar
+# -rwxrwxr-x root/root         6 2020-12-27 22:03 ar-name2.ext
 ```
 
 反过来则没有简单方法，只能先`tar x`再`git add`
@@ -27,10 +31,21 @@ tar tvf ar.tar
 另外commit的SHA1会被存储在tar/zip中的备注，可以通过`git get-tar-commit-id`访问：
 ```bash
 (git show --format=fuller efd4)
+# commit efd4f82f6151bd20b167794bc57c66bbf82ce7dd
+# Author:     b1f6c1c4 <b1f6c1c4@gmail.com>
+# AuthorDate: Sun Sep 13 20:26:40 2020 +0800
+# Commit:     b1f6c1c4 <b1f6c1c4@gmail.com>
+# CommitDate: Sun Sep 13 20:26:40 2020 +0800
+#
+#     Message may be read
+#     from stdin
+#     or by the option '-m'
 git archive --prefix=ar- -o ar-c.tar efd4 -- name2.ext
 tar tvf ar-c.tar --full-time
+# -rwxrwxr-x root/root         6 2020-09-13 12:26:40 ar-name2.ext
 git get-tar-commit-id <ar.tar
 git get-tar-commit-id <ar-c.tar
+# efd4f82f6151bd20b167794bc57c66bbf82ce7dd
 ```
 
 # 任意对象导入导出
