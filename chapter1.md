@@ -35,6 +35,7 @@ git init --bare .
 # 创建blob
 
 - Lv1
+
 ```bash
 echo 'hello' | git hash-object -t blob --stdin -w
 # ce013625030ba8dba906f756967f9e9ca394464a
@@ -79,6 +80,7 @@ git show ce01
 
 - Lv1
 注意：要先对文件名排序，再使用`git hash-object`
+
 ```bash
 (printf '100644 name.ext\x00';
 echo '0: ce013625030ba8dba906f756967f9e9ca394464a' | xxd -rp -c 256;
@@ -90,6 +92,7 @@ echo '0: ce013625030ba8dba906f756967f9e9ca394464a' | xxd -rp -c 256) \
 
 - Lv2
 *注意：SHA1和文件名之间必须用tab分隔*，在命令行里输入tab的方法是`<Ctrl-v><Tab>`
+
 ```bash
 git mktree --missing <<EOF
 100644 blob ce013625030ba8dba906f756967f9e9ca394464a$(printf '\t')name.ext
@@ -128,6 +131,7 @@ git cat-file tree 5841 | xxd
 
 - Lv2
 使用`git ls-tree`可以方便地看到文件夹的内容
+
 ```bash
 git ls-tree 5841
 # 100644 blob ce013625030ba8dba906f756967f9e9ca394464a	name.ext
@@ -136,6 +140,7 @@ git ls-tree 5841
 
 - Lv3
 使用`git show`直接作用在tree上可以看到简化版的文件夹内容
+
 ```bash
 git show 5841
 # tree 5841
@@ -181,6 +186,7 @@ EOF
 # 查看commit
 
 - Lv0
+
 ```bash
 # 注意：不可将gunzip的输出直接打印到控制台，否则会因为遇到\0而中止
 printf '\x1f\x8b\x08\x00\x00\x00\x00\x00' \
@@ -207,6 +213,7 @@ printf '\x1f\x8b\x08\x00\x00\x00\x00\x00' \
 
 - Lv2
 使用`git cat-tree`可以方便地看到commit本身的内容
+
 ```bash
 git cat-file commit efd4
 # tree 58417991a0e30203e7e9b938f62a9a6f9ce10a9a
@@ -221,6 +228,7 @@ git cat-file commit efd4
 
 - Lv3
 使用`git show`直接作用在commit上可以看到commit本身及其tree的diff情况
+
 ```bash
 git show efd4~
 # commit d4dafde7cd9248ef94c0400983d51122099d312a
@@ -250,6 +258,7 @@ git show efd4~
 # 从commit找到tree和blob
 
 - Lv2
+
 ```bash
 # 找到commit efd4对应的tree：
 # 注意：运行结果与手动写efd4^{tree}无异
@@ -301,6 +310,7 @@ EOF
 
 - Lv3
 *特别注意：`git tag -a`命令不仅仅创建了tag对象，还建立了新的引用在`refs/tags/the-tag`。*
+
 ```bash
 # 该命令没有输出
 GIT_COMMITTER_NAME=b1f6c1c4 \
@@ -426,6 +436,7 @@ git cat-file commit efd4
 
 - Lv3
 无需提前创建，直接使用vim方便地修改对象：（此时要求新旧对象类型一致）
+
 ```sh
 git replace --edit efd4
 ```

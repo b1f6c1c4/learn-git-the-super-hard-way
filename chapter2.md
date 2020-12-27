@@ -25,6 +25,7 @@ Git特别引用直接放在`<repo>`下，一般包括`HEAD`等。
 
 - Lv0
 该操作非常危险，因为没有保存操作记录。
+
 ```bash
 mkdir -p ./refs/heads/
 echo d4dafde7cd9248ef94c0400983d51122099d312a > ./refs/heads/br1
@@ -33,6 +34,7 @@ echo d4dafde7cd9248ef94c0400983d51122099d312a > ./refs/tags/tg1
 
 - Lv2
 该操作会在`<repo>/logs/refs/heads/br1`中留下操作记录。
+
 ```bash
 git update-ref --no-deref -m 'Reason for update' refs/heads/br1 d4da
 git update-ref --no-deref refs/tags/tg1 d4da
@@ -40,6 +42,7 @@ git update-ref --no-deref refs/tags/tg1 d4da
 
 - Lv3
 该操作会在`<repo>/logs/refs/heads/br1`中留下操作记录，原因是`branch: Created from ...`或者`branch: Reset to ...`。
+
 ```bash
 # 此处必须省略refs/heads/
 git branch -f br1 d4da
@@ -50,6 +53,7 @@ git tag -f tg1 d4da
 ## 查看直接引用
 
 - Lv0
+
 ```bash
 cat ./refs/heads/br1
 # d4dafde7cd9248ef94c0400983d51122099d312a
@@ -58,6 +62,7 @@ cat ./refs/tags/tg1
 ```
 
 - Lv2
+
 ```bash
 git rev-parse refs/heads/br1
 # d4dafde7cd9248ef94c0400983d51122099d312a
@@ -66,6 +71,7 @@ git rev-parse refs/tags/tg1
 ```
 
 - Lv3
+
 ```bash
 # 此处必须省略refs/heads/
 git branch -avl br1
@@ -78,6 +84,7 @@ git tag -l tg1
 # 创建间接引用
 
 - Lv0
+
 ```bash
 echo 'ref: refs/heads/br1' > ./refs/heads/br2
 ```
@@ -99,6 +106,7 @@ cat ./refs/heads/br2
 
 - Lv2
 注意以下两者的区别
+
 ```bash
 git symbolic-ref refs/heads/br2
 # refs/heads/br1
@@ -108,6 +116,7 @@ git rev-parse refs/heads/br2
 
 - Lv3
 Lv3命令只能看到解引用后的对象，无法看清楚间接引用本身
+
 ```bash
 # 此处必须省略refs/heads/
 git branch -avl br1
